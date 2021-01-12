@@ -3,11 +3,11 @@ import http from 'http';
 import https from 'https';
 import Server from './app';
 import './databaseMongoose';
-
-
+//import specialRotes from './routes/specialRoutes';
 const srv = new Server();
-
-
+//server.app.use(authRoutes);
+//server.app.use(specialRotes);
+//server.start();
 console.log(process.env)
 try {
 	const privateKey = fs.readFileSync('/etc/letsencrypt/live/firulais.net.ar/privkey.pem', {encoding:'utf8', flag:'r'});
@@ -34,3 +34,5 @@ const httpServer = http.createServer(srv.app);
 httpServer.listen(3000, () => {
 	console.log('HTTP Server running on port 3000');
 });
+
+
