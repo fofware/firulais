@@ -11,7 +11,7 @@ function createToken(user: IUser) {
   });
 };
 
-export const signUp = async (req: Request, res: Response) => {
+export const signUp = async (req: Request, res: Response): Promise<Response> => {
   if (!req.body.email || !req.body.password)
     return res.status(400).json({ msg: 'Por favor. Envíe su e-Mail y contraseña' });
   const user = await User.findOne({ email: req.body.email });
@@ -26,12 +26,10 @@ export const signUp = async (req: Request, res: Response) => {
   return res.status(200).json({ token: createToken(newUser) });
 };
 
-export const signIn = async (req: Request, res: Response) => {
-  console.log(req.body)
+export const signIn = async (req: Request, res: Response): Promise<Response> => {
   if (!req.body.email || !req.body.password)
     return res.status(401).json({ msg: 'Por favor. Envíe su e-Mail y contraseña' });
   const user = await User.findOne({ email: req.body.email });
-  console.log(user)
   if (!user)
     return res.status(401).json({ msg: 'Usuario o contraseña ivalidos' });
   const isMatch = await user.comparePassword(req.body.password);

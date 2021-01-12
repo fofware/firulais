@@ -28,6 +28,10 @@ const userSchema = new Schema({
   , provincia: { type: String, trim: true }
   , zipcode: { type: String, trim: true }
   , pais: { type: String, trim: true }
+  , roles: [{
+    ref: "roles",
+    type: Schema.Types.ObjectId
+  }]
 })
 userSchema.pre<IUser>('save', async function(next) {
   const user = this;
@@ -38,7 +42,7 @@ userSchema.pre<IUser>('save', async function(next) {
   next();
 });
 
-userSchema.methods.comparePassword = async function( password: string ): Promise<boolean> {
+userSchema.methods.comparePassword = async function( password: string ): Promise<boolean>  {
   const user:any = this;
   return await bcrypt.compare(password, user.password );
 };
