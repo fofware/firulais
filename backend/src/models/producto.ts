@@ -50,7 +50,8 @@ const productoSchema = new Schema({
   , stock: { type: Number, default: 0 }
   , stockMin: { type: Number, default: 0 }
   , iva: { type:Number, default: 0 }
-  , margen: { type: Number, default: 35 } 
+  , margen: { type: Number, default: 35 }
+  , tags: { ref: "tags", type: Schema.Types.ObjectId}
 })
 
 

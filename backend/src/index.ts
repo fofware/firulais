@@ -8,7 +8,7 @@ const srv = new Server();
 //server.app.use(authRoutes);
 //server.app.use(specialRotes);
 //server.start();
-console.log(process.env)
+//console.log(process.env)
 try {
 	const privateKey = fs.readFileSync('/etc/letsencrypt/live/firulais.net.ar/privkey.pem', {encoding:'utf8', flag:'r'});
 	const certificate = fs.readFileSync('/etc/letsencrypt/live/firulais.net.ar/cert.pem', {encoding:'utf8', flag:'r'});

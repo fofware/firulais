@@ -13,6 +13,7 @@ export interface IUser extends Document {
   provincia: string;
   zipcode: string;
   pais: string;
+  roles: [];
 
   comparePassword: ( password: string ) => Promise<boolean>;
 }
@@ -30,8 +31,13 @@ const userSchema = new Schema({
   , pais: { type: String, trim: true }
   , roles: [{
     ref: "roles",
-    type: Schema.Types.ObjectId
+    type: Schema.Types.ObjectId,
+    default: []
   }]
+  
+},{
+  timestamps: true,
+  versionKey: false
 })
 userSchema.pre<IUser>('save', async function(next) {
   const user = this;

@@ -1,12 +1,12 @@
 import { Schema, model, Document, Model } from "mongoose";
 
-export interface IRole extends Document {
+export interface ITag extends Document {
   name: string;
 }
-const roleSchema = new Schema({
+const tagSchema = new Schema({
   name:{ type: String, unique: true, required: true, lowercase: true, trim: true }
 },{
   versionKey: false
 })
 
-export default model<IRole>( 'roles', roleSchema);
+export default model<ITag>( 'tags', tagSchema);
