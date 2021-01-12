@@ -2,7 +2,7 @@ import fs from 'fs';
 import http from 'http';
 import https from 'https';
 import Server from './app';
-
+import './databaseMongoose';
 
 
 const srv = new Server();
