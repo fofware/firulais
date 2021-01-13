@@ -9,6 +9,7 @@ const opts: StrategyOptions = {
 }
 
 export default new Strategy( opts, async (payload, done) =>{
+  console.log(payload);
   const user = await User.findById(payload.id);
   try {
     if (user) return done(null, user)

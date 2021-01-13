@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express';
 import articulo, { IArticulo } from '../models/articulos';
 import { ObjectID } from 'bson'
 import producto, { IProducto } from '../models/producto';
+import passport from "passport";
 
 export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 	if (!qry.Articulo) qry.Articulo = {};
@@ -42,12 +43,12 @@ class ArticuloControler {
 	config () {
 		this.router.get( '/articulos/list', this.list );
 		this.router.get( '/articulos/search/:search', this.buscar )
-		this.router.get( '/articulos/full', this.getFull );
+		this.router.get( '/articulos/full', passport.authenticate('jwt', { session: false }), this.getFull );
 		this.router.get( '/articulo/:id', this.get );
 
 
-		this.router.get( '/articulos/productos/list', this.productosList );
-		this.router.post( '/articulos/productos/list', this.productosList );
+		this.router.get( '/articulos/productos/list', passport.authenticate('jwt', { session: false }), this.productosList );
+		this.router.post( '/articulos/productos/list', passport.authenticate('jwt', { session: false }), this.productosList );
 		this.router.get( '/articulos/productos/search/:search', this.productosBuscar )
 		this.router.get( '/articulo/productos/:id', this.getProductos );
 

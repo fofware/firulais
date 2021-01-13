@@ -6,7 +6,17 @@ import config from '../config/config';
 import passport from "passport";
 
 function createToken(user: IUser) {
-  return jwt.sign({ id: user.id, email: user.email }, config.jwtSecret, {
+  return jwt.sign({ id: user.id, 
+    apellido: user.apellido, 
+    nombre: user.nombre,
+    email: user.email,
+    direccion: user.direccion,
+    celular: user.celular,
+    fijo: user.fijo,
+    zipcode: user.zipcode,
+    localidad: user.localidad,
+    roles: user.roles
+  }, config.jwtSecret, {
     expiresIn: 86400
   });
 };
@@ -23,19 +33,32 @@ export const signUp = async (req: Request, res: Response): Promise<Response> => 
   const newUser = new User(req.body);
 
   await newUser.save();
-  return res.status(200).json({ token: createToken(newUser) });
+  delete newUser.password;
+  const token = createToken(newUser);
+  console.log(newUser);
+  delete newUser.__v;
+  delete newUser.password;
+  newUser.__v = null;
+  newUser.password = null;
+  return res.status(200).json({ token, newUser });
 };
 
 export const signIn = async (req: Request, res: Response): Promise<Response> => {
   if (!req.body.email || !req.body.password)
     return res.status(401).json({ msg: 'Por favor. Envíe su e-Mail y contraseña' });
-  const user = await User.findOne({ email: req.body.email });
+  let user = await User.findOne({ email: req.body.email });
   if (!user)
     return res.status(401).json({ msg: 'Usuario o contraseña ivalidos' });
   const isMatch = await user.comparePassword(req.body.password);
   if (!isMatch)
     return res.status(401).json({ msg: 'Contraseña o Usuario ivalidos' });
-  return res.status(200).json({ token: createToken(user) });
+  const token = createToken(user);
+  console.log(user);
+  delete user.__v ;
+  delete user.password;
+  user.password = null;
+  user.__v = null
+  return res.status(200).json({ token, user  });
 };
 /*
 export const list = async ( req: Request, res: Response ) =>{
