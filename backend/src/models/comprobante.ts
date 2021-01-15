@@ -4,6 +4,7 @@ import { IComprobanteItems } from "./comprobanteitem";
 export interface IComprobante extends Document {
   ca_pago: {};
   cae: {};
+  operador: {};
 //  emisor: {};  
   fecha: Date;
   sucursal: string;
@@ -33,6 +34,9 @@ export interface IComprobante extends Document {
 }
 
 const ComprobanteSchema = new Schema({
+  operador: { type: Schema.Types.ObjectId,
+              ref: 'users'
+            },
   ca_pago: {type: Object, default: {}},
   cae: {type: Object, defult: {} },
 //  emisor: {type: Object, default: {} },

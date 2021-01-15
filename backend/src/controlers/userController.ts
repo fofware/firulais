@@ -141,7 +141,7 @@ class UserControler {
 	config () {
     this.router.post('/signup', signUp);
     this.router.post('/signin', signIn);
-    this.router.get('/api/users/list',passport.authenticate('jwt', {session:false}), this.list );
+    this.router.get('/api/users/list', this.list );
     this.router.get('/api/users/search/:search',passport.authenticate('jwt', {session:false}), this.buscar );
     this.router.delete('/api/user/:id',passport.authenticate('jwt', {session:false}), this.delete );
     this.router.get('/api/user/:id',passport.authenticate('jwt', {session:false}), this.get );
