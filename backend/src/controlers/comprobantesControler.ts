@@ -16,7 +16,7 @@ class comprobantesControler {
 	config() {
 		this.router.get('/api/comprobante/', passport.authenticate('jwt', { session: false }), this.index);
 		this.router.post('/api/comprobante/add', passport.authenticate('jwt', { session: false }), this.add);
-		this.router.get('/api/comprobantes/list', this.fechavta);
+		this.router.get('/api/comprobantes/list', this.list);
 		this.router.get('/api/comprobante/fecha', this.fechavta);
 		this.router.get('/api/comprobante/modifica', this.modifica);
 	}

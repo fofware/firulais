@@ -65,7 +65,7 @@ class ArticuloControler {
 
 	async list(req: Request, res: Response) {
 		try {
-			const rpta = await articulo.find().sort({name: 1});
+			const rpta = await articulo.find().sort({ fabricante: 1, marca: 1, name: 1, rubro: 1, linea: 1 });
 			res.status(200).json(rpta);
 		} catch (error) {
 			res.status(500).json(error);
@@ -76,7 +76,7 @@ class ArticuloControler {
 		try {
 			const { search } = req.params
 			const qry = { "name": { $regex: new RegExp( search , 'i') } };
-			const rpta = await articulo.find(qry).sort({name: 1});
+			const rpta = await articulo.find(qry).sort({ fabricante: 1, marca: 1, name: 1, rubro: 1, linea: 1 });
 			res.status(200).json(rpta);
 		} catch (error) {
 			res.status(500).json(error);
@@ -114,8 +114,24 @@ class ArticuloControler {
 					}
 				}
 			}
-			const rpta = await readProductos(qry);
+//			const rpta = await readProductos(qry);
+			const rpta = await articulo.aggregate([
+				{$match: {}},
+				{$sort: {fabricante: 1, marca: 1, name: 1, }}
+			]);
+      for ( let index = 0; index < rpta.length; index++ ) {
+				let fullName = '';
+				const a = rpta[index];
+				if (a.d_fabricante) { fullName += a.fabricante; }
+				if (a.d_marca) { fullName += ` ${a.marca}`; }
+				if (a.d_rubro) { fullName += ` ${a.rubro}`; }
+				if (a.d_linea) { fullName += ` ${a.linea}`; }
+				a.fullName = `${fullName} ${a.name}`;
+				a.fullName.replace(/  /g, ' ');
+			}
+
 			res.status(200).json(rpta);
+
 		} catch (error) {
 			res.status(404).json(error);
 		}
@@ -185,16 +201,6 @@ class ArticuloControler {
 	async put( req: Request, res: Response) {
 		try {
 			const filter = { _id: req.params.id };
-			//		await articulo.findByIdAndDelete(id);
-					/*.then( rpta => {
-						console.log(rpta)
-						res.status(200).json(rpta);
-					}).catch(err => {
-						console.log(err);
-						res.status(500).json(err);
-					})
-					*/
-			//		articulo.replaceOne( filter, req.body )
 			const rpta = await articulo.findOneAndUpdate ( filter, { $set :  req.body  });
 			return res.status(200).json( rpta );
 		} catch (error) {

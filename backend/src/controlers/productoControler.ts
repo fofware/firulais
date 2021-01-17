@@ -76,6 +76,7 @@ class ProductoControler {
 		this.router.post('/productos', this.update);
 		this.router.put('/producto/:id', this.put);
 		this.router.get('/productos/search/:search', this.search);
+		this.router.get('/productos/test', this.test);
 	}
 
 	public index(req: Request, res: Response) {
@@ -126,6 +127,172 @@ class ProductoControler {
 		//		delete qry.Producto.pesable;
 
 		//		qry = {Producto: {}, Extra: {}}
+		const readData = await producto.aggregate([
+			{ $match: qry.Producto }
+			,{
+				$addFields:
+				{
+					total: { $multiply: ["$stock", "$contiene"] }
+				}
+			}
+			,{
+				$group:
+				{
+					_id: "$articulo",
+					product: { $push: "$$ROOT" },
+				}
+			}
+			,{
+				$addFields:
+				{
+					totalStock: { $sum: '$total' }
+				}
+			}
+			,{
+				$project: {
+					'product': 1
+					, '_id': 1
+					, 'sumaTotal': { $sum: '$product.total' }
+				}
+			}
+			,{
+				$unwind: "$product"
+			}
+			,{
+				$lookup: {
+					from: "articulos",
+					localField: "_id",
+					foreignField: "_id",
+					as: "articulo"
+				}
+			}
+			,{
+				$unwind: "$articulo"
+			}
+			,{
+				$project:
+				{
+					"_id": '$product._id'
+					, 'art_name': '$articulo.name'
+					, 'url': '$articulo.url'
+					, 'art_image': '$articulo.image'
+					, 'articulo': '$articulo._id'
+					, 'art_iva': '$articulo.iva'
+					, "parent": '$product.parent'
+					, "name": '$product.name'
+					, 'contiene': '$product.contiene'
+					, 'unidad': '$product.unidad'
+					, 'compra': '$product.compra'
+					, 'reposicion': '$product.reposicion'
+					, 'margen': '$product.margen'
+					, 'precio': '$product.precio'
+					, 'pesable': '$product.pesable'
+					, 'pVenta': '$product.pVenta'
+					, 'pCompra': '$product.pCompra'
+					, 'pServicio': '$product.pServicio'
+					, 'codigo': '$product.codigo'
+					, 'plu': '$product.plu'
+					, "image": '$product.image'
+					, "stock": '$product.stock'
+					, 'total': '$product.total'
+					, 'sumaTotal': 1
+				}
+			}
+			,{
+				$match: qry.Extra
+			}
+			,{
+				$sort: {
+					'art_name': 1, 'precio': 1, 'name': 1, 'contiene': 1
+				}
+			}
+
+		])
+		let cnt = 0;
+		for (let i = 0; i < readData.length; i++) {
+			let e = readData[i];
+//			console.log(e.parent,e._id)
+			if (e.parent == undefined) e.parent = null; 
+			if (`${e.parent}` == `${e._id}`) {
+				cnt+=1;
+				e.parent = null
+				console.log(cnt, e)
+			}
+			e.fullName = readParent(readData, e._id, e.art_name)
+			e.image = (e.image ? e.image : e.art_image)
+			if (e.pesable == true) {
+				if (e.parent){
+					const p = <IProducto>await producto.findById(e.parent);
+					if(e.margen == undefined || e.margen == 0) e.margen = 45;
+					const pmargen = (100+e.margen)/100
+					if (p.compra == undefined || p.compra == null|| p.compra == 0) p.compra = round(p.precio/pmargen,decimales)
+					if (p.reposicion == undefined || p.reposicion == null || p.reposicion == 0) p.reposicion = p.compra;//round(p.compra*1.12,decimales)
+
+					e.compra = round(p.compra/p.contiene,decimales);
+					e.reposicion = round(p.reposicion/p.contiene,decimales);
+					e.promedio = round( ((p.compra+p.reposicion)/2)/p.contiene,decimales)
+				}
+				if (!e.stock || e.stock == null || e.stock == 0) {
+					e.stock = e.sumaTotal;
+				}
+			}
+
+			if (e.margen == undefined || e.margen == null || e.margen == 0) e.margen = (e.pesable ? 45 : 35);
+      const cmargen = round((100+e.margen)/100,decimales)
+      if (e.compra == undefined || e.compra == null || e.compra == 0 ) e.compra = round(e.precio / cmargen,decimales);
+      if (e.reposicion == undefined || e.reposicion == null || e.reposicion == 0 ) e.reposicion = e.compra; //round(e.compra * 1.12,decimales);
+			e.promedio = round((e.compra+e.reposicion)/2,decimales) 
+			e.uprecio = round(e.precio/e.contiene,decimales)
+		}
+		res.status(200).json(readData)
+	}
+
+	async test(req: Request, res: Response) {
+		let qry = req.body;
+		let myMatch: any;
+		let artList: any[] = [];
+//		console.log("body",qry)
+		qry = qryProductosProcess(qry);
+/*
+		console.log("qry1",qry);
+		console.log("qry1.Extra",qry.Extra)
+*/
+		if (qry.Articulo['$and'] && qry.Articulo['$and'].length == 1) {
+			myMatch = {
+				'$or': [
+					{ 'codigo': qry.Articulo['$and'][0]['name']['$regex'] }
+					, { 'plu': { '$eq': qry.Articulo['$and'][0]['name']['$regex'] } }
+				]
+			}
+//			console.log('myMatch', myMatch)
+			artList = await producto.find(myMatch);
+//			console.log('artList', artList)
+		}
+
+		if (myMatch == undefined || artList.length == 0) {
+			artList = await articulos.find(qry.Articulo)
+			for (let index = 0; index < artList.length; index++) {
+				artList[index] = new ObjectID(artList[index]._id);
+			}
+			qry.Producto['articulo'] = { '$in': artList }
+//			console.log('myMatch',myMatch);
+		}
+
+/*
+		console.log(qry)
+		console.log("articulo", qry.Articulo)
+		console.log("articulo.$and", qry.Articulo['$and'])
+		console.log("Producto", qry.Producto)
+		console.log("Extra", qry.Extra)
+*/
+//		console.log("Producto.$or", qry.Producto['$or'])
+//		const pesable = (qry.Producto.pesable ? { 'pesable': qry.Producto.pesable } : {})
+		//		const or = qry.Producto['$or']
+		//		delete qry.Producto['$or'];
+		//		delete qry.Producto.pesable;
+
+		//		qry = {Producto: {}, Extra: {}}
+
 		const readData = await producto.aggregate([
 			{ $match: qry.Producto }
 			,{

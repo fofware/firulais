@@ -31,32 +31,7 @@ const articuloSchema = new Schema({
   url: { type: String, trim: true, required: false, default:'' },
   iva: {type:Number, default: 0},
   margen: { type: Number, default: 35}
-})
-
-articuloSchema.methods.fullName = function(): string  {
-  const a: any = this;
-  let name = '';
-  let sep = '';
-  if (a.p_fabricante) {
-    name += a.fabricante;
-    sep = " ";
-  }
-  if (a.p_marca){
-    name += `${sep}${a.marca}`;
-    sep = ' ';
-  }
-  if (a.p_rubro){
-    name += `${sep}${a.rubro}`;
-    name += a.rubro;
-    sep = ' ';
-  }
-  if (a.p_linea){
-    name += `${sep}${a.linea}`;
-    name += a.linea;
-    sep = ' ';
-  }
-  return `${name}${sep}${a.name}`;
-};
+});
 
 export default model<IArticulo>('Articulo', articuloSchema);
 
