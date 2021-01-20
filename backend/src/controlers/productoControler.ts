@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express';
 import producto, { IProducto } from '../models/producto';
 import { ObjectID } from 'bson'
 import articulos from '../models/articulos'
-import { readProductos } from './articuloControler';
+import { articuloCtrl, articuloSanitizeString, readArticulos, readProductos } from './articuloControler';
 import { qryProductosProcess, readParent } from '../common/productosCommon';
 import { decimales, round } from '../common/utils';
 
@@ -87,11 +87,24 @@ class ProductoControler {
 		let myMatch: any;
 		let artList: any[] = [];
 //		console.log("body",qry)
-		qry = qryProductosProcess(qry);
+//		qry = qryProductosProcess(qry);
 /*
 		console.log("qry1",qry);
 		console.log("qry1.Extra",qry.Extra)
 */
+		if (qry.searchItem && qry.searchItem.length == 1){
+			myMatch = {
+				'$or': [
+					{ 'codigo': qry.searchItem },
+					{ 'plu': qry.searchItem }
+				]
+			}
+		//			console.log('myMatch', myMatch)
+			artList = await producto.find(myMatch);
+		//			console.log('artList', artList)
+
+		}
+/*
 		if (qry.Articulo['$and'] && qry.Articulo['$and'].length == 1) {
 			myMatch = {
 				'$or': [
@@ -103,14 +116,20 @@ class ProductoControler {
 			artList = await producto.find(myMatch);
 //			console.log('artList', artList)
 		}
-
+*/
 		if (myMatch == undefined || artList.length == 0) {
-			artList = await articulos.find(qry.Articulo)
-			for (let index = 0; index < artList.length; index++) {
-				artList[index] = new ObjectID(artList[index]._id);
+			console.log(qry.searchItem)
+			const Articulo = articuloSanitizeString(qry.searchItem);
+
+//			artList = await articulos.find(qry.Articulo)
+			if (Articulo){
+				artList = await readArticulos({ Articulo, Project: {'_id': 1}, Sort: {'_id': 1} });
+				for (let index = 0; index < artList.length; index++) {
+					artList[index] = new ObjectID(artList[index]._id);
+				}
+				qry.Producto['articulo'] = { '$in': artList }
+	//			console.log('myMatch',myMatch);
 			}
-			qry.Producto['articulo'] = { '$in': artList }
-//			console.log('myMatch',myMatch);
 		}
 
 /*
@@ -173,7 +192,185 @@ class ProductoControler {
 				$project:
 				{
 					"_id": '$product._id'
-					, 'art_name': '$articulo.name'
+					, 'art_name': {
+						$cond: ['$articulo.d_fabricante',
+							//true fabicante
+							{
+								$cond: ['$articulo.d_marca',
+									//true fabicante true marca
+									{
+										$cond: ['$articulo.d_rubro',
+											// true fabicante true marca true rubro
+											{
+												$cond: ['$articulo.d_linea',
+													// true fabicante true marca true rubro true lineea
+													{
+														$concat: [
+															//'true fabicante true marca true rubro true lineea ',
+															'$articulo.fabricante', ' ', '$articulo.marca', ' ', '$articulo.rubro', ' ', '$articulo.linea', ' ', '$articulo.name']
+													}
+													,
+													{
+														$concat: [
+															//'true fabicante true marca true rubro true lineea ',
+															'$articulo.fabricante', ' ', '$articulo.marca', ' ', '$articulo.rubro', ' ', '$articulo.name']
+													}
+												]
+											}
+											,
+											// true fabicante true marca false rubro
+											{
+												$cond: ['$articulo.d_linea',
+													// true fabicante true marca false rubro true lineea
+													{
+														$concat: [
+															//'true fabicante true marca false rubro true lineea ',
+															'$articulo.fabricante', ' ', '$articulo.marca', ' ', '$articulo.linea', ' ', '$articulo.name']
+													}
+													,
+													{
+														$concat: [
+															//'true fabicante true marca false false linea ',
+															'$articulo.fabricante', ' ', '$articulo.marca', ' ', '$articulo.name']
+													}
+												]
+											}
+										]
+									}
+									,
+									//true fabicante false marca
+									{
+										$cond: ['$articulo.d_rubro',
+											// true fabicante false marca true rubro
+											{
+												$cond: ['$articulo.d_linea',
+													// true fabicante false marca true rubro true linea
+													{
+														$concat: [
+															//'true fabicante false marca true rubro true linea',
+															'$articulo.fabricante', ' ', '$articulo.rubro', ' ', '$articulo.linea', ' ', '$articulo.name']
+													}
+													,
+													{
+														$concat: [
+															//'true fabicante false marca true rubro false linea',
+															'$articulo.fabricante', ' ', '$articulo.rubro', ' ', '$articulo.name']
+													}
+												]
+											}
+											,
+											// true fabicante false marca false rubro
+											{
+												$cond: ['$articulo.d_linea',
+													// true fabicante false marca false rubro true lineea
+													{
+														$concat: [
+															//'true fabicante false marca false rubro true linea',
+															'$articulo.fabricante', ' ', '$articulo.linea', ' ', '$articulo.name']
+													}
+													,
+													{
+														$concat: [
+															//'true fabicante false marca false rubro false linea',
+															'$articulo.fabricante', ' ', '$articulo.name']
+													}
+												]
+											}
+										]
+									}
+								]
+							},
+							// false fabricante
+							{
+								$cond: ['$articulo.d_marca',
+									//false fabicante true marca
+									{
+										$cond: ['$articulo.d_rubro',
+											// false fabicante true marca true rubro
+											{
+												$cond: ['$articulo.d_linea',
+													// false fabicante true marca true rubro true lineea
+													{
+														$concat: [
+															//'false fabicante true marca true rubro true linea',
+															'$articulo.marca', ' ', '$articulo.rubro', ' ', '$articulo.linea', ' ', '$articulo.name']
+													}
+													,
+													{
+														$concat: [
+															//'false fabicante true marca true rubro false linea',
+															'$articulo.marca', ' ', '$articulo.rubro', ' ', '$articulo.name']
+													}
+												]
+											}
+											,
+											//false fabicante true marca false rubro
+											{
+												$cond: ['$articulo.d_linea',
+													//false fabicante true marca false rubro true lineea
+													{
+														$concat: [
+															//'false fabicante true marca false rubro true linea',
+															'$articulo.marca', ' ', '$articulo.linea', ' ', '$articulo.name']
+													}
+													,
+													{
+														$concat: [
+															//'false fabicante true marca false rubro false linea',
+															'$articulo.marca', ' ', '$articulo.name']
+													}
+												]
+											}
+										]
+									}
+									,
+									//false fabicante false marca
+									{
+										$cond: ['$articulo.d_rubro',
+											//false fabicante false marca true rubro
+											{
+												$cond: ['$articulo.d_linea',
+													//false fabicante false marca true rubro true lineea
+													{
+														$concat: [
+															//'false fabicante false marca true rubro true linea', 
+															'$articulo.rubro', ' ', '$articulo.linea', ' ', '$articulo.name']
+													}
+													,
+													{
+														$concat: [
+															//'false fabicante false marca true rubro false linea', 
+															'$articulo.rubro', ' ',
+															'$articulo.name']
+													}
+												]
+											}
+											,
+											//false fabicante false marca false rubro
+											{
+												$cond: ['$articulo.d_linea',
+													// true fabicante false marca false rubro true lineea
+													{
+														$concat: [
+															//'false fabicante false marca false rubro true linea',
+															'$articulo.linea', ' ',
+															'$articulo.name']
+													}
+													,
+													{
+														$concat: [
+															//'false fabicante false marca false rubro false linea',
+															'$articulo.name'
+														]
+													}
+												]
+											}
+										]
+									}
+								]
+							},
+						]
+					}
 					, 'url': '$articulo.url'
 					, 'art_image': '$articulo.image'
 					, 'articulo': '$articulo._id'
