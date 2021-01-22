@@ -11,9 +11,9 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 	if( !qry.Producto ) qry.Producto = {};
 	if( !qry.Articulo ) qry.Articulo = {};
 	if( !qry.Extra ) qry.Extra = {};
-	if( !qry.Sort ) qry.Sort = {};
+	if( !qry.Sort ) qry.Sort = {'art_name': 1, 'name': 1, 'contiene': 1	};
 
-	return await producto.aggregate([
+	const array = await producto.aggregate([
 		{ $match: qry.Producto },
 		{
 			$lookup: {
@@ -42,7 +42,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				"pCompra": 1,
 				"codigo": 1,
 				"plu": 1,
-				"image": 1,
+				"image": {$cond: [ '$image', '$image', '$art.image']},
 				"stock": 1,
 				"stockMin": 1,
 				"iva": 1,
@@ -281,7 +281,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 							}
 
            ],
-           as: "in"
+           as: "ins"
          }
 		},
 		{
@@ -302,9 +302,9 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
  //                        { $eq: [ "$$pServicio", false ] },
                          { $eq: [ "$$pesable", true ] },
 
-												 { $eq: [ "$pVenta", true ] },
-                         { $eq: [ "$pCompra", true ] },
-                         { $eq: [ "$pesable", false ] }
+//												 { $eq: [ "$pVenta", true ] },
+//                         { $eq: [ "$pCompra", true ] },
+//                         { $eq: [ "$pesable", false ] }
                        ]
                     }
                  }
@@ -313,9 +313,8 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 							{
 								$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0 } 
 							}
-
            ],
-           as: "de"
+           as: "parte"
          }
 		},
 		{
@@ -336,9 +335,9 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 //                         { $eq: [ "$$pServicio", false ] },
                          { $eq: [ "$$pesable", false ] },
 												 // no es necesario
-                         { $eq: [ "$pVenta", true ] },
-                         { $eq: [ "$pCompra", true ] },
-                         { $eq: [ "$pesable", false ] }
+//                         { $eq: [ "$pVenta", true ] },
+//                         { $eq: [ "$pCompra", true ] },
+//                         { $eq: [ "$pesable", false ] }
                        ]
                     }
                  }
@@ -347,25 +346,35 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 							{
 								$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0 } 
 							}
-
            ],
-           as: "en"
+           as: "cerrado"
          }
 		},
 		{
 			$unwind: {
-				path: '$de',
-				includeArrayIndex: 'de_count',
+				path: '$parte',
+				includeArrayIndex: 'count_parte',
 				preserveNullAndEmptyArrays: true
 			}				
 		},
 		{
 			$unwind: {
-				path: '$en',
-				includeArrayIndex: 'en_count',
+				path: '$cerrado',
+				includeArrayIndex: 'count_cerrado',
 				preserveNullAndEmptyArrays: true
 			}				
 		},
+
+
+		{
+			$unwind: {
+				path: '$ins',
+				includeArrayIndex: 'ins_count',
+				preserveNullAndEmptyArrays: true
+			}				
+		},
+
+
 		{
 			$project: {
 				"_id": 1,
@@ -373,24 +382,24 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				"name": 1,
 				"contiene": 1,
 				"unidad": 1,
-				"precio": { $cond: [ {$eq: ['$de_count', 0]}, 
-									{ $divide: ['$de.precio', '$de.contiene']}, 
-									{ $cond: [ {$eq:[ '$en_count', 0 ]}, 
-										{ $divide: ['$en.precio', '$en.contiene']}, 
+				"precio": { $cond: [ {$eq: ['$count_parte', 0]}, 
+									{ $divide: ['$parte.precio', '$parte.contiene']}, 
+									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+										{ $divide: ['$cerrado.precio', '$cerrado.contiene']}, 
 										'$precio' ]
 									} ]
 								},
-				"compra": { $cond: [ {$eq: ['$de_count', 0]}, 
-									{ $divide: ['$de.compra', '$de.contiene']}, 
-									{ $cond: [ {$eq:[ '$en_count', 0 ]}, 
-										{ $divide: ['$en.compra', '$en.contiene']}, 
+				"compra": { $cond: [ {$eq: ['$count_parte', 0]}, 
+									{ $divide: ['$parte.compra', '$parte.contiene']}, 
+									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+										{ $divide: ['$cerrado.compra', '$cerrado.contiene']}, 
 										'$reposicion' ]
 									} ]
 								},
-				"reposicion": { $cond: [ {$eq: ['$de_count', 0]}, 
-									{ $divide: ['$de.reposicion', '$de.contiene']}, 
-									{ $cond: [ {$eq:[ '$en_count', 0 ]}, 
-										{ $divide: ['$en.reposicion', '$en.contiene']}, 
+				"reposicion": { $cond: [ {$eq: ['$count_parte', 0]}, 
+									{ $divide: ['$parte.reposicion', '$parte.contiene']}, 
+									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+										{ $divide: ['$cerrado.reposicion', '$cerrado.contiene']}, 
 										'$reposicion' ]
 									} ]
 								},
@@ -402,33 +411,59 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				"codigo": 1,
 				"plu": 1,
 				"image": 1,
-				"stock": { $cond: [ {$eq: ['$de_count', 0]}, 
-					{ $multiply: ['$de.stock', '$de.contiene']}, 
-					{ $cond: [ {$eq:[ '$en_count', 0 ]}, 
-						{ $multiply: ['$en.stock', '$en.contiene']}, 
-						'$stock' ]
-					}]
+
+				"stock": { $cond: [ {$eq: ['$count_parte', 0]}, 
+					{ $multiply: ['$parte.stock', '$parte.contiene']}, 
+					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+						{ $multiply: ['$cerrado.stock', '$cerrado.contiene']}, 
+						{ $cond: [ {$eq: ['$ins_count',0]},
+							{ $multiply: ['$ins.stock', '$ins.contiene']}, 
+							'' ] }
+						]}
+					]
 				},
-				"divisor": { $cond: [ {$eq: ['$de_count', 0]}, 
-					'$de.contiene', 
-					{ $cond: [ {$eq:[ '$en_count', 0 ]}, 
-						'$en.contiene', 
-						1 ]
-					}]
+
+				"divisor": { $cond: [ {$eq: ['$count_parte', 0]}, 
+					'$parte.contiene', 
+					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+						'$cerrado.contiene', 
+						{ $cond: [ {$eq: ['$ins_count',0]},
+							'$ins.contiene',
+							'' ] }
+						]}
+					]
 				},
-				"sname": { $cond: [ {$eq: ['$de_count', 0]}, 
-							'$de.name', 
-							{ $cond: [ {$eq:[ '$en_count', 0 ]}, 
-								'$en.name', 
-								'' ]
-							} ]
-						},
-				"sunidad": { $cond: [ {$eq: ['$de_count', 0]}, 
-					'$de.unidad', 
-					{ $cond: [ {$eq:[ '$en_count', 0 ]}, 
-						'$en.unidad', 
-						'' ]
-					} ]
+
+				"scontiene": { $cond: [ {$eq: ['$count_parte', 0]}, 
+					'', 
+					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+						'', 
+						{ $cond: [ {$eq: ['$ins_count',0]},
+							'$ins.contiene',
+							'' ] }
+						]}
+					]
+				},
+
+				"sname": { $cond: [ {$eq: ['$count_parte', 0]}, 
+					'', 
+					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+						'', 
+						{ $cond: [ {$eq: ['$ins_count',0]},
+							'$ins.name',
+							'' ] }
+						]}
+					]
+				},
+				"sunidad": { $cond: [ {$eq: ['$count_parte', 0]}, 
+					'', 
+					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+						'', 
+						{ $cond: [ {$eq: ['$ins_count',0]},
+							'$ins.unidad',
+							'' ] }
+						]}
+					]
 				},
 				"stockMin": 1,
 				"iva": 1,
@@ -445,287 +480,34 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				"tags": 1,
 				"art_margen": 1,
 				"tipo": 1,
-				'in': 1
+				'ins': 1,
+				'ins_count':1,
+				'count_cerrado':1,
+				'de_count':1
 			}
 		},
-
-/*
-		{
-			$lookup: {
-				from: "productos",
-				localField: "parent",
-				foreignField: "_id",
-				as: "prod"
-			}
-		},
-		{
-			$unwind: {
-				path: '$prod',
-				includeArrayIndex: 'pcount',
-				preserveNullAndEmptyArrays: true
-			}				
-		},
-*/
-/*
-		,{
-			$addFields:
-			{
-				total: { $multiply: ["$stock", "$contiene"] }
-			}
-		}
-		,{
-			$group:
-			{
-				_id: "$articulo",
-				product: { $push: "$$ROOT" },
-			}
-		}
-		,{
-			$addFields:
-			{
-				totalStock: { $sum: '$total' }
-			}
-		}
-		,{
-			$project: {
-				'product': 1
-				, '_id': 1
-				, 'sumaTotal': { $sum: '$product.total' }
-			}
-		}
-		,{
-			$unwind: "$product"
-		}
-		,{
-			$lookup: {
-				from: "articulos",
-				localField: "_id",
-				foreignField: "_id",
-				as: "articulo"
-			}
-		}
-		,{
-			$unwind: "$articulo"
-		}
-		,{
-			$project:
-			{
-				"_id": '$product._id'
-				, 'art_name': {
-					$cond: ['$articulo.d_fabricante',
-						//true fabicante
-						{
-							$cond: ['$articulo.d_marca',
-								//true fabicante true marca
-								{
-									$cond: ['$articulo.d_rubro',
-										// true fabicante true marca true rubro
-										{
-											$cond: ['$articulo.d_linea',
-												// true fabicante true marca true rubro true lineea
-												{
-													$concat: [
-														//'true fabicante true marca true rubro true lineea ',
-														'$articulo.fabricante', ' ', '$articulo.marca', ' ', '$articulo.rubro', ' ', '$articulo.linea', ' ', '$articulo.name']
-												}
-												,
-												{
-													$concat: [
-														//'true fabicante true marca true rubro true lineea ',
-														'$articulo.fabricante', ' ', '$articulo.marca', ' ', '$articulo.rubro', ' ', '$articulo.name']
-												}
-											]
-										}
-										,
-										// true fabicante true marca false rubro
-										{
-											$cond: ['$articulo.d_linea',
-												// true fabicante true marca false rubro true lineea
-												{
-													$concat: [
-														//'true fabicante true marca false rubro true lineea ',
-														'$articulo.fabricante', ' ', '$articulo.marca', ' ', '$articulo.linea', ' ', '$articulo.name']
-												}
-												,
-												{
-													$concat: [
-														//'true fabicante true marca false false linea ',
-														'$articulo.fabricante', ' ', '$articulo.marca', ' ', '$articulo.name']
-												}
-											]
-										}
-									]
-								}
-								,
-								//true fabicante false marca
-								{
-									$cond: ['$articulo.d_rubro',
-										// true fabicante false marca true rubro
-										{
-											$cond: ['$articulo.d_linea',
-												// true fabicante false marca true rubro true linea
-												{
-													$concat: [
-														//'true fabicante false marca true rubro true linea',
-														'$articulo.fabricante', ' ', '$articulo.rubro', ' ', '$articulo.linea', ' ', '$articulo.name']
-												}
-												,
-												{
-													$concat: [
-														//'true fabicante false marca true rubro false linea',
-														'$articulo.fabricante', ' ', '$articulo.rubro', ' ', '$articulo.name']
-												}
-											]
-										}
-										,
-										// true fabicante false marca false rubro
-										{
-											$cond: ['$articulo.d_linea',
-												// true fabicante false marca false rubro true lineea
-												{
-													$concat: [
-														//'true fabicante false marca false rubro true linea',
-														'$articulo.fabricante', ' ', '$articulo.linea', ' ', '$articulo.name']
-												}
-												,
-												{
-													$concat: [
-														//'true fabicante false marca false rubro false linea',
-														'$articulo.fabricante', ' ', '$articulo.name']
-												}
-											]
-										}
-									]
-								}
-							]
-						},
-						// false fabricante
-						{
-							$cond: ['$articulo.d_marca',
-								//false fabicante true marca
-								{
-									$cond: ['$articulo.d_rubro',
-										// false fabicante true marca true rubro
-										{
-											$cond: ['$articulo.d_linea',
-												// false fabicante true marca true rubro true lineea
-												{
-													$concat: [
-														//'false fabicante true marca true rubro true linea',
-														'$articulo.marca', ' ', '$articulo.rubro', ' ', '$articulo.linea', ' ', '$articulo.name']
-												}
-												,
-												{
-													$concat: [
-														//'false fabicante true marca true rubro false linea',
-														'$articulo.marca', ' ', '$articulo.rubro', ' ', '$articulo.name']
-												}
-											]
-										}
-										,
-										//false fabicante true marca false rubro
-										{
-											$cond: ['$articulo.d_linea',
-												//false fabicante true marca false rubro true lineea
-												{
-													$concat: [
-														//'false fabicante true marca false rubro true linea',
-														'$articulo.marca', ' ', '$articulo.linea', ' ', '$articulo.name']
-												}
-												,
-												{
-													$concat: [
-														//'false fabicante true marca false rubro false linea',
-														'$articulo.marca', ' ', '$articulo.name']
-												}
-											]
-										}
-									]
-								}
-								,
-								//false fabicante false marca
-								{
-									$cond: ['$articulo.d_rubro',
-										//false fabicante false marca true rubro
-										{
-											$cond: ['$articulo.d_linea',
-												//false fabicante false marca true rubro true lineea
-												{
-													$concat: [
-														//'false fabicante false marca true rubro true linea', 
-														'$articulo.rubro', ' ', '$articulo.linea', ' ', '$articulo.name']
-												}
-												,
-												{
-													$concat: [
-														//'false fabicante false marca true rubro false linea', 
-														'$articulo.rubro', ' ',
-														'$articulo.name']
-												}
-											]
-										}
-										,
-										//false fabicante false marca false rubro
-										{
-											$cond: ['$articulo.d_linea',
-												// true fabicante false marca false rubro true lineea
-												{
-													$concat: [
-														//'false fabicante false marca false rubro true linea',
-														'$articulo.linea', ' ',
-														'$articulo.name']
-												}
-												,
-												{
-													$concat: [
-														//'false fabicante false marca false rubro false linea',
-														'$articulo.name'
-													]
-												}
-											]
-										}
-									]
-								}
-							]
-						},
-					]
-				}
-				, 'url': '$articulo.url'
-				, 'art_image': '$articulo.image'
-				, 'articulo': '$articulo._id'
-				, 'art_iva': '$articulo.iva'
-				, "parent": '$product.parent'
-				, "name": '$product.name'
-				, 'contiene': '$product.contiene'
-				, 'unidad': '$product.unidad'
-				, 'compra': '$product.compra'
-				, 'reposicion': '$product.reposicion'
-				, 'margen': '$product.margen'
-				, 'precio': '$product.precio'
-				, 'pesable': '$product.pesable'
-				, 'pVenta': '$product.pVenta'
-				, 'pCompra': '$product.pCompra'
-				, 'pServicio': '$product.pServicio'
-				, 'codigo': '$product.codigo'
-				, 'plu': '$product.plu'
-				, "image": '$product.image'
-				, "stock": '$product.stock'
-				, 'total': '$product.total'
-				, 'sumaTotal': 1
-			}
-		}
-*/
 		{
 			$match: qry.Extra
 		},
 		{
-			$sort: {
-				'art_name': 1, 'precio': 1, 'name': 1, 'contiene': 1
-			}
+			$sort: qry.Sort
 		}
-
+/*
+		,
+		{
+			$project: qry.Project
+		}
+	*/
 	])
-
+	for (let i = 0; i < array.length; i++) {
+		const e = array[i];
+		e.image = (e.image && e.image.length > 0 ? e.image : e.art_image)
+		e.compra = round(e.compra,2);
+		e.reposicion = round(e.reposicion,2);
+		e.precio = round(e.reposicion*((e.margen+100)/100),2);
+		e.fullName = (`${e.art_name} ${e.name} ${e.contiene > 1 ? e.contiene : ''} ${e.unidad} ${e.sname} ${e.scontiene > 1 ? e.scontiene : ''} ${e.sunidad}`);
+	}
+	return array;
 } 
 /*
 	aggregate([
@@ -782,19 +564,24 @@ class ProductoControler {
 	}
 
 	config() {
+		this.router.get('/productos/list', this.list);
+
+		this.router.post('/productos/list', this.list);
+
+		this.router.get('/producto/:id', this.leer );
+
+		this.router.post('/producto', this.add);
+		this.router.delete('/producto/:id', this.delete);
+		this.router.put('/producto/:id', this.put);
+
+		// todo lo de abajo parece que es para borrar 
+
 		this.router.get('/articulo/:id/productos', this.listado);
 		this.router.delete('/articulo/:id/productos', this.deleteMany);
 		this.router.put('/articulo/:id/productos', this.update);
 
-		this.router.get('/productos/list', this.list);
-		this.router.post('/productos/list', this.list);
 		this.router.post('/productos/buscar', this.buscar)
 		this.router.post('/productos/imany', this.insertMany);
-		this.router.get('/producto/:id', this.leer );
-		this.router.delete('/producto/:id', this.delete);
-		this.router.post('/producto', this.add);
-		this.router.post('/productos', this.update);
-		this.router.put('/producto/:id', this.put);
 		this.router.get('/productos/search/:search', this.search);
 		this.router.get('/productos/test', this.test);
 	}
@@ -802,17 +589,13 @@ class ProductoControler {
 	public index(req: Request, res: Response) {
 		res.send('Productos');
 	}
+
 	async list(req: Request, res: Response) {
 //		const { id } = req.params;
 		let qry = req.body;
 		let myMatch: any;
 		let artList: any[] = [];
-//		console.log("body",qry)
-//		qry = qryProductosProcess(qry);
-/*
-		console.log("qry1",qry);
-		console.log("qry1.Extra",qry.Extra)
-*/
+
 		if (qry.searchItem && qry.searchItem.length == 1){
 			myMatch = {
 				'$or': [
@@ -820,356 +603,28 @@ class ProductoControler {
 					{ 'plu': qry.searchItem }
 				]
 			}
-		//			console.log('myMatch', myMatch)
 			artList = await producto.find(myMatch);
-		//			console.log('artList', artList)
-
 		}
-/*
-		if (qry.Articulo['$and'] && qry.Articulo['$and'].length == 1) {
-			myMatch = {
-				'$or': [
-					{ 'codigo': qry.Articulo['$and'][0]['name']['$regex'] }
-					, { 'plu': { '$eq': qry.Articulo['$and'][0]['name']['$regex'] } }
-				]
-			}
-//			console.log('myMatch', myMatch)
-			artList = await producto.find(myMatch);
-//			console.log('artList', artList)
-		}
-*/
 		if ((myMatch == undefined || artList.length == 0) && qry.searchItem ) {
 			console.log(qry.searchItem)
 			const Articulo = articuloSanitizeString(qry.searchItem);
 
-//			artList = await articulos.find(qry.Articulo)
 			if (Articulo){
 				artList = await readArticulos({ Articulo, Project: {'_id': 1}, Sort: {'_id': 1} });
 				for (let index = 0; index < artList.length; index++) {
 					artList[index] = new ObjectID(artList[index]._id);
 				}
 				qry.Producto['articulo'] = { '$in': artList }
-	//			console.log('myMatch',myMatch);
 			}
 		}
 
-//		if( id ) qry.Producto = { _id: id }
-		
-/*
-		console.log(qry)
-		console.log("articulo", qry.Articulo)
-		console.log("articulo.$and", qry.Articulo['$and'])
-		console.log("Producto", qry.Producto)
-		console.log("Extra", qry.Extra)
-*/
-//		console.log("Producto.$or", qry.Producto['$or'])
-//		const pesable = (qry.Producto.pesable ? { 'pesable': qry.Producto.pesable } : {})
-		//		const or = qry.Producto['$or']
-		//		delete qry.Producto['$or'];
-		//		delete qry.Producto.pesable;
-
-		//		qry = {Producto: {}, Extra: {}}
-		const readData = await producto.aggregate([
-			{ $match: qry.Producto }
-			,{
-				$addFields:
-				{
-					total: { $multiply: ["$stock", "$contiene"] }
-				}
-			}
-			,{
-				$group:
-				{
-					_id: "$articulo",
-					product: { $push: "$$ROOT" },
-				}
-			}
-			,{
-				$addFields:
-				{
-					totalStock: { $sum: '$total' }
-				}
-			}
-			,{
-				$project: {
-					'product': 1
-					, '_id': 1
-					, 'sumaTotal': { $sum: '$product.total' }
-				}
-			}
-			,{
-				$unwind: "$product"
-			}
-			,{
-				$lookup: {
-					from: "articulos",
-					localField: "_id",
-					foreignField: "_id",
-					as: "articulo"
-				}
-			}
-			,{
-				$unwind: "$articulo"
-			}
-			,{
-				$project:
-				{
-					"_id": '$product._id'
-					, 'art_name': {
-						$cond: ['$articulo.d_fabricante',
-							//true fabicante
-							{
-								$cond: ['$articulo.d_marca',
-									//true fabicante true marca
-									{
-										$cond: ['$articulo.d_rubro',
-											// true fabicante true marca true rubro
-											{
-												$cond: ['$articulo.d_linea',
-													// true fabicante true marca true rubro true lineea
-													{
-														$concat: [
-															//'true fabicante true marca true rubro true lineea ',
-															'$articulo.fabricante', ' ', '$articulo.marca', ' ', '$articulo.rubro', ' ', '$articulo.linea', ' ', '$articulo.name']
-													}
-													,
-													{
-														$concat: [
-															//'true fabicante true marca true rubro true lineea ',
-															'$articulo.fabricante', ' ', '$articulo.marca', ' ', '$articulo.rubro', ' ', '$articulo.name']
-													}
-												]
-											}
-											,
-											// true fabicante true marca false rubro
-											{
-												$cond: ['$articulo.d_linea',
-													// true fabicante true marca false rubro true lineea
-													{
-														$concat: [
-															//'true fabicante true marca false rubro true lineea ',
-															'$articulo.fabricante', ' ', '$articulo.marca', ' ', '$articulo.linea', ' ', '$articulo.name']
-													}
-													,
-													{
-														$concat: [
-															//'true fabicante true marca false false linea ',
-															'$articulo.fabricante', ' ', '$articulo.marca', ' ', '$articulo.name']
-													}
-												]
-											}
-										]
-									}
-									,
-									//true fabicante false marca
-									{
-										$cond: ['$articulo.d_rubro',
-											// true fabicante false marca true rubro
-											{
-												$cond: ['$articulo.d_linea',
-													// true fabicante false marca true rubro true linea
-													{
-														$concat: [
-															//'true fabicante false marca true rubro true linea',
-															'$articulo.fabricante', ' ', '$articulo.rubro', ' ', '$articulo.linea', ' ', '$articulo.name']
-													}
-													,
-													{
-														$concat: [
-															//'true fabicante false marca true rubro false linea',
-															'$articulo.fabricante', ' ', '$articulo.rubro', ' ', '$articulo.name']
-													}
-												]
-											}
-											,
-											// true fabicante false marca false rubro
-											{
-												$cond: ['$articulo.d_linea',
-													// true fabicante false marca false rubro true lineea
-													{
-														$concat: [
-															//'true fabicante false marca false rubro true linea',
-															'$articulo.fabricante', ' ', '$articulo.linea', ' ', '$articulo.name']
-													}
-													,
-													{
-														$concat: [
-															//'true fabicante false marca false rubro false linea',
-															'$articulo.fabricante', ' ', '$articulo.name']
-													}
-												]
-											}
-										]
-									}
-								]
-							},
-							// false fabricante
-							{
-								$cond: ['$articulo.d_marca',
-									//false fabicante true marca
-									{
-										$cond: ['$articulo.d_rubro',
-											// false fabicante true marca true rubro
-											{
-												$cond: ['$articulo.d_linea',
-													// false fabicante true marca true rubro true lineea
-													{
-														$concat: [
-															//'false fabicante true marca true rubro true linea',
-															'$articulo.marca', ' ', '$articulo.rubro', ' ', '$articulo.linea', ' ', '$articulo.name']
-													}
-													,
-													{
-														$concat: [
-															//'false fabicante true marca true rubro false linea',
-															'$articulo.marca', ' ', '$articulo.rubro', ' ', '$articulo.name']
-													}
-												]
-											}
-											,
-											//false fabicante true marca false rubro
-											{
-												$cond: ['$articulo.d_linea',
-													//false fabicante true marca false rubro true lineea
-													{
-														$concat: [
-															//'false fabicante true marca false rubro true linea',
-															'$articulo.marca', ' ', '$articulo.linea', ' ', '$articulo.name']
-													}
-													,
-													{
-														$concat: [
-															//'false fabicante true marca false rubro false linea',
-															'$articulo.marca', ' ', '$articulo.name']
-													}
-												]
-											}
-										]
-									}
-									,
-									//false fabicante false marca
-									{
-										$cond: ['$articulo.d_rubro',
-											//false fabicante false marca true rubro
-											{
-												$cond: ['$articulo.d_linea',
-													//false fabicante false marca true rubro true lineea
-													{
-														$concat: [
-															//'false fabicante false marca true rubro true linea', 
-															'$articulo.rubro', ' ', '$articulo.linea', ' ', '$articulo.name']
-													}
-													,
-													{
-														$concat: [
-															//'false fabicante false marca true rubro false linea', 
-															'$articulo.rubro', ' ',
-															'$articulo.name']
-													}
-												]
-											}
-											,
-											//false fabicante false marca false rubro
-											{
-												$cond: ['$articulo.d_linea',
-													// true fabicante false marca false rubro true lineea
-													{
-														$concat: [
-															//'false fabicante false marca false rubro true linea',
-															'$articulo.linea', ' ',
-															'$articulo.name']
-													}
-													,
-													{
-														$concat: [
-															//'false fabicante false marca false rubro false linea',
-															'$articulo.name'
-														]
-													}
-												]
-											}
-										]
-									}
-								]
-							},
-						]
-					}
-					, 'url': '$articulo.url'
-					, 'art_image': '$articulo.image'
-					, 'articulo': '$articulo._id'
-					, 'art_iva': '$articulo.iva'
-					, "parent": '$product.parent'
-					, "name": '$product.name'
-					, 'contiene': '$product.contiene'
-					, 'unidad': '$product.unidad'
-					, 'compra': '$product.compra'
-					, 'reposicion': '$product.reposicion'
-					, 'margen': '$product.margen'
-					, 'precio': '$product.precio'
-					, 'pesable': '$product.pesable'
-					, 'pVenta': '$product.pVenta'
-					, 'pCompra': '$product.pCompra'
-					, 'pServicio': '$product.pServicio'
-					, 'codigo': '$product.codigo'
-					, 'plu': '$product.plu'
-					, "image": '$product.image'
-					, "stock": '$product.stock'
-					, 'total': '$product.total'
-					, 'sumaTotal': 1
-				}
-			}
-			,{
-				$match: qry.Extra
-			}
-			,{
-				$sort: {
-					'art_name': 1, 'precio': 1, 'name': 1, 'contiene': 1
-				}
-			}
-
-		])
-		let cnt = 0;
-		for (let i = 0; i < readData.length; i++) {
-			let e = readData[i];
-//			console.log(e.parent,e._id)
-			if (e.parent == undefined) e.parent = null; 
-			if (`${e.parent}` == `${e._id}`) {
-				cnt+=1;
-				e.parent = null
-				console.log(cnt, e)
-			}
-			e.fullName = readParent(readData, e._id, e.art_name)
-			e.image = (e.image ? e.image : e.art_image)
-			if (e.pesable == true) {
-				if (e.parent){
-					const p = <IProducto>await producto.findById(e.parent);
-					if(e.margen == undefined || e.margen == 0) e.margen = 45;
-					const pmargen = (100+e.margen)/100
-					if (p.compra == undefined || p.compra == null|| p.compra == 0) p.compra = round(p.precio/pmargen,decimales)
-					if (p.reposicion == undefined || p.reposicion == null || p.reposicion == 0) p.reposicion = p.compra;//round(p.compra*1.12,decimales)
-
-					e.compra = round(p.compra/p.contiene,decimales);
-					e.reposicion = round(p.reposicion/p.contiene,decimales);
-					e.promedio = round( ((p.compra+p.reposicion)/2)/p.contiene,decimales)
-				}
-				if (!e.stock || e.stock == null || e.stock == 0) {
-					e.stock = e.sumaTotal;
-				}
-			}
-
-			if (e.margen == undefined || e.margen == null || e.margen == 0) e.margen = (e.pesable ? 45 : 35);
-      const cmargen = round((100+e.margen)/100,decimales)
-      if (e.compra == undefined || e.compra == null || e.compra == 0 ) e.compra = round(e.precio / cmargen,decimales);
-      if (e.reposicion == undefined || e.reposicion == null || e.reposicion == 0 ) e.reposicion = e.compra; //round(e.compra * 1.12,decimales);
-			e.promedio = round((e.compra+e.reposicion)/2,decimales) 
-			e.uprecio = round(e.precio/e.contiene,decimales)
-		}
+		const readData: any = await productoGetData(qry);
 		res.status(200).json(readData)
 	}
 
 	async test(req: Request, res: Response) {
-		const readData = await productoGetData({});
-		res.status(200).json(readData)
+		const array:any = await productoGetData({});
+		res.status(200).json(array);
 	}
 
 	async listado(req: Request, res: Response) {
@@ -1181,7 +636,9 @@ class ProductoControler {
 	async leer(req: Request, res: Response) {
 		try {
 			const { id } = req.params
-			const rpta = await producto.findById(id).populate();
+
+//			const rpta = await producto.findById(id).populate();
+			const rpta = await productoGetData({Producto: {_id: new ObjectID(id)}, Project: {fullName: 1}});
 			res.status(200).json(rpta);
 		} catch (error) {
 			res.status(404).json(error);
@@ -1314,7 +771,8 @@ class ProductoControler {
 				}
 			}
 			console.log(qry)
-			const rpta: any = await readProductos(qry);
+//			const rpta: any = await readProductos(qry);
+			const rpta: any = await productoGetData(qry);
 			res.status(200).json(rpta);
 		} catch (error) {
 			res.status(404).json(error);
