@@ -393,7 +393,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 									{ $divide: ['$parte.compra', '$parte.contiene']}, 
 									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
 										{ $divide: ['$cerrado.compra', '$cerrado.contiene']}, 
-										'$reposicion' ]
+										'$compra' ]
 									} ]
 								},
 				"reposicion": { $cond: [ {$eq: ['$count_parte', 0]}, 
@@ -403,6 +403,16 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 										'$reposicion' ]
 									} ]
 								},
+				"promedio": { $cond: [ {$eq: ['$count_parte', 0 ] }, 
+								{ $divide: [ { $divide: [ { $add: ['$parte.reposicion','$parte.compra'] }, 2 ] } , '$parte.contiene']}, 
+								{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+									{ $divide: [ { $divide: [ { $add: ['$cerrado.reposicion','$cerrado.compra'] }, 2 ] }, '$cerrado.contiene']}, 
+									{ $divide: [ { $add: ['$reposicion','$compra'] } , 2 ] }
+								]
+							}]
+					},
+
+
 
 				"pesable": 1,
 				"servicio": 1,
@@ -417,8 +427,8 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
 						{ $multiply: ['$cerrado.stock', '$cerrado.contiene']}, 
 						{ $cond: [ {$eq: ['$ins_count',0]},
-							{ $multiply: ['$ins.stock', '$ins.contiene']}, 
-							'' ] }
+							'$stock', 
+							'$stock' ] }
 						]}
 					]
 				},
@@ -572,15 +582,17 @@ class ProductoControler {
 
 		this.router.post('/producto', this.add);
 		this.router.delete('/producto/:id', this.delete);
-		this.router.put('/producto/:id', this.put);
+		this.router.put('/productos', this.update);
+		this.router.put('/producto/:id', this.modifica);
 
 		// todo lo de abajo parece que es para borrar 
-
+/*
 		this.router.get('/articulo/:id/productos', this.listado);
 		this.router.delete('/articulo/:id/productos', this.deleteMany);
 		this.router.put('/articulo/:id/productos', this.update);
 
 		this.router.post('/productos/buscar', this.buscar)
+*/
 		this.router.post('/productos/imany', this.insertMany);
 		this.router.get('/productos/search/:search', this.search);
 		this.router.get('/productos/test', this.test);
@@ -623,7 +635,28 @@ class ProductoControler {
 	}
 
 	async test(req: Request, res: Response) {
-		const array:any = await productoGetData({});
+//		const array:any = await productoGetData({});
+		const qry = { articulo: '' };
+		const array:any = await producto.aggregate([
+			{ $match: qry }
+			,
+				{
+					 $lookup: {
+							from: "articulos",
+							localField: "articulo",    // field in the orders collection
+							foreignField: "_id",  // field in the items collection
+							as: "fromItems"
+					 }
+				},
+/*
+				{
+					 $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$fromItems", 0 ] }, "$$ROOT" ] } }
+				},
+*/
+//				{ $project: { fromItems: 0 } }
+	
+		]).sort({name: 1})
+	
 		res.status(200).json(array);
 	}
 
@@ -667,21 +700,16 @@ class ProductoControler {
 			})
 	}
 	async update(req: Request, res: Response) {
-		const id = new ObjectID(req.body[0].articulo);
-		producto.deleteMany({ "articulo": id })
-			.then(rpta => {
-				producto.insertMany(req.body)
-					.then(rta => {
-						return res.status(200).json(rta);
-					})
-					.catch(err => {
-						return res.status(500).json(err);
-					})
-			})
-			.catch(err => {
-				console.log(err);
-				res.status(500).json(err);
-			})
+		try {
+			for (let i = 0; i < req.body.length; i++) {
+				const e = req.body[i];
+				const reg = new producto(e);
+				const reslt = await reg.save();
+			}
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+		}
 	}
 
 	async insertMany(req: Request, res: Response) {
@@ -695,9 +723,9 @@ class ProductoControler {
 
 	async add(req: Request, res: Response) {
 		try {
-			const reg = await producto.findOne({ name: req.body.name });
-			if (reg)
-				return res.status(400).json({ msg: 'Registro ya existe', reg });
+//			const reg = await producto.findOne({ name: req.body.name });
+//			if (reg)
+//				return res.status(400).json({ msg: 'Registro ya existe', reg });
 			const newReg = new producto(req.body);
 			await newReg.save();
 			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
@@ -706,7 +734,7 @@ class ProductoControler {
 		}
 	}
 
-	async put(req: Request, res: Response) {
+	async modifica(req: Request, res: Response) {
 		const { id } = req.params;
 		try {
 			console.log(req.body)
@@ -796,19 +824,3 @@ class ProductoControler {
 }
 
 export const productoCtrl = new ProductoControler();
-/*
-db.productos.find().populate([
-	{
-		 $lookup: {
-				from: "articulos",
-				localField: "articulo",    // field in the orders collection
-				foreignField: "_id",  // field in the items collection
-				as: "fromItems"
-		 }
-	},
-	{
-		 $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$fromItems", 0 ] }, "$$ROOT" ] } }
-	},
-	{ $project: { fromItems: 0 } }
-])
-*/

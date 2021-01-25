@@ -251,8 +251,9 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 		qry.Project = artProject; 
 		qry.Project.productos = 1;
 	}
+//	console.log(qry.Sort)
 	if (!qry.Sort) qry.Sort = {fullName: 1};
-	console.log(qry);
+//	console.log(qry);
 	return articulo.aggregate([
 		{ $match: qry.Articulo }
 		,{ $graphLookup:
@@ -275,7 +276,7 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 }	
 
 export const articuloSanitizeString = function (search: string) {
-	console.log(search);
+//	console.log(search);
 	if(!search || search.length == 0) return null;
 	const Articulo = {'$and': []};
 	const searchItem = search.replace(/  /g, ' ');
@@ -306,7 +307,7 @@ class ArticuloControler {
 
 		this.router.delete( '/articulo/:id', this.delete );
 		this.router.post( '/articulo', this.add );
-		this.router.put( '/articulo/:id', this.put );
+		this.router.put( '/articulo/:id', this.modifica );
 
 		this.router.get( '/articulos/list', this.searchArticulos );
 		this.router.get( '/articulos/list/:search', this.searchArticulos )
@@ -375,10 +376,16 @@ class ArticuloControler {
 		}
 	}
 
-	async put( req: Request, res: Response) {
+	async modifica( req: Request, res: Response) {
 		try {
-			const filter = { _id: req.params.id };
-			const rpta = await articulo.findOneAndUpdate ( filter, { $set :  req.body  });
+			const filter = { _id: new ObjectID(req.params.id) };
+//			console.log(req.body);
+/*
+			const art = new articulo(req.body);
+			console.log(art);
+			const rpta = art.save();
+*/
+			const rpta = await articulo.updateMany( filter, { $set :  req.body  });
 			return res.status(200).json( rpta );
 		} catch (error) {
 			return res.status(500).json( error );
@@ -407,7 +414,7 @@ class ArticuloControler {
 				}
 */
 			}
-			const qry = { Articulo, Producto:{} }
+			const qry = { Articulo, Producto:{}, Sort: {'fabricante': 1, 'marca': 1, 'rubro': 1, 'linea': 1, 'name': 1 } }
 			const rpta = await readArticulos(qry);
 			res.status(200).json(rpta);
 		} catch (error) {
@@ -430,7 +437,6 @@ class ArticuloControler {
 			const { search } = req.params;
 			let Articulo = {};
 			if ( search && search.length > 0) {
-			if ( search && search.length > 0) {
 				Articulo = articuloSanitizeString(search);
 /*
 				Articulo = {'$and': []};
@@ -446,8 +452,6 @@ class ArticuloControler {
 					{'linea': {$regex: new RegExp( `${element}` , 'i')}}]
 					Articulo['$and'].push({'$or': o });
 				}
-*/
-			}
 				Articulo = {'$and': []};
 				const searchItem = search.replace(/  /g, ' ');
 				const array: any[] = searchItem.trim().split(' ');
@@ -461,8 +465,9 @@ class ArticuloControler {
 					{'linea': {$regex: new RegExp( `${element}` , 'i')}}]
 					Articulo['$and'].push({'$or': o });
 				}
+			*/
 			}
-			const qry = { Articulo, Producto:{} }
+			const qry = { Articulo, Producto:{}, Sort: { 'marca': 1, 'rubro': 1, 'linea': 1, 'name': 1 } }
 			const rpta = await readProductos(qry);
 			res.status(200).json(rpta);
 		} catch (error) {
