@@ -376,43 +376,78 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 
 
 		{
-			$project: {
+			$project: 
+			{
 				"_id": 1,
-//				"parent": "5fe202e8bab06d6b24059993",
 				"name": 1,
 				"contiene": 1,
 				"unidad": 1,
 				"precio": { $cond: [ {$eq: ['$count_parte', 0]}, 
-									{ $divide: ['$parte.precio', '$parte.contiene']}, 
+									{ $multiply:[ {$add: [ '$margen', 100 ] }, { $divide: ['$parte.reposicion', '$parte.contiene'] } ] }, 
 									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-										{ $divide: ['$cerrado.precio', '$cerrado.contiene']}, 
-										'$precio' ]
-									} ]
-								},
+											{ $multiply:[ {$add: [ '$margen', 100 ] }, 
+															 { $divide: ['$cerrado.reposicion', '$cerrado.contiene'] } ] }, 
+											{ $multiply:[ {$add: [ '$margen', 100 ] }, '$reposicion' ] }
+										]
+									}]
+									},
 				"compra": { $cond: [ {$eq: ['$count_parte', 0]}, 
-									{ $divide: ['$parte.compra', '$parte.contiene']}, 
-									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-										{ $divide: ['$cerrado.compra', '$cerrado.contiene']}, 
-										'$compra' ]
-									} ]
-								},
+										{ $divide: ['$parte.compra', '$parte.contiene']}, 
+										{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+											{ $divide: ['$cerrado.compra', '$cerrado.contiene']},
+											'$compra'
+										]}
+									]},
 				"reposicion": { $cond: [ {$eq: ['$count_parte', 0]}, 
 									{ $divide: ['$parte.reposicion', '$parte.contiene']}, 
 									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
 										{ $divide: ['$cerrado.reposicion', '$cerrado.contiene']}, 
-										'$reposicion' ]
-									} ]
-								},
+										'$reposicion' 
+									]}
+								 ]},
 				"promedio": { $cond: [ {$eq: ['$count_parte', 0 ] }, 
 								{ $divide: [ { $divide: [ { $add: ['$parte.reposicion','$parte.compra'] }, 2 ] } , '$parte.contiene']}, 
 								{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
 									{ $divide: [ { $divide: [ { $add: ['$cerrado.reposicion','$cerrado.compra'] }, 2 ] }, '$cerrado.contiene']}, 
-									{ $divide: [ { $add: ['$reposicion','$compra'] } , 2 ] }
+									{ $divide: [ { $add: ['$reposicion','$compra'] } , 2 ] } 
 								]
 							}]
 					},
 
+/*
+				"precio": { $cond: [ {$eq: ['$count_parte', 0]}, 
+									{ $ceil: { $multiply:[ {$add: [ '$margen', 100 ] }, { $divide: ['$parte.reposicion', '$parte.contiene'] } ] } }, 
+									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+											{ $ceil: { $multiply:[ {$add: [ '$margen', 100 ] }, 
+															 { $divide: ['$cerrado.reposicion', '$cerrado.contiene'] } ] } }, 
+											{ $ceil: { $multiply:[ {$add: [ '$margen', 100 ] }, '$reposicion' ] } }
+										]
+									}]
+									},
+				"compra": { $cond: [ {$eq: ['$count_parte', 0]}, 
+										{ $ceil: { $divide: ['$parte.compra', '$parte.contiene']} }, 
+										{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+											{ $ceil: { $divide: ['$cerrado.compra', '$cerrado.contiene']} },
+											{ $ceil: '$compra' }
+										]}
+									]},
+				"reposicion": { $cond: [ {$eq: ['$count_parte', 0]}, 
+									{ $ceil: { $divide: ['$parte.reposicion', '$parte.contiene']} }, 
+									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+										{ $ceil: { $divide: ['$cerrado.reposicion', '$cerrado.contiene']} }, 
+										{ $ceil: '$reposicion' } 
+									]}
+								 ]},
+				"promedio": { $cond: [ {$eq: ['$count_parte', 0 ] }, 
+								{ $ceil: { $divide: [ { $divide: [ { $add: ['$parte.reposicion','$parte.compra'] }, 2 ] } , '$parte.contiene']} }, 
+								{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+									{ $ceil: { $divide: [ { $divide: [ { $add: ['$cerrado.reposicion','$cerrado.compra'] }, 2 ] }, '$cerrado.contiene']} }, 
+									{ $ceil: { $divide: [ { $add: ['$reposicion','$compra'] } , 2 ] } }
+								]
+							}]
+					},
 
+*/
 
 				"pesable": 1,
 				"servicio": 1,
@@ -495,7 +530,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				'count_cerrado':1,
 				'de_count':1
 			}
-		},
+		},		
 		{
 			$match: qry.Extra
 		},
@@ -509,12 +544,16 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 		}
 	*/
 	])
+	const deci = 2;
 	for (let i = 0; i < array.length; i++) {
 		const e = array[i];
 		e.image = (e.image && e.image.length > 0 ? e.image : e.art_image)
-		e.compra = round(e.compra,2);
-		e.reposicion = round(e.reposicion,2);
-		e.precio = round(e.reposicion*((e.margen+100)/100),2);
+		if (!e.compra && e.reposicion) e.compra = e.reposicion;
+		if (e.compra && !e.reposicion) e.reposicion = e.compra;
+		e.compra = round(e.compra,deci);
+		e.reposicion = round(e.reposicion,deci);
+		e.promedio = round((e.compra+e.reposicion)/2,deci)
+		e.precio = round(e.reposicion*((e.margen+100)/100),deci);
 		e.fullName = (`${e.art_name} ${e.name} ${e.contiene > 1 ? e.contiene : ''} ${e.unidad} ${e.sname} ${e.scontiene > 1 ? e.scontiene : ''} ${e.sunidad}`);
 	}
 	return array;
