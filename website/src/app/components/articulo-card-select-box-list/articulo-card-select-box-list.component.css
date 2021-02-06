@@ -1,0 +1,79 @@
+article {
+  margin: 0px;
+  padding: 0px;
+/*
+  border: 1px solid #cccc33;
+  border-radius: 7pt;
+  background: #dddd88;
+*/
+  -webkit-flex: 3 1 80%;
+          flex: 3 1 80%;
+  -webkit-order: 2;
+          order: 2;
+  overflow: auto;
+}
+.caja-box{
+  position:relative;
+  width:200px;
+  height: 200px;
+}
+.caja-img {
+  position:relative;
+  top: 0px;
+  margin-right: auto;
+  max-width: 100%;
+  max-height: 60%;
+}
+.center {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+}
+
+.stock {
+  position: absolute;
+  top: 0px;
+  left: 16px;
+  z-index: 1000;
+}
+.pesable {
+  position: absolute;
+  top: 25%;
+  right: 5px;
+  z-index: 1000;
+}
+.nombre {
+  position: absolute;
+  bottom: 32px;
+  left: 0px;
+  font-weight: bolder;
+  width: 100%;
+}
+.precio{
+  position: absolute;
+  left: 0px;
+  bottom: -.5rem;
+}
+.valor2{
+  position: absolute;
+  right: 5px;
+  top: 1rem;
+}
+.valor3{
+  position: absolute;
+  right: 5px;
+  top: 2rem;
+}
+.valor4{
+  position: absolute;
+  right: 5px;
+  top: -.1rem;
+}
+.cajaUrl{
+  position: absolute;
+  right: 5px;
+  bottom: 2px;
+  z-index: 100;
+}

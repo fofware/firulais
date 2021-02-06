@@ -10,5 +10,8 @@ backend/dist/
 dist/
 front/node_modules/
 frontend/dist/
-website/node_modules
-website/dist
+frontend/assets/images/
+website/node_modules/
+website/dist/
+website/assets/images/
+

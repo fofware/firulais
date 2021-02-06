@@ -30,11 +30,17 @@ export const artProject = {
 	'marca': 1,
 	'rubro': 1,
 	'linea': 1,
+	'especie': 1,
+	'edad': 1,
+	'raza': 1,
 	'name': 1,
 	'd_fabricante': 1,
 	'd_marca': 1,
 	'd_rubro': 1,
 	'd_linea': 1,
+	'd_especie': 1,
+	'd_raza': 1,
+	'd_edad': 1,
 	'private_web': 1,
 	'image': 1,
 	'url': 1,
@@ -285,10 +291,15 @@ export const articuloSanitizeString = function (search: string) {
 	for (let index = 0; index < array.length; index++) {
 		const element = array[index];
 		const o = [{'name': {$regex: new RegExp( `${element}` , 'i')}},
-		{'fabricante': {$regex: new RegExp( `${element}` , 'i')}},
-		{'marca': {$regex: new RegExp( `${element}` , 'i')}},
-		{'rubro': {$regex: new RegExp( `${element}` , 'i')}},
-		{'linea': {$regex: new RegExp( `${element}` , 'i')}}]
+			{'fabricante': {$regex: new RegExp( `${element}` , 'i')}},
+			{'marca': {$regex: new RegExp( `${element}` , 'i')}},
+			{'rubro': {$regex: new RegExp( `${element}` , 'i')}},
+			{'linea': {$regex: new RegExp( `${element}` , 'i')}},
+			{'especie': {$regex: new RegExp( `${element}` , 'i')}},
+			{'edad': {$regex: new RegExp( `${element}` , 'i')}},
+			{'raza': {$regex: new RegExp( `${element}` , 'i')}},
+			{'tags': {$regex: new RegExp( `${element}` , 'i')}}
+		]
 		Articulo['$and'].push({'$or': o });
 	}
 	return Articulo;
@@ -309,6 +320,7 @@ class ArticuloControler {
 		this.router.post( '/articulo', this.add );
 		this.router.put( '/articulo/:id', this.modifica );
 
+		this.router.get( '/articulos/test', this.test );
 		this.router.get( '/articulos/list', this.searchArticulos );
 		this.router.get( '/articulos/list/:search', this.searchArticulos )
 		this.router.post( '/articulos/list', this.findArticulos );
@@ -321,7 +333,6 @@ class ArticuloControler {
 		this.router.get( '/articulos/productos/list', this.searchProductos );
 		this.router.get( '/articulos/productos/list/:search', this.searchProductos );
 		this.router.post( '/articulos/productos/list', this.findProductos );
-
 	}
 
 	public index(req: Request, res: Response) {
@@ -379,15 +390,13 @@ class ArticuloControler {
 	async modifica( req: Request, res: Response) {
 		try {
 			const filter = { _id: new ObjectID(req.params.id) };
-//			console.log(req.body);
-/*
-			const art = new articulo(req.body);
-			console.log(art);
-			const rpta = art.save();
-*/
-			const rpta = await articulo.updateMany( filter, { $set :  req.body  });
+//			req.body._id = filter._id;
+			console.log(req.body);
+			const rpta = await articulo.updateOne( filter, { $set :  req.body  }, { upsert: true });
+			console.log(rpta);
 			return res.status(200).json( rpta );
 		} catch (error) {
+			console.log(error);
 			return res.status(500).json( error );
 		}
 	}
@@ -483,6 +492,30 @@ class ArticuloControler {
 			res.status(200).json(rpta);
 		} catch (error) {
 			res.status(408).json(error);
+		}
+	}
+
+	async test ( req: Request, res: Response ) {
+		try {
+			const { search } = req.params;
+			let Articulo = {};
+			const qry = { Articulo, Producto:{}, Sort: {'fabricante': 1, 'marca': 1, 'rubro': 1, 'linea': 1, 'name': 1 } }
+			const array = await readArticulos(qry);
+/*
+			for (let index = 0; index < array.length; index++) {
+				const element = array[index];
+				if (element.tags)
+					if (Array.isArray(element.tags))
+						element.tags = element.tags.toString();
+				const filter = { _id: new ObjectID(element._id) };
+				const rpta = await articulo.updateOne( filter, { $set :  element  }, { upsert: true });
+				console.log(rpta);
+			}
+*/
+			res.status(200).json(array);
+		} catch (error) {
+			console.log(error);
+			res.status(403).json(error);
 		}
 	}
 

@@ -11,8 +11,10 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 	if( !qry.Producto ) qry.Producto = {};
 	if( !qry.Articulo ) qry.Articulo = {};
 	if( !qry.Extra ) qry.Extra = {};
-	if( !qry.Sort ) qry.Sort = {'art_name': 1, 'name': 1, 'contiene': 1	};
-
+//	if( !qry.Sort ) qry.Sort = {'art_name': 1, 'name': 1, 'contiene': 1	};
+	if( !qry.Sort ) qry.Sort = {'precio': 1};
+	console.log(qry.Producto);
+	console.log(qry.Extra);
 	const array = await producto.aggregate([
 		{ $match: qry.Producto },
 		{
@@ -383,11 +385,11 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				"contiene": 1,
 				"unidad": 1,
 				"precio": { $cond: [ {$eq: ['$count_parte', 0]}, 
-									{ $multiply:[ {$add: [ '$margen', 100 ] }, { $divide: ['$parte.reposicion', '$parte.contiene'] } ] }, 
+									{ $multiply:[ {$add: [ '$margen', 100 ] }, { $divide: ['$parte.compra', '$parte.contiene'] } ] }, 
 									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
 											{ $multiply:[ {$add: [ '$margen', 100 ] }, 
-															 { $divide: ['$cerrado.reposicion', '$cerrado.contiene'] } ] }, 
-											{ $multiply:[ {$add: [ '$margen', 100 ] }, '$reposicion' ] }
+															 { $divide: ['$cerrado.compra', '$cerrado.contiene'] } ] }, 
+											{ $multiply:[ {$add: [ '$margen', 100 ] }, '$compra' ] }
 										]
 									}]
 									},
@@ -456,7 +458,6 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				"codigo": 1,
 				"plu": 1,
 				"image": 1,
-
 				"stock": { $cond: [ {$eq: ['$count_parte', 0]}, 
 					{ $multiply: ['$parte.stock', '$parte.contiene']}, 
 					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
@@ -527,6 +528,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				"tipo": 1,
 				'ins': 1,
 				'ins_count':1,
+				'private_web': 1,
 				'count_cerrado':1,
 				'de_count':1
 			}
@@ -550,10 +552,11 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 		e.image = (e.image && e.image.length > 0 ? e.image : e.art_image)
 		if (!e.compra && e.reposicion) e.compra = e.reposicion;
 		if (e.compra && !e.reposicion) e.reposicion = e.compra;
+		e.stock = round(e.stock,deci);
 		e.compra = round(e.compra,deci);
 		e.reposicion = round(e.reposicion,deci);
 		e.promedio = round((e.compra+e.reposicion)/2,deci)
-		e.precio = round(e.reposicion*((e.margen+100)/100),deci);
+		e.precio = round(e.compra*((e.margen+100)/100),deci);
 		e.fullName = (`${e.art_name} ${e.name} ${e.contiene > 1 ? e.contiene : ''} ${e.unidad} ${e.sname} ${e.scontiene > 1 ? e.scontiene : ''} ${e.sunidad}`);
 	}
 	return array;
@@ -632,7 +635,7 @@ class ProductoControler {
 
 		this.router.post('/productos/buscar', this.buscar)
 */
-		this.router.post('/productos/imany', this.insertMany);
+		this.router.post('/productos/imany', this.update);
 		this.router.get('/productos/search/:search', this.search);
 		this.router.get('/productos/test', this.test);
 	}
@@ -665,10 +668,11 @@ class ProductoControler {
 				for (let index = 0; index < artList.length; index++) {
 					artList[index] = new ObjectID(artList[index]._id);
 				}
+				console.log(artList);
 				qry.Producto['articulo'] = { '$in': artList }
 			}
 		}
-
+		console.log(qry);
 		const readData: any = await productoGetData(qry);
 		res.status(200).json(readData)
 	}
@@ -740,11 +744,15 @@ class ProductoControler {
 	}
 	async update(req: Request, res: Response) {
 		try {
+			const array = [];
 			for (let i = 0; i < req.body.length; i++) {
 				const e = req.body[i];
-				const reg = new producto(e);
-				const reslt = await reg.save();
+				const rpta = await producto.updateOne( {_id: e._id}, { $set :  e  }, { upsert: true });
+				array.push(rpta)
+//				const reg = new producto(e);
+//				const reslt = await reg.save();
 			}
+			res.status(200).json(array);
 		} catch (error) {
 			console.log(error);
 			res.status(500).json(error);
@@ -753,6 +761,7 @@ class ProductoControler {
 
 	async insertMany(req: Request, res: Response) {
 		try {
+			console.log(req.body);
 			const rpta = await producto.insertMany(req.body);
 			res.status(200).json(rpta);
 		} catch (error) {

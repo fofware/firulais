@@ -1,0 +1,9 @@
+<app-articulo-card-select
+[setting]="articuloSetting"
+cmpTipo='venta'
+[ca_pago]='1'
+[ca_persona]=''
+[hidden]="!showArticulos"
+[ca_lista]="lista[1]"
+(onArticuloSelect)="addProducto($event)">
+</app-articulo-card-select>

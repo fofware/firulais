@@ -1,0 +1,35 @@
+<!--article id="browseArticulo"-->
+<div class="d-flex justify-content-center align-items-center flex-wrap pt-2">
+  <div *ngFor="let articulo of articuloList; index as i;" class="caja-box btn btn-outline-primary ml-1 mb-1 app-btn"
+    (click)="onClick(articulo)">
+    <h3 class="stock" aria-hidden="true">{{articulo.stock}} </h3>
+    <i class="pesable fa fa-balance-scale fa-fw fa-2x" aria-hidden="true" [hidden]="!articulo.pesable"></i>
+    <img class="caja-img" src="{{articulo.image}}" alt="">
+    <div class="nombre">
+      {{articulo.fullName}}
+    </div>
+    <div class="precio w-100">
+      <h2 *ngIf="cmpTipo != 'compra'">${{articulo.precio}}</h2>
+      <h2 *ngIf="cmpTipo == 'compra'">${{articulo.compra}}</h2>
+    </div>
+    <div class="valor4">
+      <h6 *ngIf="articulo.contiene > 1">${{round(articulo.precio/articulo.contiene)}}/{{articulo.unidad}}</h6>
+    </div>
+    <!--div class="valor4">
+      <h6 *ngIf="cmpTipo != 'compra'">{{articulo.precio*.965}}</h6>
+    </div-->
+    <div class="valor2" [hidden]="publico">
+      <h6 *ngIf="cmpTipo == 'compra'">{{articulo.precio}}</h6>
+      <h6 *ngIf="cmpTipo != 'compra'">{{articulo.compra}}</h6>
+    </div>
+    <div class="valor3" [hidden]="publico">
+      <h6>{{articulo.reposicion}}</h6>
+    </div>
+
+    <!--a class="cajaUrl btn btn-primary"  href="{{articulo.url}}" target='_blanck'-->
+    <i class="fa fa-info-circle cajaUrl " aria-hidden="true" [hidden]="!articulo.url || articulo.url == ''"
+      (click)="opLink(articulo.url)"></i>
+    <!--/a-->
+  </div>
+</div>
+<!--/article-->
