@@ -11,8 +11,8 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 	if( !qry.Producto ) qry.Producto = {};
 	if( !qry.Articulo ) qry.Articulo = {};
 	if( !qry.Extra ) qry.Extra = {};
-//	if( !qry.Sort ) qry.Sort = {'art_name': 1, 'name': 1, 'contiene': 1	};
-	if( !qry.Sort ) qry.Sort = {'precio': 1};
+//	if( !qry.Sort ) qry.Sort = {'fabricante': 1, 'marca': 1, 'especie': 1, 'rubro': 1, 'linea': 1, 'edad': 1, 'raza': 1	};
+	if( !qry.Sort ) qry.Sort = { 'rubro': 1, 'linea': 1, 'contiene': 1, 'precio': 1 };
 	console.log(qry.Producto);
 	console.log(qry.Extra);
 	const array = await producto.aggregate([

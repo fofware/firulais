@@ -423,7 +423,7 @@ class ArticuloControler {
 				}
 */
 			}
-			const qry = { Articulo, Producto:{}, Sort: {'fabricante': 1, 'marca': 1, 'rubro': 1, 'linea': 1, 'name': 1 } }
+			const qry = { Articulo, Producto:{}, Sort: {'fabricante': 1, 'marca': 1, 'rubro': 1, 'linea': 1, 'especie': 1, 'edad': 1, 'raza': 1, 'fullname': 1 } }
 			const rpta = await readArticulos(qry);
 			res.status(200).json(rpta);
 		} catch (error) {
@@ -476,7 +476,7 @@ class ArticuloControler {
 				}
 			*/
 			}
-			const qry = { Articulo, Producto:{}, Sort: { 'marca': 1, 'rubro': 1, 'linea': 1, 'name': 1 } }
+			const qry = { Articulo, Producto:{}, Sort: { 'fabricante': 1, 'marca': 1, 'rubro': 1, 'linea': 1, 'especie': 1, 'edad': 1, 'raza': 1, 'name': 1 } }
 			const rpta = await readProductos(qry);
 			res.status(200).json(rpta);
 		} catch (error) {
