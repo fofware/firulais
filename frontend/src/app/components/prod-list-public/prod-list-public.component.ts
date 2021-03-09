@@ -32,20 +32,19 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   };
   articuloOrder = [
     {
+      name: 'Descripción',
+      vista: 1,
+      sort: { art_name: 1, name: 1, contiene: 1, unidad: 1, 'sub.name': 1, 'sub.contiene': 1, 'sub.unidad': 1  }
+    },
+    {
+      name: 'Rubro/Esecie',
+      vista: 1,
+      sort: { rubro: 1, especie: 1, edad: -1, precioref: 1 }
+    },
+    {
       name: 'fabricante',
       vista: 1,
-      sort: {
-        fabricante: 1,
-        marca: 1,
-        especie: 1,
-        edad: -1,
-        rubro: 1,
-        linea: 1,
-        raza: 1,
-        art_name: 1,
-        name: 1,
-        contiene: -1
-      }
+      sort: { fabricante: 1, marca: 1, rubro: 1, linea: 1, especie: 1, edad: -1, art_name: 1, raza: 1 }
     },
     {
       name: 'marca',
@@ -58,11 +57,6 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
       sort: { especie: 1, edad: 1, marca: 1, rubro: 1, linea: 1, art_name: 1, name: 1, contiene: -1 }
     },
     {
-      name: 'fullname',
-      vista: 1,
-      sort: { art_name: 1, precio: 1, name: 1, contiene: -1  }
-    },
-    {
       icon: '<i class="fas fa-search-dollar"></i>',
       name: 'precio',
       vista: 1,
@@ -70,7 +64,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
     },
     {
       icon: '<i class="fas fa-search-dollar"></i>',
-      name: 'precio/kg',
+      name: 'Precio/Un',
       vista: 1,
       sort: { precioref: 1 }
     }

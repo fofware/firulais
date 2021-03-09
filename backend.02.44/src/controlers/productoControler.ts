@@ -11,6 +11,8 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 	if( !qry.Producto ) qry.Producto = {};
 	if( !qry.Articulo ) qry.Articulo = {};
 	if( !qry.Extra ) qry.Extra = {};
+	if( !qry.Project) qry.Project = { 'noproject': 0}
+	if( !qry.Decimales) qry.Decimales = 0;
 //	if( !qry.Sort ) qry.Sort = {'fabricante': 1, 'marca': 1, 'especie': 1, 'rubro': 1, 'linea': 1, 'edad': 1, 'raza': 1	};
 	if( !qry.Sort ) qry.Sort = { 'rubro': 1, 'linea': 1, 'contiene': 1, 'precio': 1 };
 	console.log(qry.Producto);
@@ -34,6 +36,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				"parent": 1,
 				"name": 1,
 				"contiene": 1,
+				"strContiene": {$toString: '$contiene'},
 				"unidad": 1,
 				"precio": 1,
 				"compra": 1,
@@ -232,13 +235,13 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				'url': '$art.url',
 				'art_image': '$art.image',
 				'art_iva': '$art.iva',
-				'fabricante': '$art.fabricante',
-				'marca': '$art.marca',
-				'rubro': '$art.rubro',
-				'linea': '$art.linea',
-				'especie': '$art.especie',
-				'edad': '$art.edad',
-				'raza': '$art.raza',
+				'fabricante': { $ifNull: [ '$art.fabricante', '' ] },
+				'marca': { $ifNull: [ '$art.marca', '' ] },
+				'rubro': { $ifNull: [ '$art.rubro', '' ] },
+				'linea': { $ifNull: [ '$art.linea', '' ] },
+				'especie': { $ifNull: [ '$art.especie', '' ] },
+				'edad': { $ifNull: [ '$art.edad', '' ] },
+				'raza': { $ifNull: [ '$art.raza', '' ] },
 				'd_fabricante': '$art.d_fabricante',
 				'd_marca': '$art.d_marca',
 				'd_rubro': '$art.d_rubro',
@@ -246,9 +249,9 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				'd_especie': '$art.d_especie',
 				'd_raza': '$art.d_raza',
 				'd_edad': '$art.d_edad',
-				'tags': '$art.tags',
+				'tags': { $ifNull: [ '$art.tags', '' ] },
 				'art_margen': '$art.margen',
-				'private_web': '$art.private_web',
+				'private_web': { $ifNull: [ '$art.private_web', false ] },
 				'tipo': {
 					$cond: ['$parent', 
 						// Tine parent 
@@ -285,7 +288,8 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 							},
 
 							{
-								$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0 } 
+								$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0, image: 1, strContiene: {$toString: '$contiene'},
+							} 
 //								$project: { name: 1, contiene: 1, unidad: 1, _id: 0 } 
 							}
 
@@ -319,7 +323,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
                  }
 							},
 							{
-								$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0 } 
+								$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0, image: 1, strContiene: {$toString: '$contiene'} } 
 							}
            ],
            as: "parte"
@@ -352,7 +356,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 							},
 
 							{
-								$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0 } 
+								$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0, image: 1, strContiene: {$toString: '$contiene'} } 
 							}
            ],
            as: "cerrado"
@@ -385,72 +389,113 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				"_id": 1,
 				"name": 1,
 				"contiene": 1,
+				"strContiene": 1,
 				"unidad": 1,
-				"compra": { $cond: [ {$eq: ['$count_parte', 0]}, 
-										{ $divide: ['$parte.compra', '$parte.contiene']}, 
-										{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-											{ $divide: ['$cerrado.compra', '$cerrado.contiene']},
-											'$compra'
-										]}
-									]},
-				"reposicion": { $cond: [ {$eq: ['$count_parte', 0]}, 
-									{ $divide: ['$parte.reposicion', '$parte.contiene']}, 
-									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-										{ $divide: ['$cerrado.reposicion', '$cerrado.contiene']}, 
-										'$reposicion' 
-									]}
-								 ]},
-				"promedio": { $cond: [ {$eq: ['$count_parte', 0 ] }, 
-								{ $divide: [ { $divide: [ { $add: ['$parte.reposicion','$parte.compra'] }, 2 ] } , '$parte.contiene']}, 
+				"compra": {
+					$round:[ 
+						{ $cond: [ {$eq: ['$count_parte', 0]}, 
+								{ $divide: ['$parte.compra', '$parte.contiene']}, 
 								{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-									{ $divide: [ { $divide: [ { $add: ['$cerrado.reposicion','$cerrado.compra'] }, 2 ] }, '$cerrado.contiene']}, 
-									{ $divide: [ { $add: ['$reposicion','$compra'] } , 2 ] } 
+									{ $divide: ['$cerrado.compra', '$cerrado.contiene']},
+									'$compra'
+								]}
+							]}
+						,
+						qry.Decimales
+					]
+				},
+				"reposicion": {
+					$round: [
+						{
+							$cond: [ {$eq: ['$count_parte', 0]}, 
+							{ $divide: ['$parte.reposicion', '$parte.contiene']}, 
+							{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+								{ $divide: ['$cerrado.reposicion', '$cerrado.contiene']}, 
+								'$reposicion' 
+							]}
+						]
+	
+						}
+						, qry.Decimales
+					]
+				},
+				"promedio": 
+				{
+					$round: [
+						{ $cond: [ {$eq: ['$count_parte', 0 ] }, 
+							{ $divide: [ { $divide: [ { $add: ['$parte.reposicion','$parte.compra'] }, 2 ] } , '$parte.contiene']}, 
+							{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+								{ $divide: [ { $divide: [ { $add: ['$cerrado.reposicion','$cerrado.compra'] }, 2 ] }, '$cerrado.contiene']}, 
+								{ $divide: [ { $add: ['$reposicion','$compra'] } , 2 ] } 
+							]}
+						]}
+					, qry.Decimales
+					] 
+				},
+				"precio": { $round: [
+					{ 
+						$cond: [ {$eq: ['$count_parte', 0]}, 
+							{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, { $divide: ['$parte.compra', '$parte.contiene'] } ] }, 
+							{ $cond: 
+								[ {$eq:[ '$count_cerrado', 0 ]}, 
+								{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] } ] }, 
+								{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, '$compra' ] }
 								]
 							}]
 					},
-					"precio": { $cond: [ {$eq: ['$count_parte', 0]}, 
-					{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, { $divide: ['$parte.compra', '$parte.contiene'] } ] }, 
-					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-							{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, 
-											 { $divide: ['$cerrado.compra', '$cerrado.contiene'] } ] }, 
-							{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, '$compra' ] }
-						]
-					}]
+					qry.Decimales
+				]},
+				"precioref": { $round: [
+					{ 
+						$cond: [ {$eq: ['$count_parte', 0]}, 
+							{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, { $divide: ['$parte.compra', '$parte.contiene' ] } ] } , 
+							{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+									{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01,'$cerrado.compra'] }, { $cond: [ {$eq: ['$cerrado.contiene', 0]},1 ,{ $multiply: ['$cerrado.contiene','$contiene']}]} ] },
+									{ $cond: [{$eq:['$count_ins', 0]},
+										{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, '$compra' ] }, { $cond: [ {$eq: ['$ins.contiene', 0]},'$contiene',{ $multiply: ['$contiene','$ins.contiene']}]} ] },
+										{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, '$compra' ] }, { $cond: [ {$eq: ['$contiene', 0]},1,'$contiene']} ] } 
+									]}
+								]}
+							]
 					},
-					"precioref": { $cond: [ {$eq: ['$count_parte', 0]}, 
-//											{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] }, { $divide: ['$parte.compra', '$parte.contiene'] } ] },{ $cond: [ {$eq: ['$parte.contiene', 0]},1,'$parte.contiene']} ] } , 
-																{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, { $divide: ['$parte.compra', '$parte.contiene' ] } ] } , 
-																{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-																	{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01,'$cerrado.compra'] }, { $cond: [ {$eq: ['$cerrado.contiene', 0]},1 ,{ $multiply: ['$cerrado.contiene','$contiene']}]} ] },
-																	{ $cond: [{$eq:['$count_ins', 0]},
-//																		{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01,{ $divide: ['$ins.compra', '$ins.contiene'] } ] }, { $cond: [ {$eq: ['$ins.contiene', 0]},1,'$ins.contiene']} ] },
-																		{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, '$compra' ] }, { $cond: [ {$eq: ['$ins.contiene', 0]},'$contiene',{ $multiply: ['$contiene','$ins.contiene']}]} ] },
-																		{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, '$compra' ] }, { $cond: [ {$eq: ['$contiene', 0]},1,'$contiene']} ] } ]}
-																	]
-																}]
-														},
+					{ $cond: [
+						{$lt:[
+							{ 
+								$cond: [ {$eq: ['$count_parte', 0]}, 
+								{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, { $divide: ['$parte.compra', '$parte.contiene' ] } ] } , 
+								{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+										{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01,'$cerrado.compra'] }, { $cond: [ {$eq: ['$cerrado.contiene', 0]},1 ,{ $multiply: ['$cerrado.contiene','$contiene']}]} ] },
+										{ $cond: [{$eq:['$count_ins', 0]},
+											{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, '$compra' ] }, { $cond: [ {$eq: ['$ins.contiene', 0]},'$contiene',{ $multiply: ['$contiene','$ins.contiene']}]} ] },
+											{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, '$compra' ] }, { $cond: [ {$eq: ['$contiene', 0]},1,'$contiene']} ] } 
+										]}
+									]}
+								]
+							}, 1 ]}, 
+							2,
+							qry.Decimales
 
-				'sub': { $cond: [ {$eq: ['$count_ins',0]},
-												'$ins',
-												{}
-/*
-											{ $cond: [ {$eq: ['$count_parte',0]},
-												'$parte',
-												{}
-												{$cond: [ {$eq: ['$count_cerrado',0]},
-													'$cerrado', 
-													'{}'
-												]}
-											]}
-*/
-										]},
+					]}
+				]},
+				'sub': { 
+					$cond: [ {$eq: ['$count_ins',0]},
+						'$ins',
+						{$cond: [{$eq: ['$count_parte',0]},
+							'$parte',
+							{$cond: [{$eq: ['$count_cerrado',0]},
+								'$cerrado',
+								{}
+							]}
+						]}
+					]
+				},
 				"pesable": 1,
 				"servicio": 1,
 				"pVenta": 1,
 				"pCompra": 1,
 				"codigo": 1,
 				"plu": 1,
-				"image": 1,
+				"image": {$cond:[{$eq:[{ $strLenBytes: "$image" },0]},'$art_image','$image']},
 				"stock": { $cond: [ {$eq: ['$count_parte', 0]}, 
 					{ $multiply: ['$parte.stock', '$parte.contiene']}, 
 					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
@@ -476,7 +521,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 					'', 
 					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
 						'', 
-						{ $cond: [ {$eq: ['$ins_count',0]},
+						{ $cond: [ {$eq: ['$count_ins',0]},
 							'$ins.contiene',
 							'' ] }
 						]}
@@ -487,7 +532,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 					'', 
 					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
 						'', 
-						{ $cond: [ {$eq: ['$ins_count',0]},
+						{ $cond: [ {$eq: ['$count_ins',0]},
 							'$ins.name',
 							'' ] }
 						]}
@@ -529,27 +574,47 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				'parte':1,
 				'count_parte': 1,
 				'private_web': 1,
-				'fullname1': '$art_name $name'
+				'fullName': { 
+					$cond: [{ $eq: ['$count_ins',0]},
+						{ $concat: ['$art_name', ' ', '$name', ' ', '$strContiene', ' ', '$unidad'
+						, ' ', '$ins.name'
+						//, ' ', '$ins.strContiene', '$ins.unidad'
+						] },
+						{$cond: [{$eq: ['$count_cerrado', 0]},
+							{$concat: ['$art_name', ' ', '$name', ' ', '$strContiene', ' ','$unidad'//, ' ', '$cerrado.name'
+//								, ' ', '$cerrado.strContiene', '$cerrado.unidad'
+							]},
+							{$cond: [{$eq: ['$count_parte',0]},
+								{$concat: ['$art_name', ' ', '$name', ' ', '$strContiene', ' ', '$unidad'
+								//, ' ', '$parte.name'
+//								, ' ', '$parte.strContiene', '$parte.unidad'
+								]},
+								{$concat: ['$art_name', ' ', '$name', ' ', '$strContiene',' ', '$unidad']},
+							]}
+						]}
+				]}
 			}
 		},		
 		{
-			$match: qry.Extra
+			$project: {
+				'nopproject': 0
+			}
 		},
+		{
+			$match: qry.Extra
+		}
+	
+		,
 		{
 			$sort: qry.Sort
 		}
-/*
-		,
-		{
-			$project: qry.Project
-		}
-	*/
+
 	])
+/*
 	const deci = 2;
 	for (let i = 0; i < array.length; i++) {
 		const e = array[i];
-		e.image = (e.image && e.image.length > 0 ? e.image : e.art_image)
-/*
+//		e.image = (e.image && e.image.length > 0 ? e.image : e.art_image)
 		if (!e.compra && e.reposicion) e.compra = e.reposicion;
 		if (e.compra && !e.reposicion) e.reposicion = e.compra;
 		e.stock = round(e.stock,deci);
@@ -557,9 +622,10 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 		e.reposicion = round(e.reposicion,deci);
 		e.promedio = round((e.compra+e.reposicion)/2,deci)
 		e.precio = round(e.compra*((e.margen+100)/100),deci);
-*/
 		e.fullName = (`${e.art_name} ${e.name} ${e.contiene > 1 ? e.contiene : ''} ${e.unidad} ${e.sname} ${e.scontiene > 1 ? e.scontiene : ''} ${e.sunidad}`);
 	}
+*/
+console.log(qry.Sort)
 	return array;
 } 
 /*
@@ -664,7 +730,6 @@ class ProductoControler {
 		let qry = req.body;
 		let myMatch: any;
 		let artList: any[] = [];
-
 		if (qry.searchItem && qry.searchItem.length == 1){
 			myMatch = {
 				'$or': [
@@ -681,13 +746,13 @@ class ProductoControler {
 			if (Articulo){
 				artList = await readArticulos({ Articulo, Project: {'_id': 1}, Sort: {'_id': 1} });
 				for (let index = 0; index < artList.length; index++) {
-					artList[index] = new ObjectID(artList[index]._id);
+//					artList[index] = new ObjectID(artList[index]._id);
+					artList[index] = artList[index]._id;
 				}
 //				console.log(artList);
 				qry.Producto['articulo'] = { '$in': artList }
 			}
 		}
-		console.log(qry);
 		const readData: any = await productoGetData(qry);
 		res.status(200).json(readData)
 	}
@@ -714,7 +779,6 @@ class ProductoControler {
 //				{ $project: { fromItems: 0 } }
 	
 		]).sort({name: 1})
-	
 		res.status(200).json(array);
 	}
 

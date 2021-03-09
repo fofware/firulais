@@ -32,7 +32,10 @@ p {
   flex-direction: column;
   align-items: center;
 }
-
+span {
+  position: relative;
+  top: 14px;
+}
 svg.material-icons {
   height: 24px;
   width: auto;
@@ -55,11 +58,24 @@ svg.material-icons:not(:last-child) {
 
 .card {
   border-radius: 4px;
+  margin: 0 8px 16px;
   border: 1px solid #eee;
   background-color: #fafafa;
   height: 80px;
   width: 200px;
-  margin: 0 8px 16px;
+}
+
+.card-container .card a > i {
+  position: absolute;
+  left: 5px;
+}
+#rocket {
+  position:absolute;
+  top: -29px;
+  left: -45px;
+}
+.card > a {
+  height: 100%;
   padding: 16px;
   display: flex;
   flex-direction: row;
@@ -68,13 +84,12 @@ svg.material-icons:not(:last-child) {
   transition: all 0.2s ease-in-out;
   line-height: 24px;
   position: relative;
-}
+  -webkit-border-radius:;
+  -moz-border-radius:;
+  -ms-border-radius:;
+  -o-border-radius:;
 
-.card-container .card > i {
-  position: absolute;
-  left: 5px;
 }
-
 .card-container .card > div {
   padding-left: 50px;
   width: 150px;

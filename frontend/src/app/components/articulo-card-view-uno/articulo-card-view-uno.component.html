@@ -4,7 +4,13 @@
     <h5 class="nombre">
       {{articulo.fullName}}
     </h5>
-    <h6>{{articulo.art_name}} {{articulo.name}} {{articulo.contiene}} {{articulo.unidad}} {{articulo.sub.name}} {{articulo.sub.contiene}} {{articulo.sub.unidad}}</h6>
+    <h6>Fabricante: {{articulo.fabricante}}</h6>
+    <h6>Marca: {{articulo.marca}}</h6>
+    <h6>Rubro: {{articulo.rubro}}</h6>
+    <h6>Linea: {{articulo.linea}}</h6>
+    <h6>Especie: {{articulo.especie}}</h6>
+    <h6>Edad: {{articulo.edad}}</h6>
+    <h6>Raza: {{articulo.raza}}</h6>
   </div>
 
 </article>
@@ -24,8 +30,8 @@
   <h2 *ngIf="cmpTipo == 'compra'">${{articulo.compra}}</h2>
 </div>
 <div class="valor4">
-  <h6 *ngIf="articulo.contiene > 0">${{round(articulo.precio/articulo.contiene)}}/{{articulo.unidad}}</h6>
-  <h6 >${{round(articulo.precioref)}}</h6>
+  <h6 *ngIf="articulo.contiene > 0">${{round(articulo.precioref)}}/{{articulo.unidad}}</h6>
+  <!--h6 >${{round(articulo.precio/articulo.contiene)}}</h6-->
 </div>
 <!--div class="valor4">
   <h6 *ngIf="cmpTipo != 'compra'">{{articulo.precio*.965}}</h6>

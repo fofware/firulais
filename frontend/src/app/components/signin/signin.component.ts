@@ -24,7 +24,7 @@ export class SigninComponent implements OnInit {
         const data: any = res;
         localStorage.setItem( 'token', data.token );
         localStorage.setItem( 'user', JSON.stringify(data.user));
-        this.router.navigate( ['/private'] );
+        this.router.navigate( ['private', 'menu'] );
       },
       err => {
         console.log(err);

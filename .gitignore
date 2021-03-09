@@ -5,10 +5,10 @@ node_modules/
 npm-debug.log
 package-lock.json
 test/*.log
-backend/node_modules/
-backend/dist/
+backen*/node_modules/
+backen*/dist/
 dist/
-front/node_modules/
+front*/node_modules/
 frontend/dist/
 frontend/assets/images/
 website/node_modules/
