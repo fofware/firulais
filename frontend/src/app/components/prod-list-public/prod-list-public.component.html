@@ -1,0 +1,16 @@
+<app-top-menu></app-top-menu>
+<app-articulo-card-select
+  [filter]='filter'
+  [order]='articuloOrder'
+  cmpTipo='venta'
+  [ca_pago]='1'
+  [ca_persona]=''
+  [hidden]='!showArticulos'
+  [ca_lista]='lista[1]'
+  [listaOrden]='listaOrden'
+  [articuloList]='articuloList'
+  [publico]='publico'
+  (onCardSelectEvent)='Prod_filterEvent($event)'
+
+>
+</app-articulo-card-select>

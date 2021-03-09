@@ -1,0 +1,146 @@
+:host {
+  position: relative;
+/*
+  border: 1px solid orange;
+*/
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  display: -webkit-flex;
+  display:         flex;
+  -webkit-flex-flow: row;
+          flex-flow: row;
+}
+
+:host > article {
+  margin: 0px;
+  padding: 0px;
+/*
+  border-radius: 7pt;
+  border: 1px solid #cccc33;
+  background: #dddd88;
+*/
+  -webkit-flex: 3 1 60%;
+  flex: 3 1 60%;
+  -webkit-order: 2;
+  order: 2;
+  overflow: none;
+  max-width: 320px;
+  -webkit-border-radius: 7pt;
+  -moz-border-radius: 7pt;
+  -ms-border-radius: 7pt;
+  -o-border-radius: 7pt;
+}
+
+:host > nav {
+  margin: 0px;
+  padding: 0px;
+/*
+  border: 1px solid #8888bb;
+  background: #ccccff;
+  border-radius: 7pt;
+*/
+  -webkit-flex: 1 6 30%;
+  flex: 1 6 30%;
+  -webkit-order: 1;
+  order: 1;
+  width: 200px;
+  position: relative;
+  -webkit-border-radius:;
+  -moz-border-radius:;
+  -ms-border-radius:;
+  -o-border-radius:;
+}
+
+#main > aside {
+  margin: 0px;
+  padding: 0px;
+/*
+  border: 1px solid #8888bb;
+*/
+  min-width: 235px;
+  border-radius: 7pt;
+  -webkit-flex: 1 6 40%;
+          flex: 1 6 40%;
+  -webkit-order: 3;
+          order: 3;
+  overflow: auto;
+}
+
+.imgbox {
+  /*
+    background-color: rgb(153, 143, 133);
+  */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+  .textbox {
+    max-width: 370px;
+    height: 200px;
+  }
+  .caja-img {
+    height: 100%;
+    max-width: 200px;
+  }
+  .center {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  .stock {
+    position: absolute;
+    top: 0px;
+    left: 16px;
+    z-index: 10;
+  }
+  .pesable {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 10;
+  }
+  .nombre {
+    position: relative;
+    font-weight: bolder;
+    min-width: 370px;
+    padding-right: 60px;
+  /*
+    top: 0px;
+    left: 0px;
+    padding-left: 60px;
+    width: 100%;
+  */
+  }
+  .precio{
+    position: absolute;
+    right: 10px;
+    bottom: 2rem;
+  }
+  .valor2{
+    position: absolute;
+    right: 5px;
+    top: 1rem;
+  }
+  .valor3{
+    position: absolute;
+    right: 5px;
+    top: 2rem;
+  }
+  .valor4{
+    position: absolute;
+    right: 11px;
+    bottom: -.25rem;
+  }
+  .cajaUrl{
+    position: absolute;
+    right: 5px;
+    bottom: 2px;
+    z-index: 100;
+  }

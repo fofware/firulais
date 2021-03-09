@@ -1,1 +1,15 @@
-<p>articulo-card-select works!</p>
+<div class="sticky-top">
+  <app-articulo-card-select-header
+    [filter]="filter"
+    [searchItem]='searchItem'
+    [order]='order'
+    [listaOrden]='listaOrden'
+    (onCardSelectHeaderEvent)='filterEvent($event)'>
+  </app-articulo-card-select-header>
+</div>
+<app-articulo-card-select-box-list
+  [articuloList]='articuloList'
+  [cmpTipo]='cmpTipo'
+  [publico]='publico'
+>
+</app-articulo-card-select-box-list>

@@ -1,0 +1,43 @@
+  <input type="search" id="busca"
+    aria-label="Search"
+    class="form-control mr-sm-2"
+    placeholder="Buscar por Nombre"
+    name="searchItem"
+    (input)="searchArticulos()"
+    [(ngModel)]="searchItem">
+  <button *ngIf="setting.pesable.display" class="btn btn-outline-primary"
+    (click)="setting.pesable.value=!setting.pesable.value;searchArticulos()">
+    <i *ngIf="setting.pesable.value" class="fa fa-balance-scale fa-2x text-white" aria-hidden="true"></i>
+    <i *ngIf="!setting.pesable.value" class="fa fa-balance-scale fa-2x text-white-50" aria-hidden="true"></i>
+  </button>
+  <button *ngIf="setting.private_web" class="btn btn-outline-primary"
+    (click)="setting.private_web.value=!setting.private_web.value;searchArticulos()">
+    <i *ngIf="setting.private_web.value" class="fas fa-first-aid fa-2x text-white-50" aria-hidden="true"></i>
+    <i *ngIf="!setting.private_web.value" class="fas fa-first-aid fa-2x text-white" aria-hidden="true"></i>
+    <!--i class="fas fa-hand-holding-medical"></i-->
+  </button>
+  <button *ngIf="setting.precio.display" class="btn btn-outline-primary"
+    (click)="setting.precio.value=!setting.precio.value;searchArticulos()">
+    <i *ngIf="setting.precio.value" class="fas fa-file-invoice-dollar fa-2x text-white" aria-hidden="true"></i>
+    <i *ngIf="!setting.precio.value" class="fas fa-file-invoice-dollar fa-2x text-white-50" aria-hidden="true"></i>
+  </button>
+  <button *ngIf="setting.stock.display" class="btn btn-outline-primary"
+    (click)="setting.stock.value=!setting.stock.value;searchArticulos()">
+    <i *ngIf="setting.stock.value" class="fa fa-shopping-cart fa-2x text-white" aria-hidden="true"></i>
+    <i *ngIf="!setting.stock.value" class="fa fa-shopping-cart fa-2x text-white-50" aria-hidden="true"></i>
+  </button>
+  <button *ngIf="setting.servicio.display" class="btn btn-outline-primary"
+    (click)="setting.servicio.value=!setting.servicio.value;searchArticulos()">
+    <i *ngIf="setting.servicio.value" class="fa fa-2x text-white" aria-hidden="true">S</i>
+    <i *ngIf="!setting.servicio.value" class="fa fa-2x text-white-50" aria-hidden="true">S</i>
+  </button>
+  <button *ngIf="setting.pCompra.display" class="btn btn-outline-primary"
+    (click)="setting.pCompra.value=!setting.pCompra.value;searchArticulos()">
+    <i *ngIf="setting.pCompra.value" class="fa fa-2x text-white" aria-hidden="true">C</i>
+    <i *ngIf="!setting.pCompra.value" class="fa fa-2x text-white-50" aria-hidden="true">C</i>
+  </button>
+  <button *ngIf="setting.pVenta.display" class="btn btn-outline-primary"
+    (click)="setting.pVenta.value=!setting.pVenta.value;searchArticulos()">
+    <i *ngIf="setting.pVenta.value" class="fa fa-2x text-white" aria-hidden="true">V</i>
+    <i *ngIf="!setting.pVenta.value" class="fa fa-2x text-white-50" aria-hidden="true">V</i>
+  </button>

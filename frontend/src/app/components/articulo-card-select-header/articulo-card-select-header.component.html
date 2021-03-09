@@ -1,1 +1,15 @@
-<p>articulo-card-select-header works!</p>
+<header id="headerArticulo">
+  <form class="form-inline">
+  <app-articulo-card-select-filter
+    [setting]="filter"
+    [searchItem]='searchItem'
+    (onSearchArticulos)='filterEvent($event)'
+  >
+  </app-articulo-card-select-filter>
+  <app-articulo-card-select-order
+    [order]="order"
+    [listaOrden]='listaOrden'
+    (onOrderChangeEvent)='filterEvent($event)'
+  ></app-articulo-card-select-order>
+  </form>
+</header>

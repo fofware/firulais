@@ -236,10 +236,16 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				'marca': '$art.marca',
 				'rubro': '$art.rubro',
 				'linea': '$art.linea',
+				'especie': '$art.especie',
+				'edad': '$art.edad',
+				'raza': '$art.raza',
 				'd_fabricante': '$art.d_fabricante',
 				'd_marca': '$art.d_marca',
 				'd_rubro': '$art.d_rubro',
 				'd_linea': '$art.d_linea',
+				'd_especie': '$art.d_especie',
+				'd_raza': '$art.d_raza',
+				'd_edad': '$art.d_edad',
 				'tags': '$art.tags',
 				'art_margen': '$art.margen',
 				'private_web': '$art.private_web',
@@ -279,7 +285,8 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 							},
 
 							{
-								$project: { name: 1, contiene: 1, unidad: 1, _id: 0 } 
+								$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0 } 
+//								$project: { name: 1, contiene: 1, unidad: 1, _id: 0 } 
 							}
 
            ],
@@ -311,7 +318,6 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
                     }
                  }
 							},
-
 							{
 								$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0 } 
 							}
@@ -366,17 +372,13 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				preserveNullAndEmptyArrays: true
 			}				
 		},
-
-
 		{
 			$unwind: {
 				path: '$ins',
-				includeArrayIndex: 'ins_count',
+				includeArrayIndex: 'count_ins',
 				preserveNullAndEmptyArrays: true
 			}				
 		},
-
-
 		{
 			$project: 
 			{
@@ -384,15 +386,6 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				"name": 1,
 				"contiene": 1,
 				"unidad": 1,
-				"precio": { $cond: [ {$eq: ['$count_parte', 0]}, 
-									{ $multiply:[ {$add: [ '$margen', 100 ] }, { $divide: ['$parte.compra', '$parte.contiene'] } ] }, 
-									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-											{ $multiply:[ {$add: [ '$margen', 100 ] }, 
-															 { $divide: ['$cerrado.compra', '$cerrado.contiene'] } ] }, 
-											{ $multiply:[ {$add: [ '$margen', 100 ] }, '$compra' ] }
-										]
-									}]
-									},
 				"compra": { $cond: [ {$eq: ['$count_parte', 0]}, 
 										{ $divide: ['$parte.compra', '$parte.contiene']}, 
 										{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
@@ -415,42 +408,42 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 								]
 							}]
 					},
-
-/*
-				"precio": { $cond: [ {$eq: ['$count_parte', 0]}, 
-									{ $ceil: { $multiply:[ {$add: [ '$margen', 100 ] }, { $divide: ['$parte.reposicion', '$parte.contiene'] } ] } }, 
-									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-											{ $ceil: { $multiply:[ {$add: [ '$margen', 100 ] }, 
-															 { $divide: ['$cerrado.reposicion', '$cerrado.contiene'] } ] } }, 
-											{ $ceil: { $multiply:[ {$add: [ '$margen', 100 ] }, '$reposicion' ] } }
-										]
-									}]
-									},
-				"compra": { $cond: [ {$eq: ['$count_parte', 0]}, 
-										{ $ceil: { $divide: ['$parte.compra', '$parte.contiene']} }, 
-										{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-											{ $ceil: { $divide: ['$cerrado.compra', '$cerrado.contiene']} },
-											{ $ceil: '$compra' }
-										]}
-									]},
-				"reposicion": { $cond: [ {$eq: ['$count_parte', 0]}, 
-									{ $ceil: { $divide: ['$parte.reposicion', '$parte.contiene']} }, 
-									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-										{ $ceil: { $divide: ['$cerrado.reposicion', '$cerrado.contiene']} }, 
-										{ $ceil: '$reposicion' } 
-									]}
-								 ]},
-				"promedio": { $cond: [ {$eq: ['$count_parte', 0 ] }, 
-								{ $ceil: { $divide: [ { $divide: [ { $add: ['$parte.reposicion','$parte.compra'] }, 2 ] } , '$parte.contiene']} }, 
-								{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-									{ $ceil: { $divide: [ { $divide: [ { $add: ['$cerrado.reposicion','$cerrado.compra'] }, 2 ] }, '$cerrado.contiene']} }, 
-									{ $ceil: { $divide: [ { $add: ['$reposicion','$compra'] } , 2 ] } }
-								]
-							}]
+					"precio": { $cond: [ {$eq: ['$count_parte', 0]}, 
+					{ $multiply:[ {$add: [ '$margen', 100 ] }, { $divide: ['$parte.compra', '$parte.contiene'] } ] }, 
+					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+							{ $multiply:[ {$add: [ '$margen', 100 ] }, 
+											 { $divide: ['$cerrado.compra', '$cerrado.contiene'] } ] }, 
+							{ $multiply:[ {$add: [ '$margen', 100 ] }, '$compra' ] }
+						]
+					}]
 					},
+					"precioref": { $cond: [ {$eq: ['$count_parte', 0]}, 
+//											{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] }, { $divide: ['$parte.compra', '$parte.contiene'] } ] },{ $cond: [ {$eq: ['$parte.contiene', 0]},1,'$parte.contiene']} ] } , 
+																{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, { $divide: ['$parte.compra', '$parte.contiene' ] } ] } , 
+																{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+																	{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01,'$cerrado.compra'] }, { $cond: [ {$eq: ['$cerrado.contiene', 0]},1 ,{ $multiply: ['$cerrado.contiene','$contiene']}]} ] },
+																	{ $cond: [{$eq:['$count_ins', 0]},
+//																		{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01,{ $divide: ['$ins.compra', '$ins.contiene'] } ] }, { $cond: [ {$eq: ['$ins.contiene', 0]},1,'$ins.contiene']} ] },
+																		{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, '$compra' ] }, { $cond: [ {$eq: ['$ins.contiene', 0]},'$contiene',{ $multiply: ['$contiene','$ins.contiene']}]} ] },
+																		{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, '$compra' ] }, { $cond: [ {$eq: ['$contiene', 0]},1,'$contiene']} ] } ]}
+																	]
+																}]
+														},
 
+				'sub': { $cond: [ {$eq: ['$count_ins',0]},
+												'$ins',
+												{}
+/*
+											{ $cond: [ {$eq: ['$count_parte',0]},
+												'$parte',
+												{}
+												{$cond: [ {$eq: ['$count_cerrado',0]},
+													'$cerrado', 
+													'{}'
+												]}
+											]}
 */
-
+										]},
 				"pesable": 1,
 				"servicio": 1,
 				"pVenta": 1,
@@ -468,7 +461,6 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 						]}
 					]
 				},
-
 				"divisor": { $cond: [ {$eq: ['$count_parte', 0]}, 
 					'$parte.contiene', 
 					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
@@ -522,15 +514,22 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				"fabricante": 1,
 				"marca": 1,
 				"rubro": 1,
+				"linea": 1,
+				"especie": 1,
+				"edad": 1,
+				"raza": 1,
 				"d_marca": 1,
 				"tags": 1,
 				"art_margen": 1,
 				"tipo": 1,
 				'ins': 1,
-				'ins_count':1,
+				'count_ins':1,
+				'cerrado':1,
+				'count_cerrado': 1,
+				'parte':1,
+				'count_parte': 1,
 				'private_web': 1,
-				'count_cerrado':1,
-				'de_count':1
+				'fullname1': '$art_name $name'
 			}
 		},		
 		{
@@ -622,6 +621,8 @@ class ProductoControler {
 
 		this.router.get('/producto/:id', this.leer );
 
+		this.router.get('/producto/marca/:id', this.marca );
+
 		this.router.post('/producto', this.add);
 		this.router.delete('/producto/:id', this.delete);
 		this.router.put('/productos', this.update);
@@ -642,6 +643,18 @@ class ProductoControler {
 
 	public index(req: Request, res: Response) {
 		res.send('Productos');
+	}
+
+	async marca(req: Request, res: Response) {
+		const { id } = req.params;
+		const artList = await readArticulos({ Articulo: { marca: id,  }, Project: {'_id': 1}, Sort: {'_id': 1} });
+		for (let index = 0; index < artList.length; index++) {
+			artList[index] = new ObjectID(artList[index]._id);
+		}
+//		console.log(artList);
+		const qry = { Producto: {'articulo' : { '$in': artList }, pCompra: true }};
+		const readData: any = await productoGetData(qry);
+		res.status(200).json(readData)
 	}
 
 	async list(req: Request, res: Response) {
@@ -668,7 +681,7 @@ class ProductoControler {
 				for (let index = 0; index < artList.length; index++) {
 					artList[index] = new ObjectID(artList[index]._id);
 				}
-				console.log(artList);
+//				console.log(artList);
 				qry.Producto['articulo'] = { '$in': artList }
 			}
 		}

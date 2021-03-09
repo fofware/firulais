@@ -1,0 +1,134 @@
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.card {
+  border-radius: 4px;
+  border: 1px solid #eee;
+  background-color: #ffffff;
+  height: 200px;
+  width: 540px;
+  margin: 0 8px 16px;
+  padding: 0px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+  line-height: 24px;
+  position: relative;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+}
+
+.card-container .card > i {
+  position: absolute;
+  left: 5px;
+}
+
+.card-container .card:not(.highlight-card) {
+  cursor: pointer;
+}
+
+.card-container .card:not(.highlight-card):hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 17px rgba(0, 0, 0, 0.35);
+  -webkit-transform: translateY(-3px);
+  -moz-transform: translateY(-3px);
+  -ms-transform: translateY(-3px);
+  -o-transform: translateY(-3px);
+}
+
+.card-container .card:not(.highlight-card):hover .material-icons path {
+  fill: rgb(105, 103, 103);
+}
+
+.card.highlight-card {
+  background-color: #1976d2;
+  color: white;
+  font-weight: 600;
+  border: none;
+  width: auto;
+  min-width: 30%;
+  position: relative;
+}
+
+.card.card.highlight-card span {
+  margin-left: 60px;
+}
+
+/*
+.imgbox {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 140px;
+    height: 200px;
+  }
+  .textbox {
+    max-width: 370px;
+    height: 200px;
+  }
+  .caja-img {
+    width: 100%;
+    max-height: 98%;
+  }
+  .center {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  .stock {
+    position: absolute;
+    top: 0px;
+    left: 16px;
+    z-index: 1000;
+  }
+  .pesable {
+    position: absolute;
+    top: 25%;
+    right: 5px;
+    z-index: 1000;
+  }
+  .nombre {
+    position: relative;
+    font-weight: bolder;
+    min-width: 370px;
+    padding-right: 60px;
+  }
+  .precio{
+    position: absolute;
+    right: 10px;
+    bottom: -.5rem;
+  }
+  .valor2{
+    position: absolute;
+    right: 5px;
+    top: 1rem;
+  }
+  .valor3{
+    position: absolute;
+    right: 5px;
+    top: 2rem;
+  }
+  .valor4{
+    position: absolute;
+    right: 5px;
+    top: -.1rem;
+  }
+  .cajaUrl{
+    position: absolute;
+    right: 5px;
+    bottom: 2px;
+    z-index: 100;
+  }
+*/

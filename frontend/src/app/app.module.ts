@@ -14,6 +14,10 @@ import { TopMenuComponent } from './components/top-menu/top-menu.component';
 import { FormsModule } from '@angular/forms';
 import { SigninComponent } from './components/signin/signin.component';
 import { SignupComponent } from './components/signup/signup.component';
+import { ProdListPublicComponent } from './components/prod-list-public/prod-list-public.component';
+import { ArticuloCardSelectOrderComponent } from './components/articulo-card-select-order/articulo-card-select-order.component';
+import { ArticuloCardSelectFilterComponent } from './components/articulo-card-select-filter/articulo-card-select-filter.component';
+import { ArticuloCardViewUnoComponent } from './components/articulo-card-view-uno/articulo-card-view-uno.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +30,11 @@ import { SignupComponent } from './components/signup/signup.component';
     HomeComponent,
     TopMenuComponent,
     SigninComponent,
-    SignupComponent
+    SignupComponent,
+    ProdListPublicComponent,
+    ArticuloCardSelectOrderComponent,
+    ArticuloCardSelectFilterComponent,
+    ArticuloCardViewUnoComponent
   ],
   imports: [
     BrowserModule,

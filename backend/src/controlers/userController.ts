@@ -17,7 +17,7 @@ function createToken(user: IUser) {
     localidad: user.localidad,
     roles: user.roles
   }, config.jwtSecret, {
-    expiresIn: 86400
+    expiresIn: 60
   });
 };
 
@@ -48,10 +48,10 @@ export const signIn = async (req: Request, res: Response): Promise<Response> => 
     return res.status(401).json({ msg: 'Por favor. Envíe su e-Mail y contraseña' });
   let user = await User.findOne({ email: req.body.email });
   if (!user)
-    return res.status(401).json({ msg: 'Usuario o contraseña ivalidos' });
+    return res.status(401).json({ msg: 'Usuario y/o contraseña ivalidos' });
   const isMatch = await user.comparePassword(req.body.password);
   if (!isMatch)
-    return res.status(401).json({ msg: 'Contraseña o Usuario ivalidos' });
+    return res.status(401).json({ msg: 'Contraseña y/o Usuario ivalidos' });
   const token = createToken(user);
   console.log(user);
   delete user.__v ;
@@ -208,7 +208,7 @@ class UserControler {
 			return res.status(500).json( {error: err});
 		})
 	}
-	
+
 }
 
 export const userCtrl = new UserControler();

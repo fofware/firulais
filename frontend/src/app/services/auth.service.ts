@@ -30,7 +30,7 @@ export class AuthService {
 
   loggedIn(): boolean {
     const stg = localStorage.getItem('token');
-    console.log('STORAGE', stg);
+//    console.log('STORAGE', stg);
     if (stg) { return true; }
     return false;
   }

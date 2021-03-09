@@ -1,0 +1,11 @@
+<!--button
+  (click)="changeOrden()"
+>
+  Ord {{listaOrden}}
+</button-->
+<select name="ordenTipo" class="form-control mr-sm-2 m-2"
+[(ngModel)]="listaOrden"
+(change)='cambioOrden()'
+>
+<option value="{{n}}" *ngFor="let ord of order;index as n">{{ord.name}}</option>
+</select>
