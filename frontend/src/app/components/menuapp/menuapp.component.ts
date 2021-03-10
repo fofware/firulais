@@ -9,9 +9,10 @@ import { MenuService } from 'src/app/services/menu.service';
 })
 export class MenuappComponent implements OnInit {
   menuId = '';
+  data: any = {};
   title = '';
   comment = '';
-  menu = [];
+  menu: any[] = [];
 
    constructor(
     private actRoute: ActivatedRoute,
@@ -34,10 +35,7 @@ export class MenuappComponent implements OnInit {
 
   findMenu(): void{
     const menuData = this.menuService.get( this.menuId) ;
-    this.title = menuData.title;
-    this.comment = menuData.comment;
-    this.menu = menuData.menu;
-    console.log(menuData);
-
+    this.data = menuData;
+    console.log(this.data);
   }
 }

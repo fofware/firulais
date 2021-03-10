@@ -19,6 +19,7 @@ import { ArticuloCardSelectFilterComponent } from './components/articulo-card-se
 import { ArticuloCardViewUnoComponent } from './components/articulo-card-view-uno/articulo-card-view-uno.component';
 import { CargalistasComponent } from './components/cargalistas/cargalistas.component';
 import { MenuappComponent } from './components/menuapp/menuapp.component';
+import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { MenuappComponent } from './components/menuapp/menuapp.component';
     ArticuloCardSelectFilterComponent,
     ArticuloCardViewUnoComponent,
     CargalistasComponent,
-    MenuappComponent
+    MenuappComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,

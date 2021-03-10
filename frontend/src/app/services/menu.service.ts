@@ -13,6 +13,6 @@ export class MenuService {
           return m.data;
         }
       }
-      return { title: id, comment: 'Comuniquese con el Administrador del sistema, esta opcion no existe' };
+      return {data: { title: id, icon: '', comment: 'Comuniquese con el Administrador del sistema, esta opcion no existe' }};
     }
 }

@@ -3,15 +3,26 @@ export const menudata = [
     id: 'menu',
     data: {
       title: 'Administración',
-      comment: 'asdfasdf adfs asd adsfasdf asdf asf',
+      comment: '',
+      icon: 'fas fa-home fa-4x',
       menu: [
+        {
+          title: 'Perfil',
+          icon: 'far fa-user fa-3x',
+          permiso: 'owner',
+          target: '',
+          rel: 'noopener',
+          route: '/user',
+          param: ''
+        },
         {
           title: 'Configuración',
           icon: 'fas fa-cogs fa-3x',
           permiso: 'moderator',
-          target: '_blank',
+          target: '',
           rel: 'noopener',
-          href: 'https://angular.io/tutorial'
+          route: 'config',
+          param: ''
         },
         {
           title: 'Archivos',
@@ -20,16 +31,6 @@ export const menudata = [
           target: '',
           rel: 'noopener',
           route: 'archivos',
-          param: ''
-
-        },
-        {
-          title: 'Personas',
-          icon: 'fas fa-user-alt fa-3x',
-          permiso: 'moderator',
-          target: '',
-          rel: 'noopener',
-          route: 'archivos1',
           param: ''
         },
         {
@@ -60,30 +61,11 @@ export const menudata = [
     }
   },
   {
-    id: 'default',
+    id: 'config',
     data: {
-      title: 'asdasdf',
-      comment: 'asdfasdfa',
-      menu: [
-        {
-          title: 'Datos personales',
-          icon: 'fas fa-database fa-3x',
-          permiso: 'moderator',
-          target: '',
-          rel: 'noopener',
-          route: '/pesonas/',
-          param: ''
-        },
-
-      ]
-    }
-  },
-  {
-    id: 'archivos',
-    data:
-    {
-      title: 'Archivos',
-      comment: 'asdfas adsaf',
+      title: 'Configuraciones',
+      icon: 'fas fa-cogs fa-4x',
+      comment: 'Puesta a punto el sistema',
       menu: [
         {
           title: 'Importar Base de Datos',
@@ -112,13 +94,62 @@ export const menudata = [
           href: '/cargalistas',
           param: ''
         },
+
+      ]
+    }
+  },
+  {
+    id: 'default',
+    data: {
+      title: 'asdasdf',
+      comment: 'asdfasdfa',
+      menu: [
         {
-          title: 'Personas',
-          icon: 'fas fa-user-alt fa-3x',
+          title: 'Datos personales',
+          icon: 'fas fa-database fa-3x',
           permiso: 'moderator',
           target: '',
           rel: 'noopener',
-          href: 'https://angular.io/tutorial',
+          route: '/pesonas/',
+          param: ''
+        },
+
+      ]
+    }
+  },
+  {
+    id: 'archivos',
+    data:
+    {
+      title: 'Archivos',
+      icon: 'fas fa-folder-open fa-4x',
+      comment: 'Archivos del Sistema',
+      menu: [
+        {
+          title: 'Usuarios',
+          icon: 'fas fa-users fa-3x',
+          permiso: 'owner',
+          target: '',
+          rel: 'noopener',
+          route: '/user',
+          param: ''
+        },
+        {
+          title: 'Libreta Direcciones',
+          icon: 'far fa-address-book fa-3x', // 'fas fa-user-alt fa-3x',
+          permiso: 'moderator',
+          target: '',
+          rel: 'noopener',
+          route: '/personas',
+          param: ''
+        },
+        {
+          title: 'Articulos',
+          icon: 'fas fa-barcode fa-3x',
+          permiso: 'moderator',
+          target: '',
+          rel: 'noopener',
+          route: '/articulos',
           param: ''
         },
         {
