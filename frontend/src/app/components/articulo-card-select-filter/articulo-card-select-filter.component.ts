@@ -23,12 +23,12 @@ export class ArticuloCardSelectFilterComponent implements OnInit {
 
   // tslint:disable-next-line:use-lifecycle-interface
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('FILTER ONCHANGES');
+//    console.log('FILTER ONCHANGES');
 //    console.log(changes);
   }
   searchArticulos(): void {
     const searchItem = this.searchItem || '';
-    console.log('FILTER-EMIT-EVENT');
+//    console.log('FILTER-EMIT-EVENT');
     this.onSearchArticulos.emit({ setting: this.setting, searchItem });
   }
 

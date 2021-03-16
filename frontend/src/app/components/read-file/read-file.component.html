@@ -1,0 +1,19 @@
+<!--div class="progress" *ngIf="existingFile">
+  <div
+    class="progress-bar progress-bar-striped bg-danger"
+    attr.aria-valuenow="{{ progress }}"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    [ngStyle]="{ width: progress + '%' }"
+  >
+    {{ progress }}%
+  </div>
+</div-->
+
+<input type="file" (change)="chooseFile($event)" />
+
+<button class="btn btn-primary" [disabled]="!chosenFiles" (click)="load()">
+  Upload
+</button>
+
+<div class="alert alert-light">{{ msg }}</div>

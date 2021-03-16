@@ -13,8 +13,6 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 	if( !qry.Extra ) qry.Extra = {};
 //	if( !qry.Sort ) qry.Sort = {'fabricante': 1, 'marca': 1, 'especie': 1, 'rubro': 1, 'linea': 1, 'edad': 1, 'raza': 1	};
 	if( !qry.Sort ) qry.Sort = { 'rubro': 1, 'linea': 1, 'contiene': 1, 'precio': 1 };
-	console.log(qry.Producto);
-	console.log(qry.Extra);
 	const array = await producto.aggregate([
 		{ $match: qry.Producto },
 		{
@@ -653,7 +651,6 @@ class ProductoControler {
 		for (let index = 0; index < artList.length; index++) {
 			artList[index] = new ObjectID(artList[index]._id);
 		}
-//		console.log(artList);
 		const qry = { Producto: {'articulo' : { '$in': artList }, pCompra: true }};
 		const readData: any = await productoGetData(qry);
 		res.status(200).json(readData)
@@ -675,7 +672,6 @@ class ProductoControler {
 			artList = await producto.find(myMatch);
 		}
 		if ((myMatch == undefined || artList.length == 0) && qry.searchItem ) {
-			console.log(qry.searchItem)
 			const Articulo = articuloSanitizeString(qry.searchItem);
 
 			if (Articulo){
@@ -683,11 +679,9 @@ class ProductoControler {
 				for (let index = 0; index < artList.length; index++) {
 					artList[index] = new ObjectID(artList[index]._id);
 				}
-//				console.log(artList);
 				qry.Producto['articulo'] = { '$in': artList }
 			}
 		}
-		console.log(qry);
 		const readData: any = await productoGetData(qry);
 		res.status(200).json(readData)
 	}
@@ -776,7 +770,6 @@ class ProductoControler {
 
 	async insertMany(req: Request, res: Response) {
 		try {
-			console.log(req.body);
 			const rpta = await producto.insertMany(req.body);
 			res.status(200).json(rpta);
 		} catch (error) {
@@ -800,7 +793,6 @@ class ProductoControler {
 	async modifica(req: Request, res: Response) {
 		const { id } = req.params;
 		try {
-			console.log(req.body)
 			const ret = await producto.findOneAndUpdate({ _id: id }, { $set: req.body });
 			res.status(200).json({ msg: "Update Ok", old: ret, new: req.body });
 		} catch (error) {
@@ -833,7 +825,6 @@ class ProductoControler {
 									qry.Articulo[key][i][id] = { $regex: new RegExp(element['$regex'], element['mod']) }
 								}
 							}
-							console.log(qry.Articulo[key])
 						}
 					} else {
 						const element = qry.Articulo[key];
@@ -845,7 +836,6 @@ class ProductoControler {
 								let array = element['$in']['$regExp']
 								for (let index = 0; index < array.length; index++) {
 									array[index] = new RegExp(`^${array[index]}`, 'i');
-									console.log(array[index])
 								}
 								qry.Articulo[key]['$in'] = array
 							}
@@ -861,7 +851,6 @@ class ProductoControler {
 					}
 				}
 			}
-			console.log(qry)
 //			const rpta: any = await readProductos(qry);
 			const rpta: any = await productoGetData(qry);
 			res.status(200).json(rpta);

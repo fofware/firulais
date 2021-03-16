@@ -4,6 +4,7 @@ import { ExtractJwt } from "passport-jwt";
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
 import passport from "passport";
+import { ObjectID } from 'bson'
 
 function createToken(user: IUser) {
   return jwt.sign({ id: user.id, 
@@ -147,6 +148,8 @@ class UserControler {
     this.router.get('/api/user/:id',passport.authenticate('jwt', {session:false}), this.get );
     this.router.put('/api/user/:id',passport.authenticate('jwt', {session:false}), this.put );
     this.router.post('/api/user/add',passport.authenticate('jwt', {session:false}), this.add );
+    this.router.post('/api/user/import',  // passport.authenticate('jwt', {session:false}), 
+                      this.import );
   }
 
 	public index(req: Request, res: Response) {
@@ -158,7 +161,21 @@ class UserControler {
 		res.json(articulos);
 	}
 
-	async get(req: Request, res: Response) {
+	async import(req: Request, res: Response) {
+		try {
+      if ( req.body._id ) req.body._id = new ObjectID( req.body._id );
+			const newReg = await User.updateOne(
+								{ _id: req.body._id, email: req.body.email },   // Query parameter
+								{ $set: req.body }, 
+								{ upsert: true }    // Options
+							);
+			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
+    } catch (error) {
+			res.status(500).json(error);
+		}
+	}
+
+  async get(req: Request, res: Response) {
 		const { id } = req.params
 		User.findById(id)
 		.then( (rpta: any) => {
@@ -180,7 +197,7 @@ class UserControler {
 	}
 
 	async add( req: Request, res: Response ){
-		const art = await User.findOne({ name: req.body.name });
+		const art = await User.findOne({ name: req.body.email });
 		if (art)
 			return res.status(400).json({ msg: 'Usuario ya existe', art });
 			const newArticulo = new User(req.body);

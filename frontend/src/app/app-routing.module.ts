@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { ApitoapiComponent } from './components/apitoapi/apitoapi.component';
 import { CargalistasComponent } from './components/cargalistas/cargalistas.component';
 import { HomeComponent } from './components/home/home.component';
+import { ImportDataComponent } from './components/import-data/import-data.component';
 import { MenuappComponent } from './components/menuapp/menuapp.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { ProdListPublicComponent } from './components/prod-list-public/prod-list-public.component';
@@ -41,8 +43,18 @@ const routes: Routes = [
     path: 'cargalistas'
     , component: CargalistasComponent
 //    , canActivate: [AuthGuard]
-  },
-  { path: '**',
+  }
+  , {
+    path: 'apitoapi'
+    , component: ApitoapiComponent
+//    , canActivate: [AuthGuard]
+  }
+  , {
+    path: 'importdata'
+    , component: ImportDataComponent
+//    , canActivate: [AuthGuard]
+  }
+  , { path: '**',
     component: PageNotFoundComponent
   }
 ];

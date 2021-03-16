@@ -125,8 +125,6 @@ const readProductos1 = function (qry: any): PromiseLike<any[]> {
   qry.Producto['pesable'] = { $ne: true };
   qry.Producto['_id'] = { $not: { $in: noList } }
   //  qry.Producto['_id'] = {$in: ["5f2ef5338fa2e3381c64f2b6","5f2ef4d78fa2e3381c64f2b0","5f2ef5e38fa2e3381c64f2bd"]}
-  console.log(noList);
-  console.log(qry.Producto);
   return articulo.aggregate([
     { $match: qry.Producto }
     , {
@@ -187,7 +185,6 @@ class MongoTestControler {
                   qry.Articulo[key][i][id] = { $regex: new RegExp(element['$regex'], element['mod']) }
                 }
               }
-              console.log(qry.Articulo[key])
             }
           } else {
             const element = qry.Articulo[key];
@@ -199,7 +196,6 @@ class MongoTestControler {
                 let array = element['$in']['$regExp']
                 for (let index = 0; index < array.length; index++) {
                   array[index] = new RegExp(`^${array[index]}`, 'i');
-                  console.log(array[index])
                 }
                 qry.Articulo[key]['$in'] = array
               }
@@ -215,7 +211,6 @@ class MongoTestControler {
           }
         }
       }
-      console.log(qry)
       const rpta: any = await readProductos(qry);
       res.status(200).json(rpta);
     } catch (error) {

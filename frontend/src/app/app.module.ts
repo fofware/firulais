@@ -20,6 +20,11 @@ import { ArticuloCardViewUnoComponent } from './components/articulo-card-view-un
 import { CargalistasComponent } from './components/cargalistas/cargalistas.component';
 import { MenuappComponent } from './components/menuapp/menuapp.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
+import { ApitoapiComponent } from './components/apitoapi/apitoapi.component';
+import { ApiconnectComponent } from './components/apiconnect/apiconnect.component';
+import { UploadComponent } from './components/upload/upload.component';
+import { ReadFileComponent } from './components/read-file/read-file.component';
+import { ImportDataComponent } from './components/import-data/import-data.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +43,12 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
     ArticuloCardViewUnoComponent,
     CargalistasComponent,
     MenuappComponent,
-    PageNotFoundComponent
+    PageNotFoundComponent,
+    ApitoapiComponent,
+    ApiconnectComponent,
+    UploadComponent,
+    ReadFileComponent,
+    ImportDataComponent
   ],
   imports: [
     BrowserModule,

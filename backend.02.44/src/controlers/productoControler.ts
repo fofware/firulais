@@ -628,52 +628,6 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 console.log(qry.Sort)
 	return array;
 } 
-/*
-	aggregate([
-		{ $match: qry }
-		,
-			{
-				 $lookup: {
-						from: "articulos",
-						localField: "articulo",    // field in the orders collection
-						foreignField: "_id",  // field in the items collection
-						as: "fromItems"
-				 }
-			},
-			{
-				 $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$fromItems", 0 ] }, "$$ROOT" ] } }
-			},
-			{ $project: { fromItems: 0 } }
-
-	]).sort({name: 1})
-
-		db.articulos.aggregate([
-			{
-				 $lookup: {
-						from: "productos",
-						pipeline: [
-							{ $match: { precio: { $gt: 0 }}}
-						],
-						localField: "_id",
-						foreignField: "articulo",
-						as: "productos"
-				 }
-			}
-		])
-
-		db.productos.aggregate([
-			{ $match: { precio: { $gt: 0 }}},
-			{
-				 $lookup: {
-						from: "articulos",
-						localField: "articulo",
-						foreignField: "_id",
-						as: "articulo"
-				 }
-			}
-		])
-	*/
-
 
 class ProductoControler {
 
@@ -692,8 +646,9 @@ class ProductoControler {
 		this.router.get('/producto/marca/:id', this.marca );
 
 		this.router.post('/producto', this.add);
+		this.router.post('/producto/import', this.import);
 		this.router.delete('/producto/:id', this.delete);
-		this.router.put('/productos', this.update);
+//		this.router.put('/productos', this.update);
 		this.router.put('/producto/:id', this.modifica);
 
 		// todo lo de abajo parece que es para borrar 
@@ -742,12 +697,11 @@ class ProductoControler {
 		if ((myMatch == undefined || artList.length == 0) && qry.searchItem ) {
 			console.log(qry.searchItem)
 			const Articulo = articuloSanitizeString(qry.searchItem);
-
 			if (Articulo){
 				artList = await readArticulos({ Articulo, Project: {'_id': 1}, Sort: {'_id': 1} });
 				for (let index = 0; index < artList.length; index++) {
-//					artList[index] = new ObjectID(artList[index]._id);
-					artList[index] = artList[index]._id;
+					artList[index] = new ObjectID(artList[index]._id);
+//					artList[index] = artList[index]._id;
 				}
 //				console.log(artList);
 				qry.Producto['articulo'] = { '$in': artList }
@@ -802,7 +756,7 @@ class ProductoControler {
 
 	async delete(req: Request, res: Response) {
 		const { id } = req.params;
-		producto.findByIdAndDelete(id).then(rpta => {
+		producto.findByIdAndDelete( new ObjectID(id)).then(rpta => {
 			res.status(200).json(rpta);
 		}).catch(err => {
 			console.log(err);
@@ -826,6 +780,7 @@ class ProductoControler {
 			const array = [];
 			for (let i = 0; i < req.body.length; i++) {
 				const e = req.body[i];
+				e._id = new ObjectID(e._id);
 				const rpta = await producto.updateOne( {_id: e._id}, { $set :  e  }, { upsert: true });
 				array.push(rpta)
 //				const reg = new producto(e);
@@ -853,6 +808,7 @@ class ProductoControler {
 //			const reg = await producto.findOne({ name: req.body.name });
 //			if (reg)
 //				return res.status(400).json({ msg: 'Registro ya existe', reg });
+			if ( req.body._id ) req.body._id = new ObjectID( req.body._id );
 			const newReg = new producto(req.body);
 			await newReg.save();
 			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
@@ -861,11 +817,38 @@ class ProductoControler {
 		}
 	}
 
+	async import(req: Request, res: Response) {
+		try {
+/*
+			if ( req.body._id ) req.body._id = new ObjectID( req.body._id );
+			let prodReg = await producto.findOne({ _id: req.body._id });
+      if ( prodReg === null ){
+        prodReg = new producto(req.body);
+      }
+			console.log(prodReg);
+*/
+			const toObjID = ['_id','articulo','parent'];
+			for (let i = 0; i < toObjID.length; i++) {
+				const e = toObjID[i];
+				if( req.body[e] ) req.body[e] = new ObjectID(req.body[e])
+			}
+			const newReg = await producto.updateOne(
+								{ _id: req.body._id },   // Query parameter
+								{ $set: req.body }, 
+								{ upsert: true }    // Options
+							);
+			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
+		} catch (error) {
+			console.log(error);
+			res.status(500).json(error);
+		}
+	}
+
 	async modifica(req: Request, res: Response) {
 		const { id } = req.params;
 		try {
 			console.log(req.body)
-			const ret = await producto.findOneAndUpdate({ _id: id }, { $set: req.body });
+			const ret = await producto.findOneAndUpdate({ _id:  new ObjectID(id) }, { $set: req.body });
 			res.status(200).json({ msg: "Update Ok", old: ret, new: req.body });
 		} catch (error) {
 			res.status(500).json(error);

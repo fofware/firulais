@@ -41,7 +41,6 @@ class PersonaControler {
 	async delete( req: Request, res: Response ){
 		const { id } = req.params;
 		persona.findByIdAndDelete(id).then( rpta => {
-			console.log(rpta)
 			res.status(200).json(rpta);
 		}).catch(err => {
 			console.log(err);
@@ -79,7 +78,6 @@ class PersonaControler {
 		})
 	}
 	find( req: Request, res: Response){
-		console.log(req.body);
     const qry = { $or: [ {"apellido": { $regex: new RegExp( req.body.search , 'i') }}, {"nombre": { $regex: new RegExp( req.body.search , 'i')}} ] }
 		persona.find( qry ).sort({name: 1})
 		.then( rpta => {

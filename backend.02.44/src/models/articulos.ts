@@ -1,4 +1,5 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, Document, isValidObjectId } from "mongoose";
+import { ObjectID } from 'bson'
 
 export interface IArticulo extends Document {
   fabricante: string;
@@ -22,6 +23,8 @@ export interface IArticulo extends Document {
   iva: number;
   margen: number;
   tags: string;
+//  getFullName: () => Promise<string>
+  setObjectIDs: () => Promise<void>
 };
 
 const articuloSchema = new Schema({
@@ -29,10 +32,10 @@ const articuloSchema = new Schema({
   marca: { type: String, trim: true, default: ''},      // Purina Dog Chow / Purina Cat Chow
   rubro: { type: String, trim: true, default: ''},      // Alimento Seco / Alimento Húmedo
   linea: { type: String, trim: true, default: ''},      // ???????
-  name: { type: String, trim: true, default: '' },      // Gatitos Carne y Leche
   especie: { type: String, trim: true, default: '' },   // Gato
-  edad: { type: String, trim: true, default: '' },      // Gatito Cachorro
-  raza: { type: String, trim: true, default: '' },      // 
+  edad: { type: String, trim: true, default: '' },
+  raza: { type: String, trim: true, default: '' },
+  name: { type: String, trim: true, default: '' },      // Gatitos Carne y Leche
   d_fabricante: {type: Boolean, default: false },
   d_marca: {type: Boolean, default: true },
   d_rubro: {type: Boolean, default: false },
@@ -47,6 +50,10 @@ const articuloSchema = new Schema({
   margen: { type: Number, default: 35},
   tags: { type: String, trim: true, default: '' }
 });
+
+articuloSchema.methods.setObjectIDs = async function (): Promise<void> {
+  this._id = new ObjectID(this._id);
+}
 
 export default model<IArticulo>('Articulo', articuloSchema);
 

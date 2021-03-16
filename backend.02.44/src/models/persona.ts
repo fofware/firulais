@@ -8,6 +8,7 @@ export interface IRetencion {
 }
 
 export interface IPersona extends Document {
+  _id?: object;
   email: string;
   apellido: string;
   nombre: string;
@@ -27,7 +28,8 @@ export interface IPersona extends Document {
 
 }
 const personaSchema = new Schema({
-  email:{ type: String, lowercase: true, trim: true }
+  _id: { type: Schema.Types.ObjectId }
+  , email:{ type: String, lowercase: true, trim: true }
   , apellido: { type: String, trim: true }
   , nombre: { type: String, trim: true }
   , cuit:{ type: String, trim: true }
@@ -39,7 +41,8 @@ const personaSchema = new Schema({
   , zipcode: { type: String, trim: true }
   , pais: { type: String, trim: true }
   , coeficiente: { type: Number, default: 1 }
-  , categoria: { type: Array }
+  , categoria: { type: Array, default: [] }
+  , retiene: { type: Array, default: [] }
 })
 /*
 userSchema.pre<IPersona>('save', async function(next) {

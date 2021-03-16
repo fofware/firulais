@@ -35,7 +35,6 @@ export const qryProductosProcess = function (qry: any) {
                 qry.Articulo[key][i][id] = { $regex: new RegExp(element['$regex'], element['mod']) }
               }
             }
-            console.log(qry.Articulo[key])
           }
         } else {
           const element = qry.Articulo[key];

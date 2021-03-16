@@ -17,7 +17,6 @@ export function doQry(cmd: string, data: any): string {
 export function doWhere( data: any ): string {
     let strWhere = " WHERE ";
     let sep = "";
-    console.log (data);
     Object.keys(data).forEach(function(key) {
         strWhere += sep + '`' + key + "`='" + data[key] + "'";
         sep = " and "
@@ -26,12 +25,10 @@ export function doWhere( data: any ): string {
 } 
 export function doUpdate( data: any ): string {
     let strUpdate = "UPDATE "+data.table+" SET ";
-    console.log (data);
     const {id} = data; 
     let sep = "";
     delete(data.table);
     delete(data.id);
-    console.log (data);
     Object.keys(data).forEach(function(key) {
         strUpdate += sep + '`' + key + "`='" + data[key] + "'";
         sep = ", "

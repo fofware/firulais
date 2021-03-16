@@ -22,7 +22,6 @@ export const findProduct = function (prodList: any[], id: string) {
 }
 
 export const qryProductosProcess = function (qry: any) {
-//  console.log(qry)
   if (qry.Articulo) {
     for (const key in qry.Articulo) {
       if (Object.prototype.hasOwnProperty.call(qry.Articulo, key)) {
@@ -35,7 +34,6 @@ export const qryProductosProcess = function (qry: any) {
                 qry.Articulo[key][i][id] = { $regex: new RegExp(element['$regex'], element['mod']) }
               }
             }
-            console.log(qry.Articulo[key])
           }
         } else {
           const element = qry.Articulo[key];

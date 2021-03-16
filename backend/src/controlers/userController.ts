@@ -35,7 +35,6 @@ export const signUp = async (req: Request, res: Response): Promise<Response> => 
   await newUser.save();
   delete newUser.password;
   const token = createToken(newUser);
-  console.log(newUser);
   delete newUser.__v;
   delete newUser.password;
   newUser.__v = null;
@@ -53,7 +52,6 @@ export const signIn = async (req: Request, res: Response): Promise<Response> => 
   if (!isMatch)
     return res.status(401).json({ msg: 'Contraseña y/o Usuario ivalidos' });
   const token = createToken(user);
-  console.log(user);
   delete user.__v ;
   delete user.password;
   user.password = null;
@@ -171,7 +169,6 @@ class UserControler {
 	async delete( req: Request, res: Response ){
 		const { id } = req.params;
 		User.findByIdAndDelete(id).then( (rpta: any) => {
-			console.log(rpta)
 			res.status(200).json(rpta);
 		}).catch((err: any) => {
 			console.log(err);

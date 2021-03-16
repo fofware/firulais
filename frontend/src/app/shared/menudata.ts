@@ -68,16 +68,7 @@ export const menudata = [
       comment: 'Puesta a punto el sistema',
       menu: [
         {
-          title: 'Importar Base de Datos',
-          icon: 'fas fa-database fa-3x',
-          permiso: 'moderator',
-          target: '',
-          rel: 'noopener',
-          route: 'menu',
-          param: ''
-        },
-        {
-          title: 'Importar Archivos',
+          title: 'Archivos',
           icon: 'fas fa-folder fa-3x',
           permiso: 'moderator',
           target: '',
@@ -86,7 +77,7 @@ export const menudata = [
           param: 'archivos1'
         },
         {
-          title: 'Importar Listas',
+          title: 'Archivos',
           icon: 'fas fa-cogs fa-3x',
           permiso: 'moderator',
           target: '',
@@ -186,16 +177,28 @@ export const menudata = [
     id: 'archivos1',
     data:
     {
-      title: 'Archivos1',
-      comment: 'asdfas adsaf',
+      title: 'Archivos',
+      comment: 'Manejo de Archivos',
+      icon: 'fas fa-folder-open fa-4x',
       menu: [
+/*
         {
-          title: 'Importar Base de Datos',
+          title: 'Copia de Api a Api',
           icon: 'fas fa-database fa-3x',
           permiso: 'moderator',
           target: '',
           rel: 'noopener',
-          href: '/menuarchivos',
+          route: '/apitoapi',
+          param: ''
+        },
+*/
+        {
+          title: 'Importar Base de Datos',
+          icon: 'fas fa-cloud-download-alt fa-3x',
+          permiso: 'moderator',
+          target: '',
+          rel: 'noopener',
+          href: '/apitoapi',
           param: ''
         },
         {
@@ -204,7 +207,7 @@ export const menudata = [
           permiso: 'moderator',
           target: '',
           rel: 'noopener',
-          href: '/menuarchivos',
+          href: '/importdata',
           param: ''
         },
         {

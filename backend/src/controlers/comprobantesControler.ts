@@ -32,7 +32,6 @@ class comprobantesControler {
 	}
 
 	async add(req: Request, res: Response) {
-		console.log(req.body)
 		try {
 			const newReg = new comprobante(req.body);
 			await newReg.save();

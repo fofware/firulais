@@ -16,7 +16,7 @@ export class ArticuloCardSelectBoxListComponent implements OnInit, OnChanges {
   ngOnInit(): void {
   }
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('BOX-LIST-CHANGES', changes);
+//    console.log('BOX-LIST-CHANGES', changes);
 /*
     for (const propName in changes) {
       console.log(propName,changes[propName]);

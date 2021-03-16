@@ -1,39 +1,36 @@
 import { Schema, model, Document } from "mongoose";
 
 export interface IProducto extends Document {
-  articulo: object;
-  parent: object;
-  name: string;
-  contiene: number;
-  unidad: string;
-  precio: number;
-  compra: number;
-  reposicion: number;
-  pesable: boolean;
-  servicio: boolean;
-  pVenta: boolean;
-  pCompra: boolean;
-  codigo: string;
-  plu: number;
-  image: string;
-  stock: number;
-  stockMin: number;
-  iva: number;
-  margen: number;
-
+  _id?: object;
+  articulo?: object;
+  parent?: object;
+  name?: string;
+  contiene?: number;
+  unidad?: string;
+  precio?: number;
+  compra?: number;
+  reposicion?: number;
+  pesable?: boolean;
+  servicio?: boolean;
+  pVenta?: boolean;
+  pCompra?: boolean;
+  codigo?: string;
+  plu?: number;
+  image?: string;
+  stock?: number;
+  stockMin?: number;
+  stockMax?: number;
+  iva?: number;
+  margen?: number;
+  tags?: string;
+  
 //  getFullName: () => Promise<string>
 }
 
 const productoSchema = new Schema({
-  articulo: {
-    type: Schema.Types.ObjectId
-    ,ref: "articulos"
-  }
-  , parent: {
-    type: Schema.Types.ObjectId
-    ,ref: "productos"
-    ,default: null
-  }
+  _id: { type: Schema.Types.ObjectId }
+  , articulo: { type: Schema.Types.ObjectId, ref: "articulos" }
+  , parent: { type: Schema.Types.ObjectId, ref: "productos", default: null }
   , name: { type: String, trim: true, default: "" }
   , contiene: { type: Number, default: 0 }
   , unidad: { type: String, trim: true, default: "" }
@@ -49,9 +46,13 @@ const productoSchema = new Schema({
   , image: { type: String, trim: true, default: "" }
   , stock: { type: Number, default: 0 }
   , stockMin: { type: Number, default: 0 }
+  , stockMax: { type: Number, default: 0 }
   , iva: { type:Number, default: 0 }
   , margen: { type: Number, default: 35 }
-  , tags: { ref: "tags", type: Schema.Types.ObjectId}
+  , tags: { ref: "tags", type: String, default: ''}
+},{
+  timestamps: true,
+  versionKey: true
 })
 
 

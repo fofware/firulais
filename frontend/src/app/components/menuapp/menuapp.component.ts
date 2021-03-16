@@ -20,7 +20,7 @@ export class MenuappComponent implements OnInit {
   ) {
     this.menuId = this.actRoute.snapshot.params.id;
     this.findMenu();
-    console.log('this.menuId', this.menuId);
+  //  console.log('this.menuId', this.menuId);
   }
 
   ngOnInit(): void {
@@ -36,6 +36,6 @@ export class MenuappComponent implements OnInit {
   findMenu(): void{
     const menuData = this.menuService.get( this.menuId) ;
     this.data = menuData;
-    console.log(this.data);
+//    console.log(this.data);
   }
 }

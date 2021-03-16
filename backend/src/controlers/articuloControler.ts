@@ -257,9 +257,7 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 		qry.Project = artProject; 
 		qry.Project.productos = 1;
 	}
-//	console.log(qry.Sort)
 	if (!qry.Sort) qry.Sort = {fullName: 1};
-//	console.log(qry);
 	return articulo.aggregate([
 		{ $match: qry.Articulo }
 		,{ $graphLookup:
@@ -282,7 +280,6 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 }	
 
 export const articuloSanitizeString = function (search: string) {
-//	console.log(search);
 	if(!search || search.length == 0) return null;
 	const Articulo = {'$and': []};
 	const searchItem = search.replace(/  /g, ' ');
@@ -391,9 +388,7 @@ class ArticuloControler {
 		try {
 			const filter = { _id: new ObjectID(req.params.id) };
 //			req.body._id = filter._id;
-			console.log(req.body);
 			const rpta = await articulo.updateOne( filter, { $set :  req.body  }, { upsert: true });
-			console.log(rpta);
 			return res.status(200).json( rpta );
 		} catch (error) {
 			console.log(error);
@@ -487,7 +482,6 @@ class ArticuloControler {
 	async findProductos ( req: Request, res: Response ) {
 		try {
 			const qry = req.body;
-			console.log(qry);
 			const rpta = await readProductos(qry);
 			res.status(200).json(rpta);
 		} catch (error) {

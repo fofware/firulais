@@ -1,9 +1,10 @@
 import { Request, Response, Router } from 'express';
 import passport from "passport";
-import comprobante from '../models/comprobante';
+import comprobante, { IComprobante } from '../models/comprobante';
 import producto from '../models/producto';
 import articulo, { IArticulo } from '../models/articulos';
 import { decimales, round } from '../common/utils';
+import { ObjectID } from 'bson'
 
 
 class comprobantesControler {
@@ -15,15 +16,60 @@ class comprobantesControler {
 
 	config() {
 		this.router.get('/api/comprobante/', passport.authenticate('jwt', { session: false }), this.index);
-		this.router.post('/api/comprobante/add', passport.authenticate('jwt', { session: false }), this.add);
+//		this.router.post('/api/comprobante/add', passport.authenticate('jwt', { session: false }), this.add);
+		this.router.post('/api/comprobante/add', this.add);
 		this.router.get('/api/comprobantes/list', this.list);
 		this.router.get('/api/comprobante/fecha', this.fechavta);
 		this.router.get('/api/comprobantes/modifica', this.modifica);
 		this.router.get('/api/comprobantes/test', this.test);
+		this.router.post('/api/comprobante/import', this.import);
 	}
 
 	public index(req: Request, res: Response) {
 		res.send('Comprobantes');
+	}
+
+	async setIds( data: any ): Promise<void> {
+		const iteToObId = ['articuloId','productoId','stock_id'];
+		if ( data._id ) data._id = new ObjectID( data._id );
+		if ( data.persona._id) data.persona._id = new ObjectID(data.persona._id); 
+		for (let i = 0; i < data.items.length; i++) {
+			const element = data.items[i];
+			for (let j = 0; j < iteToObId.length; j++) {
+				const key = iteToObId[j];
+				if (Object.prototype.hasOwnProperty.call(element, key)) {
+					data.items[i][key] = new ObjectID(element[key]);
+				}
+			}
+		}
+	}
+
+	async import(req: Request, res: Response): Promise<void> {
+//		await this.setIds( req.body );
+		const iteToObId = ['articuloId','productoId','stock_id'];
+		if ( req.body._id ) req.body._id = new ObjectID( req.body._id );
+		if ( req.body.persona._id) req.body.persona._id = new ObjectID(req.body.persona._id); 
+		for (let i = 0; i < req.body.items.length; i++) {
+			const element = req.body.items[i];
+			for (let j = 0; j < iteToObId.length; j++) {
+				const key = iteToObId[j];
+				if (Object.prototype.hasOwnProperty.call(element, key)) {
+					req.body.items[i][key] = new ObjectID(element[key]);
+				}
+			}
+		}
+
+		try {
+			const newReg = await comprobante
+					.updateOne(
+						{ _id: req.body._id },   // Query parameter
+						{ $set: req.body }, 
+						{ upsert: true }    // Options
+					);
+			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
+		} catch (error) {
+			res.status(500).json(error);
+		}
 	}
 
 	async list(req: Request, res: Response) {
@@ -31,18 +77,33 @@ class comprobantesControler {
 		res.json(comprobantes);
 	}
 
-	async add(req: Request, res: Response) {
+	async add(req: Request, res: Response): Promise<any> {
 		console.log(req.body)
 		try {
+/*
 			const newReg = new comprobante(req.body);
 			await newReg.save();
-			return res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
+*/
+			if ( req.body._id ) req.body._id = new ObjectID( req.body._id );
+/*
+			const newReg = await comprobante
+					.updateOne(
+						{ _id: req.body._id },   // Query parameter
+						{ $set: req.body }, 
+						{ upsert: true }    // Options
+					);
+*/
 
+			const newReg = new comprobante(req.body);
+			await newReg.save();
+			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
+		
+			return res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
 		} catch (error) {
 			return res.status(500).json(error);
-
 		}
 	}
+
 	async fechavta(req: Request, res: Response) {
 		try {
 			const qry = req.body;

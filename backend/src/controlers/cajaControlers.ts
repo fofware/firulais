@@ -9,11 +9,8 @@ import { round } from '../common/utils';
 
 const readData4 = async function (qry: any) {
   qry = qryProductosProcess(qry);
-  console.log(qry);
   try {
     qry = qryProductosProcess(qry);
-    console.log(qry);
-
     const retData: any[] = await articulo.aggregate([
       {
         $addFields: {
@@ -50,19 +47,12 @@ const readData4 = async function (qry: any) {
 }
 const readData = async function (qry: any) {
   qry = qryProductosProcess(qry);
-  console.log(qry);
   try {
     const artList = await articulo.find(qry.Articulo)
     for (let index = 0; index < artList.length; index++) {
       artList[index] = artList[index]._id;
     }
-    console.log("articulos", artList.length)
     qry.Producto['articulo'] = { $in: artList }
-    console.log("-------------------------------------------------")
-    console.log(qry)
-    console.log("-------------------------------------------------")
-    console.log(qry.Producto)
-    console.log("-------------------------------------------------")
     const retData: any[] = await producto.aggregate([
       { $match: qry.Producto },
       {
@@ -124,22 +114,12 @@ const readData = async function (qry: any) {
 
 const readData1 = async function (qry: any) {
   qry = qryProductosProcess(qry);
-  console.log(qry);
   try {
     const artList: any[] = await articulo.find(qry.Articulo)
     for (let index = 0; index < artList.length; index++) {
       artList[index] = new ObjectID(artList[index]._id);
     }
     qry.Producto['articulo'] = { $in: artList }
-    console.log("-------------------------------------------------")
-    console.log('qry', qry)
-    console.log("-------------------------------------------------")
-    console.log('qry.Producto', qry.Producto)
-    /*
-        console.log('qry.Producto.$or.stock',qry.Producto['$or'][0])
-        
-        console.log("-------------------------------------------------")
-    */
     const retData: any[] = await producto.aggregate([
       { $match: qry.Producto },
       {
@@ -214,18 +194,13 @@ const readData3 = async function (qry: any) {
   try {
     let myMatch:any;
     let artList:any[] = [];
-    console.log('Articulo',qry.Articulo)
-    console.log("qry.Articulo['$and']", qry.Articulo['$and'])
-//    console.log("qry.Articulo['$and'].length",qry.Articulo['$and'].length)
 
     if(qry.Articulo['$and'] && qry.Articulo['$and'].length == 1){
       myMatch = { '$or': [
         {'codigo': qry.Articulo['$and'][0]['name']['$regex']}
         ,{'plu': {'$eq': qry.Articulo['$and'][0]['name']['$regex']}}
       ]}
-      console.log('myMatch', myMatch)
       artList = await producto.find(myMatch);
-      console.log('artList',artList)
     }
     qry = qryProductosProcess(qry);
     if(myMatch == undefined || artList.length == 0){
@@ -236,19 +211,6 @@ const readData3 = async function (qry: any) {
       myMatch = {'articulo':{'$in': artList } }
     }
     //    qry.Producto['articulo'] = { $in: artList }
-    console.log("-------------------------------------------------")
-    console.log('qry', qry)
-    console.log("-------------------------------------------------")
-    console.log('artList',artList)
-    console.log('myMatch', myMatch)
-    console.log("-------------------------------------------------")
-    console.log('qry.Producto', qry.Producto)
-    console.log("-------------------------------------------------")
-    /*
-        console.log('qry.Producto.$or.stock',qry.Producto['$or'][0])
-        
-        console.log("-------------------------------------------------")
-    */
     const retData = await producto.aggregate([
       {
         $match: myMatch
@@ -343,23 +305,11 @@ const readData3 = async function (qry: any) {
 
 const readData2 = async function (qry: any) {
   qry = qryProductosProcess(qry);
-  console.log(qry);
   try {
     const artList: any[] = await articulo.find(qry.Articulo)
     for (let index = 0; index < artList.length; index++) {
       artList[index] = new ObjectID(artList[index]._id);
     }
-    //    qry.Producto['articulo'] = { $in: artList }
-    console.log("-------------------------------------------------")
-    console.log('qry', qry)
-    console.log("-------------------------------------------------")
-    console.log('qry.Producto', qry.Producto)
-    /*
-        console.log('qry.Producto.$or.stock',qry.Producto['$or'][0])
-        
-        console.log("-------------------------------------------------")
-    */
-
   } catch (error) {
     return error;
   }
@@ -367,7 +317,6 @@ const readData2 = async function (qry: any) {
 
 const loadData = async function (qry: any) {
   qry = qryProductosProcess(qry);
-  console.log(qry);
   try {
     const retData: any[] = await articulo.aggregate([
       { $match: qry.Articulo }
@@ -462,12 +411,9 @@ class CajaControler {
 
   }
   format_Data3(data: any) {
-    console.log(data);
-    console.log('data.length', data.length)
     let fmtData: any[] = [];
     for (let i = 0; i < data.length; i++) {
       const e = data[i];
-      console.log(e);
       //      fmtData.push(e);
     }
     return fmtData;
@@ -507,7 +453,6 @@ class CajaControler {
   async productosList(req: Request, res: Response) {
     try {
       const qry = (req.body ? req.body : { Articulo: {}, Producto: {} });
-      console.log(qry);
       for (const key in qry.Articulo) {
         if (Object.prototype.hasOwnProperty.call(qry.Articulo, key)) {
           const element = qry.Articulo[key];
@@ -608,17 +553,6 @@ class CajaControler {
           ,items: e.kartList
         }  
         newData.push(cmp);
-/*
-        try {
-          const c = await comprobante.findById(cmp._id);
-          if ( c )
-            await comprobante.updateOne({_id: cmp._id}, { $set: {cmp} })
-          else 
-            await comprobante.insertMany(cmp);
-       } catch (e) {
-          console.log(e);
-       }
-*/
       } 
       res.status(200).json(newData)
     } catch (error) {

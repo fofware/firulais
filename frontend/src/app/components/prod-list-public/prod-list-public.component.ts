@@ -80,7 +80,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
-    console.log('PROD-LIST-PUBLIC OnChanges');
+//    console.log('PROD-LIST-PUBLIC OnChanges');
 /*
     console.log(changes);
     for (const propName in changes) {
@@ -94,12 +94,12 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
 
   }
 
-  Prod_filterEvent( event ): void {
-    console.log( event );
+  Prod_filterEvent( ev ): void {
+//    console.log( event );
     // tslint:disable-next-line:forin
-    for (const propName in event) {
-      console.log(propName, event[propName]);
-      this[propName] = event[propName];
+    for (const propName in ev) {
+//      console.log(propName, ev[propName]);
+      this[propName] = ev[propName];
     }
 
 //    this.searchItem = event.searchItem;
@@ -126,7 +126,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
     if (this.filter.servicio.value) { Producto.servicio = this.filter.servicio.qry; }
     if (this.filter.pCompra.value) { Producto.pCompra = this.filter.pCompra.qry; }
     if (this.filter.pVenta.value) { Producto.pVenta = this.filter.pVenta.qry; }
-    console.log( 'LISTAORDEN' , this.articuloOrder[this.listaOrden].sort );
+  //  console.log( 'LISTAORDEN' , this.articuloOrder[this.listaOrden].sort );
     const Sort = this.articuloOrder[this.listaOrden].sort;
 
     this.buscaProductos({Articulo, Producto, Extra, searchItem: this.searchItem, Sort })
@@ -146,7 +146,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
           this.articuloList = data;
         }
         this.wait = false;
-        console.log(this.articuloList);
+//        console.log(this.articuloList);
       },
       err => {
         console.log(err);

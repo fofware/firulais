@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express';
 import articulo, { IArticulo } from '../models/articulos';
 import { ObjectID } from 'bson'
+import { sanitize } from '../common/utils'
 import producto, { IProducto } from '../models/producto';
 import passport from "passport";
 /*
@@ -257,9 +258,7 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 		qry.Project = artProject; 
 		qry.Project.productos = 1;
 	}
-//	console.log(qry.Sort)
 	if (!qry.Sort) qry.Sort = {fullName: 1};
-//	console.log(qry);
 	return articulo.aggregate([
 		{ $match: qry.Articulo }
 		,{ $graphLookup:
@@ -282,7 +281,6 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 }	
 
 export const articuloSanitizeString = function (search: string) {
-//	console.log(search);
 	if(!search || search.length == 0) return null;
 	const Articulo = {'$and': []};
 	const searchItem = search.replace(/  /g, ' ');
@@ -318,6 +316,7 @@ class ArticuloControler {
 
 		this.router.delete( '/articulo/:id', this.delete );
 		this.router.post( '/articulo', this.add );
+		this.router.post( '/articulo/import', this.import );
 		this.router.put( '/articulo/:id', this.modifica );
 
 		this.router.get( '/articulos/test', this.test );
@@ -342,7 +341,7 @@ class ArticuloControler {
 	async leer(req: Request, res: Response) {
 		try {
 			const { id } = req.params;
-			const qry = {Articulo: { _id: id } };
+			const qry = {Articulo: { _id: new ObjectID(id) } };
 			const rpta = await readArticulos(qry);
 			return res.status(200).json(rpta);
 		} catch (error) {
@@ -352,7 +351,7 @@ class ArticuloControler {
 
 	async leerProductos(req: Request, res: Response) {
 		try {
-			const qry = {Articulo:{_id: req.params.id }};
+			const qry = {Articulo:{_id: new ObjectID(req.params.id) }};
 			const rpta = await readProductos(qry)
 			res.status(200).json(rpta[0])
 		} catch (error) {
@@ -363,10 +362,9 @@ class ArticuloControler {
 	async delete( req: Request, res: Response ){
 		try {
 			const { id } = req.params;
-			console.log("Id a borrar", id)
-			const proddel = await producto.deleteMany( { 'articulo': id } );
+			const proddel = await producto.deleteMany( { 'articulo':  new ObjectID(id) } );
 			console.log(proddel);
-			const rpta = await articulo.deleteOne( { _id: id } );
+			const rpta = await articulo.deleteOne( { _id:  new ObjectID(id) } );
 			res.status(200).json(rpta);
 		} catch (error) {
 			console.log(error)
@@ -374,27 +372,56 @@ class ArticuloControler {
 		}
 	}
 
+	async import( req: Request, res: Response ){
+		try {
+			if ( req.body._id ) req.body._id = new ObjectID( req.body._id );
+			const newReg = await articulo
+			.updateOne({ _id: req.body._id },   // Query parameter
+				{ $set: req.body }, 
+				{ upsert: true }    // Options
+			 );
+			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
+		} catch (error) {
+			console.log(error);
+			return res.status(500).json(error);
+		}
+	}
+
 	async add( req: Request, res: Response ){
 		try {
+/*
 			const art = await articulo.findOne({ name: req.body.name });
 			if (art)
 				return res.status(400).json({ msg: 'Registro ya existe', art });
 			const newArticulo = new articulo(req.body);
 			const rpta = await newArticulo.save();
 			return res.status(200).json({ msg: 'Registro creado satisfactoriamente', newArticulo });
+		*/
+			if ( req.body._id ) req.body._id = new ObjectID( req.body._id );
+			const newReg = await articulo.updateOne({ _id: req.body._id },   // Query parameter
+			{ $set: req.body }, 
+			{ upsert: true }    // Options
+	 )
+/*
+			console.log(req.body)
+			const newReg = new articulo(req.body);
+			await newReg.save();
+*/
+			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
+
 		} catch (error) {
+			console.log(error);
 			return res.status(500).json(error);
 		}
 	}
 
 	async modifica( req: Request, res: Response) {
 		try {
-			const filter = { _id: req.params.id };
-//			req.body._id = filter._id;
-			console.log(req.body);
-			console.log(filter);
-			const rpta = await articulo.updateOne( filter, { $set :  req.body  }, { upsert: true });
-			console.log("Update",rpta);
+			if ( req.body._id ) req.body._id = new ObjectID( req.body._id );
+			const rpta = await articulo.updateOne({ _id: req.body._id },   // Query parameter
+				{ $set: req.body }, 
+				{ upsert: true }    // Options
+			);
 			return res.status(200).json( rpta );
 		} catch (error) {
 			console.log(error);

@@ -7,7 +7,6 @@ class IndexControler {
     }; 
 	genObjectId(req: Request, res: Response){
 		const newObjectId = new ObjectID();
-        console.log(newObjectId);
         res.status(200).json(newObjectId);
 	}
 }

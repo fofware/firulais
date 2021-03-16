@@ -91,7 +91,11 @@ svg.material-icons:not(:last-child) {
 }
 .card-container .card a > div {
   padding-left: 50px;
+  font-weight: 600;
+  font-size: large;
+/*
   width: 150px;
+*/
 }
 
 .card-container .card:not(:last-child) {

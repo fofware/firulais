@@ -18,18 +18,18 @@ export class ArticuloCardSelectOrderComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void  {
-    console.log('ORDER-ON-CHANGE');
-    console.log(changes);
+//    console.log('ORDER-ON-CHANGE');
+//    console.log(changes);
 //    this.onCardSelectHeaderEvent.emit({ changes });
   }
   cambioOrden(): void {
-    console.log(this.listaOrden);
+//    console.log(this.listaOrden);
     this.onOrderChangeEvent.emit( { listaOrden: this.listaOrden } );
   }
   changeOrden(): void {
     this.listaOrden++;
     if ( this.listaOrden >= 5 ) this.listaOrden = 0;
-    console.log(this.listaOrden);
+//    console.log(this.listaOrden);
     this.onOrderChangeEvent.emit( { listaOrden: this.listaOrden } );
   }
 }

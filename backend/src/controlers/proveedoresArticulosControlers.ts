@@ -345,7 +345,6 @@ class ProveedoresArticulosControler {
 	async delete( req: Request, res: Response ){
 		try {
 			const { id } = req.params;
-			console.log("delete ",id);
 			const rpta = await provArt.findByIdAndDelete(new ObjectID(id));
 			res.status(200).json(rpta);
 		} catch (error) {

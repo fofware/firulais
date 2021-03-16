@@ -27,8 +27,8 @@ export class ArticuloCardSelectComponent implements OnInit, OnChanges {
 
   wait = false;
 
-  constructor(private http: HttpClient) {
-  }
+  constructor(private http: HttpClient) { }
+
   setHeight(): void {
     const elMain   = document.getElementById('mainArticulo');
     const elHeader = document.getElementById('headerArticulo');
@@ -41,33 +41,19 @@ export class ArticuloCardSelectComponent implements OnInit, OnChanges {
 //    console.log(h,b)
   }
   ngOnInit(): void {
-    console.log('Setting', this.filter);
+//    console.log('Setting', this.filter);
     this.cmpTipo = this.cmpTipo.toLowerCase();
 //    this.setHeight();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log('CARD-SELECT-ON-CHANGE', changes );
+//    console.log('CARD-SELECT-ON-CHANGE', changes );
   }
 
   filterEvent(event): void {
-    console.log('CARD-SELECT-EMIT', event);
+  //  console.log('CARD-SELECT-EMIT', event);
     this.onCardSelectEvent.emit(event);
   }
-/*
-  eventSearchArticulos(event): void {
-    console.log('CARD-SELECT');
-    console.log('eventSearchArticulos', event);
-    this.onHeaderArticuloSelect.emit(event);
-  }
-*/
-/*
-  onClick(p): void {
-    this.onCardSelectEvent.emit(p);
-//    console.log('click add')
-
-  }
-*/
   opLink(url: string): void {
 //    console.log('click link')
     const myWin = window.open(url, 'myWindow');
@@ -79,14 +65,4 @@ export class ArticuloCardSelectComponent implements OnInit, OnChanges {
   setAjustePago(coeficiente: number): void {
     this.ca_pago = coeficiente;
   }
-/*
-  changePrecio(): void {
-    this.calculaPrecios(this.articuloList);
-  }
-  calculaPrecios(array): void {
-  }
-  round(num): number {
-    return round(num, decimales);
-  }
-*/
 }
