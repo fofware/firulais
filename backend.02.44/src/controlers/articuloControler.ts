@@ -47,186 +47,25 @@ export const artProject = {
 	'url': 1,
 	'iva': 1,
 	'margen': 1,
-	'fullName':
-	{
-		$cond: ['$d_fabricante',
-			//true fabicante
-			{
-				$cond: ['$d_marca',
-					//true fabicante true marca
-					{
-						$cond: ['$d_rubro',
-							// true fabicante true marca true rubro
-							{
-								$cond: ['$d_linea',
-									// true fabicante true marca true rubro true lineea
-									{
-										$concat: [
-											//'true fabicante true marca true rubro true lineea ',
-											'$fabricante', ' ', '$marca', ' ', '$rubro', ' ', '$linea', ' ', '$name']
-									}
-									,
-									{
-										$concat: [
-											//'true fabicante true marca true rubro true lineea ',
-											'$fabricante', ' ', '$marca', ' ', '$rubro', ' ', '$name']
-									}
-								]
-							}
-							,
-							// true fabicante true marca false rubro
-							{
-								$cond: ['$d_linea',
-									// true fabicante true marca false rubro true lineea
-									{
-										$concat: [
-											//'true fabicante true marca false rubro true lineea ',
-											'$fabricante', ' ', '$marca', ' ', '$linea', ' ', '$name']
-									}
-									,
-									{
-										$concat: [
-											//'true fabicante true marca false false linea ',
-											'$fabricante', ' ', '$marca', ' ', '$name']
-									}
-								]
-							}
-						]
-					}
-					,
-					//true fabicante false marca
-					{
-						$cond: ['$d_rubro',
-							// true fabicante false marca true rubro
-							{
-								$cond: ['$d_linea',
-									// true fabicante false marca true rubro true linea
-									{
-										$concat: [
-											//'true fabicante false marca true rubro true linea',
-											'$fabricante', ' ', '$rubro', ' ', '$linea', ' ', '$name']
-									}
-									,
-									{
-										$concat: [
-											//'true fabicante false marca true rubro false linea',
-											'$fabricante', ' ', '$rubro', ' ', '$name']
-									}
-								]
-							}
-							,
-							// true fabicante false marca false rubro
-							{
-								$cond: ['$d_linea',
-									// true fabicante false marca false rubro true lineea
-									{
-										$concat: [
-											//'true fabicante false marca false rubro true linea',
-											'$fabricante', ' ', '$linea', ' ', '$name']
-									}
-									,
-									{
-										$concat: [
-											//'true fabicante false marca false rubro false linea',
-											'$fabricante', ' ', '$name']
-									}
-								]
-							}
-						]
-					}
+	'fullName': { $trim: 
+		{ input: 
+			{	$concat: [
+				{ $cond: ['$d_fabricante', 'fabricante', '']},
+				{ $cond: ['$d_marca', ' ', '']},
+				{ $cond: ['$d_marca', '$marca', '']},
+				{ $cond: ['$d_linea', ' ', '']},
+				{ $cond: ['$d_linea', '$linea', '']},
+				{ $cond: ['$d_especie', ' ', '']},
+				{ $cond: ['$d_especie', '$especie', '']},
+				{ $cond: ['$d_edad', ' ', '']},
+				{ $cond: ['$d_edad', '$edad', '']},
+				{ $cond: ['$d_raza', ' ', '']},
+				{ $cond: ['$d_raza', '$raza', '']},
+				' ',
+				'$name'
 				]
-			},
-			// false fabricante
-			{
-				$cond: ['$d_marca',
-					//false fabicante true marca
-					{
-						$cond: ['$d_rubro',
-							// false fabicante true marca true rubro
-							{
-								$cond: ['$d_linea',
-									// false fabicante true marca true rubro true lineea
-									{
-										$concat: [
-											//'false fabicante true marca true rubro true linea',
-											'$marca', ' ', '$rubro', ' ', '$linea', ' ', '$name']
-									}
-									,
-									{
-										$concat: [
-											//'false fabicante true marca true rubro false linea',
-											'$marca', ' ', '$rubro', ' ', '$name']
-									}
-								]
-							}
-							,
-							//false fabicante true marca false rubro
-							{
-								$cond: ['$d_linea',
-									//false fabicante true marca false rubro true lineea
-									{
-										$concat: [
-											//'false fabicante true marca false rubro true linea',
-											'$marca', ' ', '$linea', ' ', '$name']
-									}
-									,
-									{
-										$concat: [
-											//'false fabicante true marca false rubro false linea',
-											'$marca', ' ', '$name']
-									}
-								]
-							}
-						]
-					}
-					,
-					//false fabicante false marca
-					{
-						$cond: ['$d_rubro',
-							//false fabicante false marca true rubro
-							{
-								$cond: ['$d_linea',
-									//false fabicante false marca true rubro true lineea
-									{
-										$concat: [
-											//'false fabicante false marca true rubro true linea', 
-											'$rubro', ' ', '$linea', ' ', '$name']
-									}
-									,
-									{
-										$concat: [
-											//'false fabicante false marca true rubro false linea', 
-											'$rubro', ' ',
-											'$name']
-									}
-								]
-							}
-							,
-							//false fabicante false marca false rubro
-							{
-								$cond: ['$d_linea',
-									// true fabicante false marca false rubro true lineea
-									{
-										$concat: [
-											//'false fabicante false marca false rubro true linea',
-											'$linea', ' ',
-											'$name']
-									}
-									,
-									{
-										$concat: [
-											//'false fabicante false marca false rubro false linea',
-											'$name'
-										]
-									}
-								]
-							}
-						]
-					}
-
-				]
-			},
-		]
+			}
+		}
 	}
 };
 
@@ -451,7 +290,7 @@ class ArticuloControler {
 				}
 */
 			}
-			const qry = { Articulo, Producto:{}, Sort: {'fabricante': 1, 'marca': 1, 'rubro': 1, 'linea': 1, 'especie': 1, 'edad': 1, 'raza': 1, 'fullname': 1 } }
+			const qry = { Articulo, Producto:{}, Sort: {'fullName': 1 } }
 			const rpta = await readArticulos(qry);
 			res.status(200).json(rpta);
 		} catch (error) {

@@ -1,3 +1,4 @@
+/*
 .toolbar {
   position: absolute;
   top: 0;
@@ -23,7 +24,7 @@
 .toolbar #twitter-logo:hover {
   opacity: 0.8;
 }
-
+*/
 .doc{
   display: flex;
   flex-flow: column wrap;
@@ -56,8 +57,15 @@
   cursor: pointer;
 }
 .box img{
+  width: auto;
+  max-height: 300px;
+  height: 100%;
+}
+.QMbmRe {
+  background-position: center center;
+  background-repeat: no-repeat;
+  padding-top: 86%;
   width: 100%;
-  height: auto;
 }
 @supports(object-fit: cover){
     .box img{

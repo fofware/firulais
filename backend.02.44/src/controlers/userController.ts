@@ -6,19 +6,16 @@ import config from '../config/config';
 import passport from "passport";
 import { ObjectID } from 'bson'
 
-function createToken(user: IUser) {
-  return jwt.sign({ id: user.id, 
-    apellido: user.apellido, 
-    nombre: user.nombre,
+function createToken(user: IUser | any ) {
+  return jwt.sign({ _id: user._id, 
     email: user.email,
-    direccion: user.direccion,
-    celular: user.celular,
-    fijo: user.fijo,
-    zipcode: user.zipcode,
-    localidad: user.localidad,
-    roles: user.roles
+    appellido: user.apellido,
+    nombre: user.nombre,
+    roles: user.roles,
+    nickname: user.nickname || `${user.nombre} ${user.apellido}`,
+    image: '/assets/images/defuser.png',
   }, config.jwtSecret, {
-    expiresIn: 60
+    expiresIn: 43200
   });
 };
 
@@ -59,8 +56,17 @@ export const signIn = async (req: Request, res: Response): Promise<Response> => 
   delete user.password;
   user.password = null;
   user.__v = null
-  return res.status(200).json({ token, user  });
+  return res.status(200).json( token);
 };
+
+export const renew = async (req: Request, res: Response): Promise<Response> => {
+	const user = req.user;
+  console.log("Renovó token");
+  console.log(user);
+  const newToken = createToken(user);
+  return res.status(200).json({ newToken });
+};
+
 /*
 export const list = async ( req: Request, res: Response ) =>{
   User.find({}, {password: 0}).sort({name: 1})
@@ -142,14 +148,14 @@ class UserControler {
 	config () {
     this.router.post('/signup', signUp);
     this.router.post('/signin', signIn);
+    this.router.post('/renew',passport.authenticate('jwt', {session:false}), renew);
     this.router.get('/api/users/list', this.list );
     this.router.get('/api/users/search/:search',passport.authenticate('jwt', {session:false}), this.buscar );
     this.router.delete('/api/user/:id',passport.authenticate('jwt', {session:false}), this.delete );
     this.router.get('/api/user/:id',passport.authenticate('jwt', {session:false}), this.get );
     this.router.put('/api/user/:id',passport.authenticate('jwt', {session:false}), this.put );
     this.router.post('/api/user/add',passport.authenticate('jwt', {session:false}), this.add );
-    this.router.post('/api/user/import',  // passport.authenticate('jwt', {session:false}), 
-                      this.import );
+    this.router.post('/api/user/import',passport.authenticate('jwt', {session:false}),this.import );
   }
 
 	public index(req: Request, res: Response) {

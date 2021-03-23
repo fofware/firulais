@@ -1,59 +1,9 @@
-<!--article id="browseArticulo"-->
-<!--div class="d-flex justify-content-center align-items-center flex-wrap pt-2">
-  <div *ngFor="let articulo of articuloList; index as i;"
-    class="card caja-box mb-3 d-flex col-md-6">
-    <div class="row no-gutters">
-      <div class="col-md-4">
-        <img src="{{articulo.image}}" class="caja-img" alt="...">
-      </div>
-      <div class="col-md-8">
-        <div class="card-body">
-          <h5 class="card-title">{{articulo.fullName}}</h5>
-          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div-->
 <div class="card-container">
   <div *ngFor="let articulo of articuloList; index as i;"
     class="card">
     <app-articulo-card-view-uno
       [articulo]='articulo'
+      [publico]='publico'
     ></app-articulo-card-view-uno>
   </div>
 </div>
-
-<!--div class="d-flex justify-content-center align-items-center flex-wrap pt-2">
-  <div *ngFor="let articulo of articuloList; index as i;" class="caja-box"
-    (click)="onClick(articulo)">
-    <h3 class="stock" aria-hidden="true">{{articulo.stock}} </h3>
-    <i class="pesable fa fa-balance-scale fa-fw fa-2x" aria-hidden="true" [hidden]="!articulo.pesable"></i>
-    <img class="caja-img" src="{{articulo.image}}" alt="">
-    <div class="nombre">
-      {{articulo.fullName}}
-    </div>
-    <div class="precio w-100">
-      <h2 *ngIf="cmpTipo != 'compra'">${{articulo.precio}}</h2>
-      <h2 *ngIf="cmpTipo == 'compra'">${{articulo.compra}}</h2>
-    </div>
-    <div class="valor4">
-      <h6 *ngIf="articulo.contiene > 1">${{round(articulo.precio/articulo.contiene)}}/{{articulo.unidad}}</h6>
-    </div-->
-    <!--div class="valor4">
-      <h6 *ngIf="cmpTipo != 'compra'">{{articulo.precio*.965}}</h6>
-    </div-->
-    <!-- div class="valor2" [hidden]="publico">
-      <h6 *ngIf="cmpTipo == 'compra'">{{articulo.precio}}</h6>
-      <h6 *ngIf="cmpTipo != 'compra'">{{articulo.compra}}</h6>
-    </div>
-    <div class="valor3" [hidden]="publico">
-      <h6>{{articulo.reposicion}}</h6>
-    </div>
-
-    <i class="fa fa-info-circle cajaUrl " aria-hidden="true" [hidden]="!articulo.url || articulo.url == ''"
-      (click)="opLink(articulo.url)"></i>
-  </div>
-</div-->
-<!--/article-->

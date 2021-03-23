@@ -406,7 +406,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 								]
 							}]
 					},
-					"precio": { $cond: [ {$eq: ['$count_parte', 0]}, 
+					"precio": { $ceil: { $cond: [ {$eq: ['$count_parte', 0]}, 
 					{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, { $divide: ['$parte.compra', '$parte.contiene'] } ] }, 
 					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
 							{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, 
@@ -414,7 +414,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 							{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, '$compra' ] }
 						]
 					}]
-					},
+					}},
 					"precioref": { $cond: [ {$eq: ['$count_parte', 0]}, 
 //											{ $divide: [{ $multiply:[ {$add: [ '$margen', 100 ] }, { $divide: ['$parte.compra', '$parte.contiene'] } ] },{ $cond: [ {$eq: ['$parte.contiene', 0]},1,'$parte.contiene']} ] } , 
 																{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, { $divide: ['$parte.compra', '$parte.contiene' ] } ] } , 
@@ -556,6 +556,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 		e.promedio = round((e.compra+e.reposicion)/2,deci)
 		e.precio = round(e.compra*((e.margen+100)/100),deci);
 */
+		e.precio = Math.ceil(e.compra*((e.margen+100)/100));
 		e.fullName = (`${e.art_name} ${e.name} ${e.contiene > 1 ? e.contiene : ''} ${e.unidad} ${e.sname} ${e.scontiene > 1 ? e.scontiene : ''} ${e.sunidad}`);
 	}
 	return array;

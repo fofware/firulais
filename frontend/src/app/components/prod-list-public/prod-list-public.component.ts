@@ -37,7 +37,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
       sort: { art_name: 1, name: 1, contiene: 1, unidad: 1, 'sub.name': 1, 'sub.contiene': 1, 'sub.unidad': 1  }
     },
     {
-      name: 'Rubro/Esecie',
+      name: 'Rubro/Especie',
       vista: 1,
       sort: { rubro: 1, especie: 1, edad: -1, precioref: 1 }
     },
@@ -54,7 +54,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
     {
       name: 'especie',
       vista: 1,
-      sort: { especie: 1, edad: 1, marca: 1, rubro: 1, linea: 1, art_name: 1, name: 1, contiene: -1 }
+      sort: { especie: 1, edad: -1, rubro: 1, linea: 1, fullName: 1 }
     },
     {
       icon: '<i class="fas fa-search-dollar"></i>',
@@ -71,7 +71,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   ];
   listaOrden = 0;
   showArticulos = true;
-  publico = false;
+  publico = true;
 
   constructor(private http: HttpClient) {}
 
@@ -146,7 +146,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
           this.articuloList = data;
         }
         this.wait = false;
-//        console.log(this.articuloList);
+        console.log(this.articuloList);
       },
       err => {
         console.log(err);
