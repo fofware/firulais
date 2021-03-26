@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ApitoapiComponent } from './components/apitoapi/apitoapi.component';
+import { ArticulosListComponent } from './components/articulos-list/articulos-list.component';
 import { CargalistasComponent } from './components/cargalistas/cargalistas.component';
 import { HomeComponent } from './components/home/home.component';
 import { ImportDataComponent } from './components/import-data/import-data.component';
@@ -41,6 +42,11 @@ const routes: Routes = [
   {
     path: 'productlist'
     , component: ProdListPublicComponent
+//    , canActivate: [AuthGuard]
+  },
+  {
+    path: 'articuloslist'
+    , component: ArticulosListComponent
 //    , canActivate: [AuthGuard]
   }
   , {

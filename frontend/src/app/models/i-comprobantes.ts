@@ -1,4 +1,6 @@
-import { API_URI, decimales, round } from '../common/utils';
+import { decimales, round } from '../common/utils';
+import { API_URI } from '../shared/uris';
+
 import { ItemComprobante } from './i-comprobante-items';
 import { IPersonas } from './i-personas';
 

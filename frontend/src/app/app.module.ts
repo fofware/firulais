@@ -28,6 +28,9 @@ import { ImportDataComponent } from './components/import-data/import-data.compon
 import { TokenInterceptorInterceptor } from './interceptor/token-interceptor.interceptor';
 import { AuthGuard } from './guard/auth.guard';
 import { ErrorInterceptor } from './interceptor/error.interceptor';
+import { ArticulosListComponent } from './components/articulos-list/articulos-list.component';
+import { ProductsCardViewUnoComponent } from './components/products-card-view-uno/products-card-view-uno.component';
+import { ArticuloEditComponent } from './components/articulo-edit/articulo-edit.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +54,10 @@ import { ErrorInterceptor } from './interceptor/error.interceptor';
     ApiconnectComponent,
     UploadComponent,
     ReadFileComponent,
-    ImportDataComponent
+    ImportDataComponent,
+    ArticulosListComponent,
+    ProductsCardViewUnoComponent,
+    ArticuloEditComponent
   ],
   imports: [
     BrowserModule,

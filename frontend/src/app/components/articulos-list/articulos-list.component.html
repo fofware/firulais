@@ -1,0 +1,20 @@
+<div class="sticky-top">
+  <app-top-menu></app-top-menu>
+
+  <app-articulo-card-select-header
+    [filter]="filter"
+    [searchItem]='searchItem'
+    [order]='articuloOrder'
+    [listaOrden]='listaOrden'
+    (onCardSelectHeaderEvent)='filterEvent($event)'>
+  </app-articulo-card-select-header>
+</div>
+<div class="card-container">
+  <div *ngFor="let articulo of articuloList; index as i;"
+    class="card">
+    <app-articulo-card-view-uno
+      [articulo]='articulo'
+      [publico]='publico'
+    ></app-articulo-card-view-uno>
+  </div>
+</div>

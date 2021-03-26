@@ -1,0 +1,37 @@
+<article>
+  <h3 class="stock" aria-hidden="true" [hidden]="publico">{{articulo.stock}} </h3>
+  <div class='textbox'>
+    <h5 class="nombre">{{articulo.fullName}}</h5>
+    <h6>Fabricante: {{articulo.fabricante}}</h6>
+    <h6>Marca: {{articulo.marca}}</h6>
+    <h6>Rubro: {{articulo.rubro}}</h6>
+    <h6>Linea: {{articulo.linea}}</h6>
+    <h6>Especie: {{articulo.especie}}</h6>
+    <h6>Edad: {{articulo.edad}}</h6>
+    <h6>Raza: {{articulo.raza}}</h6>
+  </div>
+</article>
+<nav>
+  <i class="pesable fa fa-balance-scale fa-fw fa-2x" aria-hidden="true" [hidden]="!articulo.pesable"></i>
+  <div class="imgbox">
+    <img class="caja-img" src="{{articulo.image}}" alt="">
+  </div>
+  <a class="cajaUrl btn btn-link" href="{{articulo.url}}" target='_blanck'
+    [hidden]="!articulo.url || articulo.url == ''">
+    <i class="fas fa-info-circle" (click)="opLink(articulo.url)"></i>
+  </a>
+</nav>
+<div class="precio">
+  <h2 *ngIf="cmpTipo != 'compra'">${{articulo.precio}}</h2>
+  <h2 *ngIf="cmpTipo == 'compra'">${{articulo.compra}}</h2>
+</div>
+<div class="valor4">
+  <h6 *ngIf="articulo.contiene > 0">${{round(articulo.precioref)}}/{{articulo.unidad}}</h6>
+</div>
+<div class="valor2" [hidden]="publico">
+  <h6 *ngIf="cmpTipo == 'compra'">{{articulo.precio}}</h6>
+  <h6 *ngIf="cmpTipo != 'compra'">{{articulo.compra}}</h6>
+</div>
+<div class="valor3" [hidden]="publico">
+  <h6>{{articulo.reposicion}}</h6>
+</div>

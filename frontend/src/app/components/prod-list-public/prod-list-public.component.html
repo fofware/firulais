@@ -1,15 +1,33 @@
-<app-articulo-card-select
-  [filter]='filter'
-  [order]='articuloOrder'
-  cmpTipo='venta'
-  [ca_pago]='1'
-  [ca_persona]=''
-  [hidden]='!showArticulos'
-  [ca_lista]='lista[1]'
-  [listaOrden]='listaOrden'
+<div class="sticky-top">
+  <app-top-menu></app-top-menu>
+  <app-articulo-card-select
+    [filter]='filter'
+    [order]='articuloOrder'
+    cmpTipo='venta'
+    [ca_pago]='1'
+    [ca_persona]=''
+    [hidden]='!showArticulos'
+    [ca_lista]='lista[1]'
+    [listaOrden]='listaOrden'
+    [articuloList]='articuloList'
+    [publico]='publico'
+    (onCardSelectEvent)='Prod_filterEvent($event)'
+  >
+  </app-articulo-card-select>
+</div>
+<div class="card-container">
+  <div *ngFor="let articulo of articuloList; index as i;"
+    class="card">
+    <app-products-card-view-uno
+      [articulo]='articulo'
+      cmpTipo='venta'
+      [publico]='publico'
+    ></app-products-card-view-uno>
+  </div>
+</div>
+
+<!--app-articulo-card-select-box-list
   [articuloList]='articuloList'
   [publico]='publico'
-  (onCardSelectEvent)='Prod_filterEvent($event)'
-
 >
-</app-articulo-card-select>
+</app-articulo-card-select-box-list-->

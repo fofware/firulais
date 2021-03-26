@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Observer } from 'rxjs';
 import { IArticulo } from '../models/i-articulo';
-import { API_URI } from '../common/utils';
+import { API_URI } from '../shared/uris';
 import { promise } from 'protractor';
 
 @Injectable({

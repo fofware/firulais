@@ -29,6 +29,7 @@ export class ArticuloCardSelectComponent implements OnInit, OnChanges {
 
   constructor(private http: HttpClient) { }
 
+/*
   setHeight(): void {
     const elMain   = document.getElementById('mainArticulo');
     const elHeader = document.getElementById('headerArticulo');
@@ -40,6 +41,7 @@ export class ArticuloCardSelectComponent implements OnInit, OnChanges {
     elBrowse.style.height = `${b}px`;
 //    console.log(h,b)
   }
+*/
   ngOnInit(): void {
 //    console.log('Setting', this.filter);
     this.cmpTipo = this.cmpTipo.toLowerCase();

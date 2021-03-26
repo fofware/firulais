@@ -226,16 +226,18 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 							{ $cond: ['$art.d_fabricante', '$art.fabricante', '']},
 							{ $cond: ['$art.d_marca', ' ', '']},
 							{ $cond: ['$art.d_marca', '$art.marca', '']},
-							{ $cond: ['$art.d_linea', ' ', '']},
-							{ $cond: ['$art.d_linea', '$art.linea', '']},
+							{ $cond: [ { $or: ['$art.d_marca','$art.d_fabricante'] }, ' ', '']},
+							'$art.name',
 							{ $cond: ['$art.d_especie', ' ', '']},
 							{ $cond: ['$art.d_especie', '$art.especie', '']},
 							{ $cond: ['$art.d_edad', ' ', '']},
 							{ $cond: ['$art.d_edad', '$art.edad', '']},
 							{ $cond: ['$art.d_raza', ' ', '']},
 							{ $cond: ['$art.d_raza', '$art.raza', '']},
-							' ',
-							'$art.name'
+							{ $cond: ['$art.d_rubro', ' ', '']},
+							{ $cond: ['$art.d_rubro', '$art.rubro', '']},
+							{ $cond: ['$art.d_linea', ' ', '']},
+							{ $cond: ['$art.d_linea', '$art.linea', '']},
 							]
 						}
 					}
@@ -659,9 +661,9 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 			'parte':1,
 			'count_parte': 1,
 			'private_web': 1,
-			'fullName': //{
-//				$trim: 
-//				{ input: 
+			'fullName': {
+				$trim: 
+				{ input: 
 					{ $concat: [
 						'$art_name', 
 						{ $cond: [{ $eq: ['$name', '']}, '', ' ']},
@@ -677,8 +679,8 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 						{ $cond: [{ $eq: ['$sunidad', '']}, '', ' ']},
 						'$sunidad'
 						]
-//					}
-//				}
+					}
+				}
 			},
 			'fullName1': { 
 				$cond: [{ $eq: ['$count_ins',0]},
@@ -786,8 +788,9 @@ class ProductoControler {
 		}
 		if ((myMatch == undefined || artList.length == 0) && qry.searchItem ) {
 			console.log(qry.searchItem)
-			const Articulo = articuloSanitizeString(qry.searchItem);
-			if (Articulo){
+			const Articulo = {};
+			Articulo['$and'] = articuloSanitizeString(qry.searchItem);
+			if (Articulo['$and']){
 				artList = await readArticulos({ Articulo, Project: {'_id': 1}, Sort: {'_id': 1} });
 				for (let index = 0; index < artList.length; index++) {
 					artList[index] = new ObjectID(artList[index]._id);

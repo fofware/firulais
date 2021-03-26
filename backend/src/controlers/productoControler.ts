@@ -689,26 +689,7 @@ class ProductoControler {
 
 	async test(req: Request, res: Response) {
 //		const array:any = await productoGetData({});
-		const qry = { articulo: '' };
-		const array:any = await producto.aggregate([
-			{ $match: qry }
-			,
-				{
-					 $lookup: {
-							from: "articulos",
-							localField: "articulo",    // field in the orders collection
-							foreignField: "_id",  // field in the items collection
-							as: "fromItems"
-					 }
-				},
-/*
-				{
-					 $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$fromItems", 0 ] }, "$$ROOT" ] } }
-				},
-*/
-//				{ $project: { fromItems: 0 } }
-	
-		]).sort({name: 1})
+		const array:any = await producto.find({ pesable: true });
 	
 		res.status(200).json(array);
 	}

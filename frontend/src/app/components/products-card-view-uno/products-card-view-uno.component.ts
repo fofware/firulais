@@ -1,27 +1,31 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { round } from 'src/app/shared/toolbox';
 
 @Component({
-  selector: 'app-articulo-card-select-box-list',
-  templateUrl: './articulo-card-select-box-list.component.html',
-  styleUrls: ['./articulo-card-select-box-list.component.css']
+  selector: 'app-products-card-view-uno',
+  templateUrl: './products-card-view-uno.component.html',
+  styleUrls: ['./products-card-view-uno.component.css']
 })
-export class ArticuloCardSelectBoxListComponent implements OnInit, OnChanges {
-  @Input() articuloList: any[];
+export class ProductsCardViewUnoComponent implements OnInit, OnChanges {
+
+  @Input() articulo: any;
   @Input() publico: any;
+  @Input() cmpTipo: any;
 
   constructor() { }
 
   ngOnInit(): void {
   }
+
+
   ngOnChanges(changes: SimpleChanges): void {
-//    console.log('BOX-LIST-CHANGES', changes);
 /*
+    console.log('CARD-VIEW-UNO-CHANGES', changes);
     for (const propName in changes) {
       console.log(propName,changes[propName]);
     }
-*/
-  }
+ */
+   }
 
 
   opLink(url: string): void {
@@ -31,4 +35,5 @@ export class ArticuloCardSelectBoxListComponent implements OnInit, OnChanges {
   round(valor: number ): number {
     return round( valor, 2);
   }
+
 }

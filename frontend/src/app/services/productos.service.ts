@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IProducto } from '../models/i-producto';
 import { ArticulosService } from './articulos.service';
-import { API_URI } from '../common/utils';
+import { API_URI } from '../shared/uris';
 
 @Injectable({
   providedIn: 'root'

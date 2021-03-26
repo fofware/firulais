@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { API_URI } from '../common/utils';
+import { API_URI } from '../shared/uris';
 
 @Injectable({
   providedIn: 'root'
