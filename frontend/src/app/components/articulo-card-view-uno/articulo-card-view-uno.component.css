@@ -1,63 +1,8 @@
-#main {
-  height: 100%;
-  margin: 0px;
-  padding: 0px;
-  display: -webkit-flex;
-  display:         flex;
-  -webkit-flex-flow: row;
-          flex-flow: row;
-}
-#main > article {
-  margin: 0px;
-  padding: 0px;
-  border-radius: 7pt;
-/*
-  border: 1px solid #cccc33;
-  background: #dddd88;
-*/
-  -webkit-flex: 3 1 60%;
-          flex: 3 1 60%;
-  -webkit-order: 2;
-          order: 2;
-  overflow: auto;
-}
-
- #main > nav {
-  margin: 0px;
-  padding: 0px;
-  border: 1px solid #8888bb;
-  border-radius: 7pt;
-/*
-  min-width:430px;
-  max-width:430px;
-*/
-  background: #ccccff;
-  -webkit-flex: 1 6 30%;
-          flex: 1 6 30%;
-  -webkit-order: 1;
-          order: 1;
-  }
-
-  #main > aside {
-  margin: 0px;
-  padding: 0px;
-/*
-  border: 1px solid #8888bb;
-*/
-  min-width: 235px;
-  border-radius: 7pt;
-  -webkit-flex: 1 6 40%;
-          flex: 1 6 40%;
-  -webkit-order: 3;
-          order: 3;
-  overflow: auto;
-  }
-
 :host {
   position: relative;
 
   border: 1px solid orange;
-
+  text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
   height: 100%;
   width: 100%;
   margin: 0px;
@@ -69,13 +14,12 @@
 }
 
 :host > article {
+  position: relative;
+/*
+  margin: 1rem;
+*/
   margin: 0px;
   padding: 0px;
-/*
-  border-radius: 7pt;
-  border: 1px solid #cccc33;
-  background: #dddd88;
-*/
   -webkit-flex: 3 1 60%;
   flex: 3 1 60%;
   -webkit-order: 2;
@@ -87,14 +31,17 @@
   -o-border-radius: 7pt;
 }
 
+article .control {
+  position: absolute;
+  top: .1rem;
+  right: .1rem;
+/*
+  border: 1px solid brown;
+*/
+}
 :host > nav {
   margin: 0px;
   padding: 0px;
-/*
-  border: 1px solid #8888bb;
-  background: #ccccff;
-  border-radius: 7pt;
-*/
   -webkit-flex: 1 6 30%;
   flex: 1 6 30%;
   -webkit-order: 1;
@@ -107,12 +54,9 @@
   -o-border-radius:;
 }
 
-#main > aside {
+:host > aside {
   margin: 0px;
   padding: 0px;
-/*
-  border: 1px solid #8888bb;
-*/
   min-width: 235px;
   border-radius: 7pt;
   -webkit-flex: 1 6 40%;
@@ -123,9 +67,6 @@
 }
 
 .imgbox {
-  /*
-    background-color: rgb(153, 143, 133);
-  */
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -138,7 +79,10 @@
     height: 200px;
   }
   .caja-img {
+/*
     height: 100%;
+*/
+    max-height: 100%;
     max-width: 200px;
   }
   .center {
@@ -166,12 +110,6 @@
     font-weight: bolder;
     min-width: 370px;
     padding-right: 60px;
-  /*
-    top: 0px;
-    left: 0px;
-    padding-left: 60px;
-    width: 100%;
-  */
   }
   .precio{
     position: absolute;

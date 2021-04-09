@@ -9,7 +9,7 @@ import { round } from 'src/app/shared/toolbox';
 export class ProductsCardViewUnoComponent implements OnInit, OnChanges {
 
   @Input() articulo: any;
-  @Input() publico: any;
+  @Input() showStock: any;
   @Input() cmpTipo: any;
 
   constructor() { }

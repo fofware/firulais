@@ -1,0 +1,36 @@
+:host {
+  height: 15rem;
+}
+
+:host .card-header {
+  font-weight: 700;
+  font-size: 1.1rem;
+  height: 3.3rem;
+}
+
+:host .card-body {
+  height: 11.3rem;
+  padding: 0;
+}
+
+.imagen {
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
+/*
+  border: 1px solid blueviolet;
+*/
+}
+.imagen .imgBox {
+  height: 100%;
+  max-height: 180px;
+}
+.imagen .imgBox > img {
+  width: auto;
+  height: 98%;
+  max-width: 180px;
+/*
+  height: calc(50% - 33.5px);
+  width:  calc(100vh * 1.3);
+*/
+}

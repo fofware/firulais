@@ -11,19 +11,22 @@ import { API_URI } from 'src/app/shared/uris';
 })
 export class ArticuloCardSelectComponent implements OnInit, OnChanges {
   @Input() filter: any;
+  @Input() searchItem: string;
   @Input() order: any;
-  @Input() cmpTipo: any;
   @Input() listaOrden: number;
+
+/*
+  @Input() showStock: boolean;
+
+  @Input() cmpTipo: any;
   @Input() articuloList: any[];
-  @Input() publico: boolean;
 
   @Input() ca_pago = 1;
   @Input() ca_persona = 1;
   @Input() ca_lista: any;
-
+*/
   @Output() onCardSelectEvent = new EventEmitter<object>();
-
-  searchItem = '';
+  @Output() onNewRegEvent = new EventEmitter<object>();
 
   wait = false;
 
@@ -44,7 +47,7 @@ export class ArticuloCardSelectComponent implements OnInit, OnChanges {
 */
   ngOnInit(): void {
 //    console.log('Setting', this.filter);
-    this.cmpTipo = this.cmpTipo.toLowerCase();
+//    this.cmpTipo = this.cmpTipo.toLowerCase();
 //    this.setHeight();
   }
 
@@ -56,15 +59,22 @@ export class ArticuloCardSelectComponent implements OnInit, OnChanges {
   //  console.log('CARD-SELECT-EMIT', event);
     this.onCardSelectEvent.emit(event);
   }
+
+  newRegEvent(ev){
+    this.onNewRegEvent.emit(ev);
+  }
+/*
   opLink(url: string): void {
 //    console.log('click link')
     const myWin = window.open(url, 'myWindow');
     event.stopPropagation();
   }
+
   setAjusteCliente(coeficiente: number): void {
     this.ca_persona = coeficiente;
   }
   setAjustePago(coeficiente: number): void {
     this.ca_pago = coeficiente;
   }
+*/
 }

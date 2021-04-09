@@ -11,9 +11,11 @@ import { API_URI } from 'src/app/shared/uris';
 export class ArticuloCardSelectFilterComponent implements OnInit {
 
   @Input() setting: any;
+  @Input() filterButtons: any;
   @Input() searchItem: string;
   // tslint:disable-next-line:no-output-on-prefix
   @Output() onSearchArticulos = new EventEmitter<object>();
+  @Output() onButtonMsg = new EventEmitter<object>();
 
 
   constructor(private http: HttpClient) { }
@@ -31,5 +33,8 @@ export class ArticuloCardSelectFilterComponent implements OnInit {
 //    console.log('FILTER-EMIT-EVENT');
     this.onSearchArticulos.emit({ setting: this.setting, searchItem });
   }
-
+  emitMsg(button){
+    console.log(button);
+    this.onButtonMsg.emit(this.filterButtons);
+  }
 }

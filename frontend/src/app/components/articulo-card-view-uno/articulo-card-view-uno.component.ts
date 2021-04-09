@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { round } from 'src/app/shared/toolbox';
 
 @Component({
@@ -11,6 +11,8 @@ export class ArticuloCardViewUnoComponent implements OnInit, OnChanges {
   @Input() articulo: any;
   @Input() cmpTipo: any;
   @Input() publico: any;
+  @Input() idx: number;
+  @Output() onSelectArticulo = new EventEmitter<object>();
 
   constructor() { }
 
@@ -40,4 +42,8 @@ export class ArticuloCardViewUnoComponent implements OnInit, OnChanges {
     return round( valor, 2);
   }
 
+  editdata(){
+    console.log(this.articulo);
+    this.onSelectArticulo.emit({idx: this.idx, articulo: this.articulo})
+  }
 }

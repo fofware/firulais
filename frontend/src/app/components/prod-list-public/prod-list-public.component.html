@@ -1,33 +1,43 @@
 <div class="sticky-top">
   <app-top-menu></app-top-menu>
-  <app-articulo-card-select
+  <!--app-articulo-card-select
     [filter]='filter'
+    [searchItem]='searchItem'
     [order]='articuloOrder'
-    cmpTipo='venta'
-    [ca_pago]='1'
-    [ca_persona]=''
-    [hidden]='!showArticulos'
-    [ca_lista]='lista[1]'
     [listaOrden]='listaOrden'
-    [articuloList]='articuloList'
-    [publico]='publico'
+
     (onCardSelectEvent)='Prod_filterEvent($event)'
-  >
-  </app-articulo-card-select>
+    (onNewRegEvent)='newReg($event)'
+  ></app-articulo-card-select-->
+  <app-articulo-card-select-header
+    [filter]="filter"
+    [filterButtons]='filterButtons'
+    [searchItem]='searchItem'
+    [order]='articuloOrder'
+    [listaOrden]='listaOrden'
+    (onCardSelectHeaderEvent)='Prod_filterEvent($event)'
+    (onNewRegEvent)='newReg($event)'
+    (onButtonMsg)='buttonMsg($event)'
+  ></app-articulo-card-select-header>
 </div>
 <div class="card-container">
+  <app-prod-card-view-dos
+    class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-4 no-gutters"
+    *ngFor="let articulo of articuloList; index as i;"
+    [articulo]='articulo'
+    cmpTipo='venta'
+    [showStock]='showStock'
+    (click)="selected(articulo)"
+  ></app-prod-card-view-dos>
+</div>
+<!-- div class="card-container">
   <div *ngFor="let articulo of articuloList; index as i;"
     class="card">
     <app-products-card-view-uno
       [articulo]='articulo'
       cmpTipo='venta'
-      [publico]='publico'
+      [showStock]='showStock'
+      (click)="selected(articulo)"
     ></app-products-card-view-uno>
   </div>
-</div>
-
-<!--app-articulo-card-select-box-list
-  [articuloList]='articuloList'
-  [publico]='publico'
->
-</app-articulo-card-select-box-list-->
+</div-->

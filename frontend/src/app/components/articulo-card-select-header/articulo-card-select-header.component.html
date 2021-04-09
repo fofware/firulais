@@ -1,15 +1,21 @@
-<header id="headerArticulo">
+<header id="headerArticulo" class="w-auto">
   <form class="form-inline">
-  <app-articulo-card-select-filter
-    [setting]="filter"
-    [searchItem]='searchItem'
-    (onSearchArticulos)='filterEvent($event)'
-  >
-  </app-articulo-card-select-filter>
-  <app-articulo-card-select-order
-    [order]="order"
-    [listaOrden]='listaOrden'
-    (onOrderChangeEvent)='filterEvent($event)'
-  ></app-articulo-card-select-order>
+    <app-articulo-card-select-filter
+      [setting]="filter"
+      [searchItem]='searchItem'
+      [filterButtons]='filterButtons'
+      (onSearchArticulos)='filterEvent($event)'
+      (onButtonMsg)='buttonsMsg($event)'
+    >
+    </app-articulo-card-select-filter>
+    <app-articulo-card-select-order
+      [order]="order"
+      [listaOrden]='listaOrden'
+      (onOrderChangeEvent)='filterEvent($event)'
+    ></app-articulo-card-select-order>
+    <app-articulo-card-select-tools class="float-left"
+      (onNewRegEvent)='toolsNewReg($event)'
+    >
+    </app-articulo-card-select-tools>
   </form>
 </header>

@@ -31,6 +31,8 @@ import { ErrorInterceptor } from './interceptor/error.interceptor';
 import { ArticulosListComponent } from './components/articulos-list/articulos-list.component';
 import { ProductsCardViewUnoComponent } from './components/products-card-view-uno/products-card-view-uno.component';
 import { ArticuloEditComponent } from './components/articulo-edit/articulo-edit.component';
+import { ArticuloCardSelectToolsComponent } from './components/articulo-card-select-tools/articulo-card-select-tools.component';
+import { ProdCardViewDosComponent } from './components/prod-card-view-dos/prod-card-view-dos.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +59,9 @@ import { ArticuloEditComponent } from './components/articulo-edit/articulo-edit.
     ImportDataComponent,
     ArticulosListComponent,
     ProductsCardViewUnoComponent,
-    ArticuloEditComponent
+    ArticuloEditComponent,
+    ArticuloCardSelectToolsComponent,
+    ProdCardViewDosComponent
   ],
   imports: [
     BrowserModule,

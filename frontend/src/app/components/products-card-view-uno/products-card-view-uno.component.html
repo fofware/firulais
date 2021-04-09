@@ -1,5 +1,5 @@
 <article>
-  <h3 class="stock" aria-hidden="true" [hidden]="publico">{{articulo.stock}} </h3>
+  <h3 class="stock" aria-hidden="true" [hidden]="!showStock">{{articulo.stock}} </h3>
   <div class='textbox'>
     <h5 class="nombre">{{articulo.fullName}}</h5>
     <h6>Fabricante: {{articulo.fabricante}}</h6>
@@ -13,6 +13,8 @@
 </article>
 <nav>
   <i class="pesable fa fa-balance-scale fa-fw fa-2x" aria-hidden="true" [hidden]="!articulo.pesable"></i>
+  <!--i class="pesable fas fa-box fa-2x" aria-hidden="true" [hidden]="!(articulo.parent !== null && articulo.pVenta && articulo.pCompra)"></i-->
+  <i class="pesable fas fa-box fa-2x" aria-hidden="true" [hidden]="!(articulo.count_ins === 0)"></i>
   <div class="imgbox">
     <img class="caja-img" src="{{articulo.image}}" alt="">
   </div>
@@ -28,10 +30,10 @@
 <div class="valor4">
   <h6 *ngIf="articulo.contiene > 0">${{round(articulo.precioref)}}/{{articulo.unidad}}</h6>
 </div>
-<div class="valor2" [hidden]="publico">
+<!--div class="valor2" [hidden]="publico">
   <h6 *ngIf="cmpTipo == 'compra'">{{articulo.precio}}</h6>
   <h6 *ngIf="cmpTipo != 'compra'">{{articulo.compra}}</h6>
 </div>
 <div class="valor3" [hidden]="publico">
   <h6>{{articulo.reposicion}}</h6>
-</div>
+</div-->

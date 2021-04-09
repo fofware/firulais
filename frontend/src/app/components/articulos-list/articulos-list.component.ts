@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnChanges, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_URI } from 'src/app/shared/uris';
+import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
 
 @Component({
   selector: 'app-articulos-list',
@@ -11,6 +13,14 @@ import { API_URI } from 'src/app/shared/uris';
 export class ArticulosListComponent implements OnInit {
   wait: boolean = false;
   filter = {
+/*
+    perro: { value: 'perro', display: true, qry: {}}
+  , gato: { value: 'gato', display: true, qry: {}}
+  , ave: { value: 'ave', display: true, qry: {}}
+  , pez: { value: 'pez', display: false, qry: {}}
+  , caballo: { value: 'caballo', display: false, qry: {}}
+  ,
+*/
     pesable: { value: false,  display: false, qry: true }
   , precio: { value: true, display: false,  qry: { $gt: 0 }}
   , stock:  { value: true, display: false,  qry: { $gte: 1 }}
@@ -63,13 +73,47 @@ export class ArticulosListComponent implements OnInit {
   listaOrden = 0;
   showArticulos = true;
   publico = true;
-  searchItem = '';
+  searchItem: string = '';
   cmpSetting = {
     tipo: 'Venta',
     public: true
   };
   articuloList: any[] = [];
-  constructor( private http: HttpClient) { }
+  prodList: any[] = [];
+  unidades: [{ id: any, name: string }];
+  selectedArticulo: any;
+
+  closeModal: string;
+
+  constructor(  private http: HttpClient,
+                private modalService: NgbModal,
+                private list: ListasArtProdService
+              ) {
+                  this.list.filter = this.filter;
+                }
+
+  triggerModal(content) {
+    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title', size: 'xl', scrollable: true, centered: true }).result.then((res) => {
+      this.closeModal = `Closed with: ${res}`;
+      console.log(this.closeModal)
+    }, (res) => {
+      this.closeModal = `Dismissed ${this.getDismissReason(res)}`;
+      console.log(this.closeModal)
+    });
+  }
+
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      console.log('by pressing ESC')
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      console.log('by clicking on a backdrop')
+      return 'by clicking on a backdrop';
+    } else {
+      console.log(`with: ${reason}`)
+      return  `with: ${reason}`;
+    }
+  }
 
   ngOnInit(): void {
     this.listArticulos()
@@ -90,6 +134,9 @@ export class ArticulosListComponent implements OnInit {
     this.searchItem = ([] as any);
     this.searchArticulos();
   }
+  newReg(ev){
+    console.log("Add New Articulo")
+  }
 
   searchArticulos(): void {
     if (this.wait) { return; }
@@ -108,8 +155,11 @@ export class ArticulosListComponent implements OnInit {
     //  console.log( 'LISTAORDEN' , this.articuloOrder[this.listaOrden].sort );
     const Sort = this.articuloOrder[this.listaOrden].sort;
 
-    this.buscaProductos({Articulo, Producto, Extra, searchItem: this.searchItem, Sort })
-    .subscribe(
+//    this.list.buscaArticulos({Articulo, Producto, Extra, searchItem: this.searchItem, Sort })
+    this.list.readData(
+      `${API_URI}/articulos/productos/list`,
+      {Articulo, Producto, Extra, searchItem: this.searchItem, Sort }
+    ).subscribe(
       res => {
         //        this.calculaPrecios(res);
         const data = res as any;
@@ -133,14 +183,51 @@ export class ArticulosListComponent implements OnInit {
       }
     );
   }
-  buscaProductos(params: any): Observable<any> {
-    return new Observable((observer) => {
-      this.http.post(`${API_URI}/articulos/productos/list`, params ).subscribe(res => {
-      observer.next(res);
-        // observable execution
-      observer.complete();
-      });
-    });
+
+  SelectEvent(ev,modalData){
+    console.log(ev);
+    this.selectedArticulo = ev.articulo;
+    this.selectedArticulo.idx = ev.idx;
+    this.prodList = ev.articulo.productos;
+    this.unidades = [{ id: null, name: null }];
+
+    for (let index = 0; index < this.prodList.length; index++) {
+      const e = this.prodList[index];
+      this.prodList[index].parentname = this.readParent(e.parent);
+      const unid = { id: e._id, name: this.readParent(e._id) };
+      this.prodList[index].infile = true;
+      this.prodList[index].changed = false;
+      if (!this.unidades) { this.unidades = [unid]; }
+      else { this.unidades.push(unid); }
+    }
+    this.triggerModal(modalData);
+  }
+
+  readParent(id: any, descr?: string) {
+    if ( descr === undefined ) { descr = ''; }
+    const item = this.findProduct(id);
+    if (item._id) {
+      if (`${item._id}` === `${item.parent}` || item.parent === undefined) { item.parent = null; }
+      descr += `${item.name} ${item.contiene} ${item.unidad}`;
+/*
+      if (item.contiene && item.contiene > 1) { descr += `${item.name} ${item.contiene} ${item.unidad}`; }
+      else if (item.unidad) { descr += `${item.name} ${item.unidad}`; }
+      else { descr += `${item.name}`; }
+*/
+      if (item.parent != null) {
+        descr = this.readParent(item.parent, descr);
+      }
+    }
+    return descr.trim();
+  }
+
+  findProduct(id: any): any {
+    // tslint:disable-next-line:prefer-for-of
+    for (let index = 0; index < this.prodList.length; index++) {
+      const element: any = this.prodList[index];
+      if (element._id === id) { return element; }
+    }
+    return {};
   }
 
 }

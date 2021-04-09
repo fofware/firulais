@@ -1,7 +1,41 @@
 <article>
-  <h4 class="nombre">{{articulo.fullName}}</h4>
+  <!--div class="control">
+    <div class="d-flex flex-row bd-highlight ">
+      <button class="btn btn-outline-primary" (click)="editdata()"><i class="fas fa-pen-square"></i></button>
+      <button class="btn btn-outline-danger" (click)="editdata()"><i class="fas fa-trash-alt"></i></button>
+    </div>
+  </div-->
+  <div class="d-flex flex-row justify-content-between">
+    <h4 class="nombre">
+      <span *ngIf="articulo.d_fabricante">{{articulo.fabricante}} </span>
+      <span *ngIf="articulo.d_marca">{{articulo.marca}} </span>
+      <span>{{articulo.name}} </span>
+      <span *ngIf="articulo.d_especie">{{articulo.especie}} </span>
+      <span *ngIf="articulo.d_edad">{{articulo.edad}} </span>
+      <span *ngIf="articulo.d_raza">{{articulo.raza}} </span>
+      <span *ngIf="articulo.d_rubro">{{articulo.rubro}} </span>
+      <span *ngIf="articulo.d_linea">{{articulo.linea}} </span>
+        <!--
+      {{articulo.fullName}}
+      -->
+    </h4>
+    <div class="d-flex flex-row">
+      <div class="block" style="width: max-content;">
+        <button class="btn btn-outline-primary" (click)="editdata()"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-outline-danger" (click)="editdata()"><i class="fas fa-trash-alt"></i></button>
+      </div>
+    </div>
+  </div>
   <div>
-    {{articulo.fabricante}} {{articulo.marca}} {{articulo.name}} {{articulo.especie}} {{articulo.edad}} {{articulo.raza}} {{articulo.rubro}} {{articulo.linea}}
+    <span *ngIf="articulo.d_fabricante">{{articulo.fabricante}} </span>
+    <span *ngIf="articulo.d_marca">{{articulo.marca}} </span>
+    <span>{{articulo.name}} </span>
+    <span *ngIf="articulo.d_especie">{{articulo.especie}} </span>
+    <span *ngIf="articulo.d_edad">{{articulo.edad}} </span>
+    <span *ngIf="articulo.d_raza">{{articulo.raza}} </span>
+    <span *ngIf="articulo.d_rubro">{{articulo.rubro}} </span>
+    <span *ngIf="articulo.d_linea">{{articulo.linea}} </span>
+<!--    {{articulo.marca}} {{articulo.name}} {{articulo.especie}} {{articulo.edad}} {{articulo.raza}} {{articulo.rubro}} {{articulo.linea}} -->
   </div>
   <table>
     <tr *ngFor="let producto of articulo.productos; index as i;" >

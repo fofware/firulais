@@ -720,7 +720,7 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 									},
 		
 									{
-										$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0, image: 1, strContiene: {$toString: '$contiene'},
+										$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: {$toString: '$contiene'},
 									} 
 		//								$project: { name: 1, contiene: 1, unidad: 1, _id: 0 } 
 									}
@@ -755,7 +755,7 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 										 }
 									},
 									{
-										$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0, image: 1, strContiene: {$toString: '$contiene'} } 
+										$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: {$toString: '$contiene'} } 
 									}
 							 ],
 							 as: "parte"
@@ -788,7 +788,7 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 									},
 		
 									{
-										$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0, image: 1, strContiene: {$toString: '$contiene'} } 
+										$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: {$toString: '$contiene'} } 
 									}
 							 ],
 							 as: "cerrado"
@@ -863,7 +863,8 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 						, qry.Decimales
 						] 
 					},
-					"precio": { $ceil:
+					precio: 1,
+					"calc_precio": { $ceil:
 						{ 
 							$cond: [ {$eq: ['$count_parte', 0]}, 
 								{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, { $divide: ['$parte.compra', '$parte.contiene'] } ] }, 
@@ -930,7 +931,7 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 								'$parte',
 								{$cond: [{$eq: ['$count_cerrado',0]},
 									'$cerrado',
-									{'name':'','strContiene':'','unidad':''}
+									{'name':'','strContiene': '','unidad':''}
 								]}
 							]}
 						]
@@ -960,7 +961,7 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 							'$cerrado.contiene', 
 							{ $cond: [ {$eq: ['$ins_count',0]},
 								'$ins.contiene',
-								'' ] }
+								1 ] }
 							]}
 						]
 					},
@@ -1008,12 +1009,13 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 					"iva": 1,
 					"margen": 1,
 					"tipo": 1,
-					'ins': 1,
+//					'ins': 1,
 					'count_ins':1,
-					'cerrado':1,
+//					'cerrado':1,
 					'count_cerrado': 1,
-					'parte':1,
+//					'parte':1,
 					'count_parte': 1,
+					'parent': 1
 				}
 				},
 				{
@@ -1024,7 +1026,6 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 			as: "productos"
 		}
 	},
-
 	{
 		$project: qry.Project
 	},
