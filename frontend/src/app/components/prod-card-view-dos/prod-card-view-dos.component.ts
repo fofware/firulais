@@ -10,7 +10,7 @@ export class ProdCardViewDosComponent implements OnInit {
   @Input() articulo: any;
   @Input() showStock: any;
   @Input() cmpTipo: any;
-
+  @Input() idx: number;
   constructor() { }
 
   ngOnInit(): void {

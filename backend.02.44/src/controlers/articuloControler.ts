@@ -32,7 +32,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 	if( !qry.Decimales) qry.Decimales = 2;
 //	if( !qry.Sort ) qry.Sort = {'fabricante': 1, 'marca': 1, 'especie': 1, 'rubro': 1, 'linea': 1, 'edad': 1, 'raza': 1	};
 	if( !qry.Sort ) qry.Sort = { 'rubro': 1, 'linea': 1, 'contiene': 1, 'precio': 1 };
-	console.log(qry.Producto);
+//	console.log(qry.Producto);
 	console.log(qry.Extra);
 	const array = await producto.aggregate([
 		{ $match: qry.Producto },
@@ -1036,14 +1036,117 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 	]);
 }	
 
-export const articuloSanitizeString = function (search: string) {
-	if(!search || search.length == 0) return null;
+	export const articuloSanitize = async function (qry: any) {
+		//	if(!search || search.length == 0) return null;
+		const artFlds = ['name','fabricante','marca','rubro', 'linea', 'especie', 'edad', 'raza', 'tags'];
+		const Articulo = {};
+		const Extra = {};
+		const In = [];
+		let a = [];
+		let t = [];
+		let e = [];
+		if (qry.Articulo){
+			for (const key in qry.Articulo) {
+				if (Object.prototype.hasOwnProperty.call(qry.Articulo, key)) {
+					const e = qry.Articulo[key];
+					Articulo[key] = (e['$regex'] ? {$regex: new RegExp(e['$regex'].params, e['$regex'].flags )} : e); 
+					artFlds.splice (artFlds.indexOf(key), 1)
+				}
+			}
+			const lista = await readArticulos({ Articulo, Project: {'_id': 1}, Sort: {'_id': 1} });
+			for (let index = 0; index < lista.length; index++) {
+				lista[index] = new ObjectID(lista[index]._id);
+			}
+			t = t.concat(lista);
+		}
+
+		if (qry.searchItem.length > 0){
+			const searchItem = qry.searchItem.replace(/  /g, ' ');
+			const array: any[] = searchItem.trim().split(' ');
+			Articulo['$and'] = [];
+			for (let index = 0; index < array.length; index++) {
+				const str = array[index];
+				const v = {}
+				v['$or'] = [];
+				for (let n = 0; n < artFlds.length; n++) {
+					const fld = artFlds[n];
+					const o = {};
+					o[fld] = { $regex: new RegExp( str, 'i' ) } 
+					v['$or'].push(o);
+				}
+				const testQry = v; //{ '$or':[ v['$or'][v['$or'].length-1]] }
+				const lista = await readArticulos({ Articulo: { '$and': [ {_id: { $in: t}}, testQry ] }, Project: {'_id': 1}, Sort: {'_id': 1} });
+				if (lista.length > 0){
+					if(Articulo['$and']) Articulo['$and'] = [];
+					Articulo['$and'].push(v);
+					for (let index = 0; index < lista.length; index++) {
+						lista[index] = new ObjectID(lista[index]._id);
+					}
+					t = lista;
+				} else {
+					v['$or'].push({fullName: { $regex: new RegExp(str, 'i')}})
+					if (!Extra['$and']) Extra['$and'] = [];
+					Extra['$and'].push(v)
+					e.push(str);
+				}
+			}
+		}
+		a = t
+		if(Articulo['$and'] && Articulo['$and'].length === 0) delete Articulo['$and'];
+		return { Articulo, lista: a, failString: e, Extra } 
+	}
+
+	export const articuloSanitizeString = function (search: string, artQry?: any) {
+//	if(!search || search.length == 0) return null;
+	artQry = (artQry ? artQry : {});
 	const Articulo = [];
+	const Extra = [];
+
 	const searchItem = search.replace(/  /g, ' ');
 	const array: any[] = searchItem.trim().split(' ');
-
-	for (let index = 0; index < array.length; index++) {
-		const element = array[index];
+	const artFlds = ['name','fabricante','marca','rubro', 'linea', 'especie', 'edad', 'raza', 'tags'];
+	const a = [];
+	const e = [];
+	const keys = []
+/*
+	for (const key in artQry) {
+		if (Object.prototype.hasOwnProperty.call(artQry, key)) {
+			keys.push(key);
+			switch (artQry[key].qryValue) {
+				case '$regex':
+					v[fld] = { $regex: new RegExp(artQry.qryValue['$regex']) }
+					break;
+				default:
+					v[fld] = artQry.qryValue
+					break;
+			}
+			console.log("v", fld, v);
+			a.push( v ); 
+		}
+	}
+*/
+	console.log("articuloControler-artQry", artQry);
+		for (let i = 0; i < artFlds.length; i++) {
+			const fld = artFlds[i];
+			const v = {};
+			if (artQry[fld]){
+				switch (artQry.qryValue) {
+					case '$regex':
+						v[fld] = { $regex: new RegExp(artQry.qryValue['$regex']) }
+						break;
+					default:
+						v[fld] = artQry.qryValue
+						break;
+				}
+				console.log("v", fld, v);
+				a.push( v ); 
+			} else {
+				for (let index = 0; index < array.length; index++) {
+					const element = array[index];
+					v[fld] = {$regex: new RegExp( `${element}`)};
+				}
+			}
+/*
 		const o = [{'name': {$regex: new RegExp( `${element}` , 'i')}},
 			{'fabricante': {$regex: new RegExp( `${element}` , 'i')}},
 			{'marca': {$regex: new RegExp( `${element}` , 'i')}},
@@ -1053,10 +1156,24 @@ export const articuloSanitizeString = function (search: string) {
 			{'edad': {$regex: new RegExp( `${element}` , 'i')}},
 			{'raza': {$regex: new RegExp( `${element}` , 'i')}},
 			{'tags': {$regex: new RegExp( `${element}` , 'i')}}
-		]
-		Articulo.push({'$or': o });
+		];
+
+		const e = [
+			{'fullName': {$regex: new RegExp( `${element}` , 'i')}},
+			{'fabricante': {$regex: new RegExp( `${element}` , 'i')}},
+			{'marca': {$regex: new RegExp( `${element}` , 'i')}},
+			{'rubro': {$regex: new RegExp( `${element}` , 'i')}},
+			{'linea': {$regex: new RegExp( `${element}` , 'i')}},
+			{'especie': {$regex: new RegExp( `${element}` , 'i')}},
+			{'edad': {$regex: new RegExp( `${element}` , 'i')}},
+			{'raza': {$regex: new RegExp( `${element}` , 'i')}},
+			{'tags': {$regex: new RegExp( `${element}` , 'i')}}
+		];
+*/
+		Articulo.push({'$or': a });
+		Extra.push({'$or': e });
 	}
-	return Articulo;
+	return { Articulo, Extra } ;
 }
 
 class ArticuloControler {
@@ -1271,9 +1388,11 @@ class ArticuloControler {
 	async findProductos ( req: Request, res: Response ) {
 		try {
 			const qry = req.body;
-			if (qry.searchItem && qry.searchItem.length > 0 )			
-				qry.Articulo['$and'] = articuloSanitizeString(qry.searchItem);
-			console.log(qry);
+			console.log('Entra qry', qry);
+			const ret = await articuloSanitize(qry);
+			console.log('ret',ret)
+			qry.Articulo = { _id: { $in: [ret.lista]}};
+			qry.Articulo =  ret.Articulo;
 			const rpta = await readProductos(qry);
 			res.status(200).json(rpta);
 		} catch (error) {

@@ -9,7 +9,7 @@ import { ReadFileService } from 'src/app/services/read-file.service';
 })
 
 export class ReadFileComponent implements OnInit {
-
+  @Input() encode: string;
   // tslint:disable-next-line:no-output-on-prefix
   @Output() onGotData = new EventEmitter<object>();
 
@@ -22,7 +22,9 @@ export class ReadFileComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.encode = ( this.encode == null ? 'utf8' : this.encode );
+  }
 
   chooseFile(event): void {
     this.chosenFiles = event.target.files;
@@ -114,7 +116,7 @@ arrayBufferToString(buffer): string {
     reader.addEventListener('load', () => {
       this.gotData(reader.result);
     }, false);
-    reader.readAsText(this.existingFile); // Converting file into data URL
-    this.chosenFiles = undefined;
+    reader.readAsText(this.existingFile, this.encode );
+//    this.chosenFiles = undefined;
   }
 }

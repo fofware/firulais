@@ -1,14 +1,5 @@
-<div class="sticky-top">
+<div class="productos-header sticky-top">
   <app-top-menu></app-top-menu>
-  <!--app-articulo-card-select
-    [filter]='filter'
-    [searchItem]='searchItem'
-    [order]='articuloOrder'
-    [listaOrden]='listaOrden'
-
-    (onCardSelectEvent)='Prod_filterEvent($event)'
-    (onNewRegEvent)='newReg($event)'
-  ></app-articulo-card-select-->
   <app-articulo-card-select-header
     [filter]="filter"
     [filterButtons]='filterButtons'
@@ -20,24 +11,14 @@
     (onButtonMsg)='buttonMsg($event)'
   ></app-articulo-card-select-header>
 </div>
-<div class="card-container">
+<div class="card-container d-print-flex">
   <app-prod-card-view-dos
-    class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-4 no-gutters"
+    class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 no-gutters"
     *ngFor="let articulo of articuloList; index as i;"
     [articulo]='articulo'
+    [idx]='i'
     cmpTipo='venta'
     [showStock]='showStock'
     (click)="selected(articulo)"
   ></app-prod-card-view-dos>
 </div>
-<!-- div class="card-container">
-  <div *ngFor="let articulo of articuloList; index as i;"
-    class="card">
-    <app-products-card-view-uno
-      [articulo]='articulo'
-      cmpTipo='venta'
-      [showStock]='showStock'
-      (click)="selected(articulo)"
-    ></app-products-card-view-uno>
-  </div>
-</div-->

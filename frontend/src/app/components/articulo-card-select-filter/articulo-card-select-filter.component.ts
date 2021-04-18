@@ -37,4 +37,20 @@ export class ArticuloCardSelectFilterComponent implements OnInit {
     console.log(button);
     this.onButtonMsg.emit(this.filterButtons);
   }
+  radioItem( parent:any, item:any ){
+    const array = parent.buttons;
+    item.value = (item.value === item.show.length-1 ? 0 : item.value + 1);
+console.log(this.filterButtons);
+console.log(parent);
+console.log(item);
+    if(item.value > 0){
+      for (let i = 0; i < array.length; i++) {
+        const element = array[i];
+        if(item.id !== element.id) element.value = 0;
+
+      }
+
+    }
+    this.emitMsg(this.filterButtons);
+  }
 }

@@ -77,7 +77,7 @@ export const menudata = [
           param: 'archivos1'
         },
         {
-          title: 'Archivos',
+          title: 'Leer csv',
           icon: 'fas fa-cogs fa-3x',
           permiso: 'moderator',
           target: '',

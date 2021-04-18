@@ -5,13 +5,24 @@
   name="searchItem"
   (input)="searchArticulos()"
   [(ngModel)]="searchItem">
-<button *ngFor="let item of filterButtons"
-  class="btn btn-outline-primary"
-  [hidden]='!item.display'
-  (click)="item.value = (item.value === item.show.length-1 ? 0 : item.value + 1);emitMsg(item)"
->
-    <i class="{{item.show[item.value]}}">{{item.text}}</i>
-</button>
+  <span *ngFor="let item of filterButtons">
+      <button *ngIf="item.tipo.search('button')===0"
+        class="btn btn-outline-primary"
+        [hidden]='!item.display'
+        (click)="item.value = (item.value === item.show.length-1 ? 0 : item.value + 1);emitMsg(item)"
+      >
+        <i class="{{item.show[item.value]}}">{{item.text}}</i>
+      </button>
+      <div *ngIf="item.tipo.search('radioButton')===0" class="btn-group btn-group-toggle" data-toggle="buttons">
+        <button *ngFor="let rbitem of item.buttons"
+          class="btn btn-outline-primary"
+          [hidden]='!rbitem.display'
+          (click)="radioItem(item, rbitem)"
+        >
+          <i class="{{rbitem.show[rbitem.value]}}">{{rbitem.text}}</i>
+        </button>
+      </div>
+    </span>
 <!--button *ngIf="setting.perro.display"
   class="btn btn-outline-primary"
   (click)="(searchItem.search('perro') ? searchItem='perro' : searchItem='');searchArticulos()"
@@ -40,7 +51,7 @@
   <i *ngIf="!searchItem.search('caballo')" class="fas fa-horse-head fa-2x text-white" aria-hidden="true"></i>
   <i *ngIf="searchItem.search('caballo')" class="fas fa-horse-head fa-2x text-white-50" aria-hidden="true"></i>
 </button-->
-<button *ngIf="setting.pesable.display" class="btn btn-outline-primary"
+<!--button *ngIf="setting.pesable.display" class="btn btn-outline-primary"
   (click)="setting.pesable.value=!setting.pesable.value;searchArticulos()">
   <i *ngIf="setting.pesable.value" class="fa fa-balance-scale fa-2x text-white" aria-hidden="true"></i>
   <i *ngIf="!setting.pesable.value" class="fa fa-balance-scale fa-2x text-white-50" aria-hidden="true"></i>
@@ -49,7 +60,6 @@
   (click)="setting.private_web.value=!setting.private_web.value;searchArticulos()">
   <i *ngIf="setting.private_web.value" class="fas fa-prescription fa-2x text-white-50" aria-hidden="true"></i>
   <i *ngIf="!setting.private_web.value" class="fas fa-prescription fa-2x text-white" aria-hidden="true"></i>
-  <!--i class="fas fa-hand-holding-medical"></i-->
 </button>
 <button *ngIf="setting.precio.display" class="btn btn-outline-primary"
   (click)="setting.precio.value=!setting.precio.value;searchArticulos()">
@@ -75,4 +85,4 @@
   (click)="setting.pVenta.value=!setting.pVenta.value;searchArticulos()">
   <i *ngIf="setting.pVenta.value" class="fa fa-2x text-white" aria-hidden="true">V</i>
   <i *ngIf="!setting.pVenta.value" class="fa fa-2x text-white-50" aria-hidden="true">V</i>
-</button>
+</button-->

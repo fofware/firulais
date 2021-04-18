@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnChanges, OnInit } from '@angular/core';
+import { regExpEscape } from '@ng-bootstrap/ng-bootstrap/util/util';
 import { Observable } from 'rxjs';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
 import { tpLista } from 'src/app/shared/toolbox';
@@ -23,72 +24,80 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   articuloList: any[] = [];
   filterButtons = [
       {
-        id: 'perro'
-        ,value: 0
-        ,show:[
-          'fas fa-dog fa-2x text-white-50'
-          ,'fas fa-dog fa-2x text-white'
+        id: 'especie'
+        , tipo: 'radioButton'
+        , buttons:[
+          {
+            id: 'perro'
+            ,value: 0
+            ,show:[
+              'fas fa-dog fa-2x text-white-50'
+              ,'fas fa-dog fa-2x text-white'
+            ]
+            ,qryName: 'Articulo'
+            ,qryValue: [{$regex: { params:'perro', flags: 'i'}}]
+            ,qryKey: 'especie'
+            ,display: true
+            ,text: ''
+          }
+          , {
+            id: 'gato'
+            ,value: 0
+            ,show:[
+              'fas fa-cat fa-2x text-white-50'
+              ,'fas fa-cat fa-2x text-white'
+            ]
+            ,qryName: 'Articulo'
+            ,qryValue: [{$regex: { params:'gato', flags: 'i'}}]
+            ,qryKey: 'especie'
+            ,display: true
+            ,text: ''
+          }
+          , {
+            id: 'aves'
+            ,value: 0
+            ,show:[
+              'fas fa-dove fa-2x text-white-50'
+              ,'fas fa-dove fa-2x text-white'
+            ]
+            ,qryName: 'Articulo'
+            ,qryValue: [{$regex: { params:'ave', flags: 'i'}}]
+            ,qryKey: 'especie'
+            ,display: true
+            ,text: ''
+          }
+          , {
+            id: 'pez'
+            ,value: 0
+            ,show:[
+              'fas fa-fish fa-2x text-white-50'
+              ,'fas fa-fish fa-2x text-white'
+            ]
+            ,qryName: 'Articulo'
+            ,qryValue: [{$regex: { params:'pez', flags: 'i'}}]
+            ,qryKey: 'especie'
+            ,display: false
+            ,text: ''
+          }
+          , {
+            id: 'caballo'
+            ,value: 0
+            ,show:[
+              'fas fa-horse fa-2x text-white-50'
+              ,'fas fa-horse fa-2x text-white'
+            ]
+            ,qryName: 'Articulo'
+            ,qryValue: [{$regex: { params:'caballo', flags: 'i'}}]
+            ,qryKey: 'especie'
+            ,display: false
+            ,text: ''
+          }
+
         ]
-        ,qryName: 'Articulo'
-        ,qryValue: ['perro']
-        ,qryKey: 'especie'
-        ,display: true
-        ,text: ''
-      }
-      , {
-        id: 'gato'
-        ,value: 0
-        ,show:[
-          'fas fa-cat fa-2x text-white-50'
-          ,'fas fa-cat fa-2x text-white'
-        ]
-        ,qryName: 'Articulo'
-        ,qryValue: ['gato']
-        ,qryKey: 'especie'
-        ,display: true
-        ,text: ''
-      }
-      , {
-        id: 'aves'
-        ,value: 0
-        ,show:[
-          'fas fa-dove fa-2x text-white-50'
-          ,'fas fa-dove fa-2x text-white'
-        ]
-        ,qryName: 'Articulo'
-        ,qryValue: ['ave']
-        ,qryKey: 'especie'
-        ,display: true
-        ,text: ''
-      }
-      , {
-        id: 'pez'
-        ,value: 0
-        ,show:[
-          'fas fa-fish fa-2x text-white-50'
-          ,'fas fa-fish fa-2x text-white'
-        ]
-        ,qryName: 'Articulo'
-        ,qryValue: ['pez']
-        ,qryKey: 'especie'
-        ,display: false
-        ,text: ''
-      }
-      , {
-        id: 'caballo'
-        ,value: 0
-        ,show:[
-          'fas fa-horse fa-2x text-white-50'
-          ,'fas fa-horse fa-2x text-white'
-        ]
-        ,qryName: 'Articulo'
-        ,qryValue: ['caballo']
-        ,qryKey: 'especie'
-        ,display: false
-        ,text: ''
       }
       , {
         id: 'pesable'
+        , tipo: 'button'
         ,value: 0
         ,show:[ 'fa fa-balance-scale fa-2x text-white-50',
                 'fa fa-balance-scale fa-2x text-white',
@@ -102,11 +111,12 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
        }
        , {
         id: 'private_web'
+        , tipo: 'button'
         ,value: 1
         ,show:[ 'fas fa-prescription fa-2x text-white',
                 'fas fa-prescription fa-2x text-white-50'
               ]
-        ,qryName: 'Extra'
+        ,qryName: 'Articulo'
         ,qryValue: [{ $not: { $eq: true } }]
         ,qryKey: 'private_web'
         ,display: true
@@ -114,6 +124,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
        }
        , {
         id: 'precio'
+        , tipo: 'button'
         ,value: 1
         ,show:[ 'fas fa-file-invoice-dollar fa-2x text-white-50',
                 'fas fa-file-invoice-dollar fa-2x text-white'
@@ -121,11 +132,12 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
         ,qryName: 'Extra'
         ,qryValue: [{ $gte: 1 }]
         ,qryKey: 'precio'
-        ,display: true
+        ,display: false
         ,text: ''
        }
        , {
         id: 'stock'
+        , tipo: 'button'
         ,value: 1
         ,show:[ 'fa fa-shopping-cart fa-2x text-white-50',
                 'fa fa-shopping-cart fa-2x text-white'
@@ -138,6 +150,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
        }
        , {
         id: 'servicio'
+        , tipo: 'button'
         ,value: 0
         ,show:[ 'fa fa-2x text-white-50',
                 'fa fa-2x text-white'
@@ -145,11 +158,12 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
         ,qryName: 'Producto'
         ,qryValue: [{ $eq: true }]
         ,qryKey: 'servicio'
-        ,display: true
+        ,display: false
         ,text: 'S'
        }
        , {
         id: 'compra'
+        , tipo: 'button'
         ,value: 0
         ,show:[ 'fa fa-2x text-white-50',
                 'fa fa-2x text-white'
@@ -157,11 +171,12 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
         ,qryName: 'Producto'
         ,qryValue: [{ $eq: true }]
         ,qryKey: 'pCompra'
-        ,display: true
+        ,display: false
         ,text: 'C'
        }
        , {
         id: 'venta'
+        , tipo: 'button'
         ,value: 1
         ,show:[ 'fa fa-2x text-white-50',
                 'fa fa-2x text-white'
@@ -169,10 +184,9 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
         ,qryName: 'Producto'
         ,qryValue: [{ $eq: true }]
         ,qryKey: 'pVenta'
-        ,display: true
+        ,display: false
         ,text: 'V'
        }
-
   ]
   filter = {
 /*
@@ -182,7 +196,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   , pez: { value: 'pez', display: false, qry: {}}
   , caballo: { value: 'caballo', display: false, qry: {}}
   ,
-*/
+
   pesable: { value: false,  display: true, qry: true }
   , precio: { value: true, display: true,  qry: { $gt: 0 }}
   , stock:  { value: true, display: true,  qry: { $gte: 1 }}
@@ -190,6 +204,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   , pCompra: { value: false, display: true, qry: { $eq: true }}
   , pVenta: { value: true, display: true, qry: { $eq: true }}
   , private_web: { value: true, display: true, qry: { $not: { $eq: true } } }
+*/
   };
   articuloOrder = [
     {
@@ -268,23 +283,40 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
 
   }
 
-
-  buttonMsg(array){
-    console.log("Procesa Buttons Msg", array)
-    this.filterButtons = array;
+  makeQry (): any {
     const qry: any = {
       Articulo: {}
       ,Producto: {}
       ,Extra: {}
+      ,searchItem: this.searchItem
     }
+
+    const array = this.filterButtons;
     for (let i = 0; i < array.length; i++) {
       const el = array[i];
-      if (el.value > 0) {
-        qry[el.qryName][el.qryKey] = el.qryValue[el.value-1];
+      switch (el.tipo) {
+        case 'radioButton':
+          for (let n = 0; n < el.buttons.length; n++) {
+            const sb = el.buttons[n];
+            if (sb.value > 0) {
+              qry[sb.qryName][sb.qryKey] = sb.qryValue[sb.value-1];
+            }
+          }
+          break;
+        default:
+          if (el.value > 0) {
+            qry[el.qryName][el.qryKey] = el.qryValue[el.value-1];
+          }
+          break;
       }
     }
-    console.log(qry);
-    this.searchProductos(qry);
+    console.log("qry",qry);
+    return qry;
+  }
+  buttonMsg(array){
+    console.log("Procesa Buttons Msg", array)
+    this.filterButtons = array;
+    this.searchProductos();
   }
 
   Prod_filterEvent( ev ): void {
@@ -301,7 +333,6 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   }
 
   listProductos(): void {
-    this.searchItem = ([] as any);
     this.searchProductos();
   }
 
@@ -312,28 +343,21 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
     console.log( art );
   }
 
-  searchProductos(qry?:any): void {
+  searchProductos(): void {
     if (this.wait) { return; }
     this.wait = true;
+    const qry:any = this.makeQry();
     const Articulo: any = (qry ? qry.Articulo : {});
     const Producto: any = (qry ? qry.Producto : {});
     const Extra: any = (qry ? qry.Extra : {});
-/*
-    if (this.filter.pesable.value) { Extra.pesable = this.filter.pesable.qry; }
-    if (this.filter.private_web.value) { Extra.private_web = this.filter.private_web.qry; }
-    if (this.filter.precio.value) { Extra.precio = this.filter.precio.qry; }
-    if (this.filter.stock.value) { Extra.stock = this.filter.stock.qry; }
-    if (this.filter.servicio.value) { Producto.servicio = this.filter.servicio.qry; }
-    if (this.filter.pCompra.value) { Producto.pCompra = this.filter.pCompra.qry; }
-    if (this.filter.pVenta.value) { Producto.pVenta = this.filter.pVenta.qry; }
-*/
-  //  console.log( 'LISTAORDEN' , this.articuloOrder[this.listaOrden].sort );
+    const searchItem: any = (qry ? qry.searchItem : "" );
+
     const Sort = this.articuloOrder[this.listaOrden].sort;
 
 //    this.list.buscaProductos({Articulo, Producto, Extra, searchItem: this.searchItem, Sort })
     this.list.readData(
       `${this.ApiUri}/productos/list`,
-      {Articulo, Producto, Extra, searchItem: this.searchItem, Sort }
+      {Articulo, Producto, Extra, searchItem, Sort }
     ).subscribe(
       res => {
 //        this.calculaPrecios(res);

@@ -61,7 +61,29 @@
 .card.card.highlight-card span {
   margin-left: 60px;
 }
+.page-break	{
+  display: block;
+  width: 100%;
+}
+
 @media print {
+  @page {
+    /* declaraciones Css */
+    widows: 10;
+    orphans: 10;
+  }
+  .productos-header {
+    display: none;
+  }
+  .page-break	{ display: block; page-break-before: always; }
+/*
+  app-prod-card-view-dos {
+    display: flex;
+    flex-wrap: wrap;
+    flex-flow: column;
+    justify-content: center;
+    margin-top: 16px;
+  }
   .card-container {
     display: flex;
     flex-wrap: wrap;
@@ -125,4 +147,5 @@
   .card.card.highlight-card span {
     margin-left: 60px;
   }
-  }
+*/
+}

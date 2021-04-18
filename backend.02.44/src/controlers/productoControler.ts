@@ -3,7 +3,7 @@ import producto, { IProducto } from '../models/producto';
 import { ObjectID } from 'bson'
 import passport from "passport";
 import articulos from '../models/articulos'
-import { articuloCtrl, articuloSanitizeString, readArticulos, readProductos } from './articuloControler';
+import { articuloCtrl, articuloSanitize, articuloSanitizeString, readArticulos, readProductos } from './articuloControler';
 import { qryProductosProcess, readParent } from '../common/productosCommon';
 import { decimales, round } from '../common/utils';
 import {Strategy, ExtractJwt, StrategyOptions} from 'passport-jwt';
@@ -110,8 +110,10 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 	if( !qry.Decimales) qry.Decimales = 2;
 //	if( !qry.Sort ) qry.Sort = {'fabricante': 1, 'marca': 1, 'especie': 1, 'rubro': 1, 'linea': 1, 'edad': 1, 'raza': 1	};
 	if( !qry.Sort ) qry.Sort = { 'rubro': 1, 'linea': 1, 'contiene': 1, 'precio': 1 };
-	console.log(qry.Producto);
-	console.log(qry.Extra);
+//	console.log('Articulo',qry.Articulo);
+//	console.log('Producto',qry.Producto);
+//	console.log('Extra',qry.Extra);
+//	console.log('Extra.$and',qry.Extra['$and']);
 	const array = await producto.aggregate([
 		{ $match: qry.Producto },
 		{
@@ -558,7 +560,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 		}
 
 	])
-	console.log(qry.Sort)
+//	console.log(qry.Sort)
 	return array;
 } 
 
@@ -615,9 +617,25 @@ class ProductoControler {
 
 	async list(req: Request, res: Response) {
 //		const { id } = req.params;
-		let qry = req.body;
+		let qry:any = req.body;
+//		console.log("Llega Qry",qry)
 		let myMatch: any;
 		let artList: any[] = [];
+
+		if (qry.searchItem && qry.searchItem.length == 1){
+			myMatch = {
+				'$or': [
+					{ 'codigo': qry.searchItem },
+					{ 'plu': qry.searchItem }
+				]
+			}
+			artList = await producto.find(myMatch);
+		}
+		const ret:any = await articuloSanitize(qry);
+//		console.log('ret',ret);
+		artList = ret.lista;
+//		artList = await readArticulos({ Articulo: ret.Articulo, Project: {'_id': 1}, Sort: {'_id': 1} });
+/*
 		if (qry.searchItem && qry.searchItem.length == 1){
 			myMatch = {
 				'$or': [
@@ -628,18 +646,38 @@ class ProductoControler {
 			artList = await producto.find(myMatch);
 		}
 		if ((myMatch == undefined || artList.length == 0) && qry.searchItem ) {
-			console.log(qry.searchItem)
 			const Articulo = {};
-			Articulo['$and'] = articuloSanitizeString(qry.searchItem);
-			if (Articulo['$and']){
-				artList = await readArticulos({ Articulo, Project: {'_id': 1}, Sort: {'_id': 1} });
-				for (let index = 0; index < artList.length; index++) {
-					artList[index] = new ObjectID(artList[index]._id);
-//					artList[index] = artList[index]._id;
+			const ret:any = articuloSanitizeString(qry.searchItem, qry.Articulo);
+			console.log('ret',ret);
+//			artList = await readArticulos({ Articulo: qry.Articulo, Project: {'_id': 1}, Sort: {'_id': 1} });
+			if(ret){
+				for (let i = 0; i < ret.Articulo.length; i++) {
+					const element = ret.Articulo[i];
+					const List = await readArticulos({ element, Project: {'_id': 1}, Sort: {'_id': 1} });
+					if( List ){
+						artList = artList.concat(artList,List);
+					} else {
+						ret.Extra.push(element);
+					}
 				}
-//				console.log(artList);
-				qry.Producto['articulo'] = { '$in': artList }
+				if(artList.length === 0 ){
+						artList = await readArticulos({ Articulo: {}, Project: {'_id': 1}, Sort: {'_id': 1} });
+				}
+				if ( ret.Extra.length > 0 )
+				{
+					qry.Extra['$and'] = ret.Extra;
+				}
 			}
+		}
+		console.log('qry.Articulo-productoControler',qry.Articulo)
+	//	console.log('artList-productoControler', artList)
+*/
+		for (let index = 0; index < artList.length; index++) {
+			artList[index] = new ObjectID(artList[index]._id);
+		}
+		if (artList.length){
+			qry.Producto['articulo'] = { '$in': artList };
+			qry.Extra = Object.assign(qry.Extra, ret.Extra);
 		}
 		const readData: any = await productoGetData(qry);
 		res.status(200).json(readData)

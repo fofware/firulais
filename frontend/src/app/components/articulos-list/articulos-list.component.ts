@@ -12,6 +12,175 @@ import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
 })
 export class ArticulosListComponent implements OnInit {
   wait: boolean = false;
+  filterButtons = [
+    {
+      id: 'especie'
+      , tipo: 'radioButton'
+      , buttons:[
+        {
+          id: 'perro'
+          ,value: 0
+          ,show:[
+            'fas fa-dog fa-2x text-white-50'
+            ,'fas fa-dog fa-2x text-white'
+          ]
+          ,qryName: 'Articulo'
+          ,qryValue: [{$regex: { params:'perro', flags: 'i'}}]
+          ,qryKey: 'especie'
+          ,display: true
+          ,text: ''
+        }
+        , {
+          id: 'gato'
+          ,value: 0
+          ,show:[
+            'fas fa-cat fa-2x text-white-50'
+            ,'fas fa-cat fa-2x text-white'
+          ]
+          ,qryName: 'Articulo'
+          ,qryValue: [{$regex: { params:'gato', flags: 'i'}}]
+          ,qryKey: 'especie'
+          ,display: true
+          ,text: ''
+        }
+        , {
+          id: 'aves'
+          ,value: 0
+          ,show:[
+            'fas fa-dove fa-2x text-white-50'
+            ,'fas fa-dove fa-2x text-white'
+          ]
+          ,qryName: 'Articulo'
+          ,qryValue: [{$regex: { params:'ave', flags: 'i'}}]
+          ,qryKey: 'especie'
+          ,display: true
+          ,text: ''
+        }
+        , {
+          id: 'pez'
+          ,value: 0
+          ,show:[
+            'fas fa-fish fa-2x text-white-50'
+            ,'fas fa-fish fa-2x text-white'
+          ]
+          ,qryName: 'Articulo'
+          ,qryValue: [{$regex: { params:'pez', flags: 'i'}}]
+          ,qryKey: 'especie'
+          ,display: false
+          ,text: ''
+        }
+        , {
+          id: 'caballo'
+          ,value: 0
+          ,show:[
+            'fas fa-horse fa-2x text-white-50'
+            ,'fas fa-horse fa-2x text-white'
+          ]
+          ,qryName: 'Articulo'
+          ,qryValue: [{$regex: { params:'caballo', flags: 'i'}}]
+          ,qryKey: 'especie'
+          ,display: false
+          ,text: ''
+        }
+
+      ]
+    }
+    , {
+      id: 'pesable'
+      , tipo: 'button'
+      ,value: 0
+      ,show:[ 'fa fa-balance-scale fa-2x text-white-50',
+              'fa fa-balance-scale fa-2x text-white',
+              'fa fa-balance-scale fa-2x text-danger'
+            ]
+      ,qryName: 'Extra'
+      ,qryValue: [true, { $not: { $eq: true } }]
+      ,qryKey: 'pesable'
+      ,display: true
+      ,text: ''
+     }
+     , {
+      id: 'private_web'
+      , tipo: 'button'
+      ,value: 1
+      ,show:[ 'fas fa-prescription fa-2x text-white',
+              'fas fa-prescription fa-2x text-white-50'
+            ]
+      ,qryName: 'Articulo'
+      ,qryValue: [{ $not: { $eq: true } }]
+      ,qryKey: 'private_web'
+      ,display: true
+      ,text: ''
+     }
+/*
+     , {
+      id: 'precio'
+      , tipo: 'button'
+      ,value: 1
+      ,show:[ 'fas fa-file-invoice-dollar fa-2x text-white-50',
+              'fas fa-file-invoice-dollar fa-2x text-white'
+            ]
+      ,qryName: 'Extra'
+      ,qryValue: [{ $gte: 1 }]
+      ,qryKey: 'precio'
+      ,display: false
+      ,text: ''
+     }
+     , {
+      id: 'stock'
+      , tipo: 'button'
+      ,value: 1
+      ,show:[ 'fa fa-shopping-cart fa-2x text-white-50',
+              'fa fa-shopping-cart fa-2x text-white'
+            ]
+      ,qryName: 'Extra'
+      ,qryValue: [{ $gte: 1 }]
+      ,qryKey: 'stock'
+      ,display: true
+      ,text: ''
+     }
+     , {
+      id: 'servicio'
+      , tipo: 'button'
+      ,value: 0
+      ,show:[ 'fa fa-2x text-white-50',
+              'fa fa-2x text-white'
+            ]
+      ,qryName: 'Producto'
+      ,qryValue: [{ $eq: true }]
+      ,qryKey: 'servicio'
+      ,display: false
+      ,text: 'S'
+     }
+     , {
+      id: 'compra'
+      , tipo: 'button'
+      ,value: 0
+      ,show:[ 'fa fa-2x text-white-50',
+              'fa fa-2x text-white'
+            ]
+      ,qryName: 'Producto'
+      ,qryValue: [{ $eq: true }]
+      ,qryKey: 'pCompra'
+      ,display: false
+      ,text: 'C'
+     }
+     , {
+      id: 'venta'
+      , tipo: 'button'
+      ,value: 1
+      ,show:[ 'fa fa-2x text-white-50',
+              'fa fa-2x text-white'
+            ]
+      ,qryName: 'Producto'
+      ,qryValue: [{ $eq: true }]
+      ,qryKey: 'pVenta'
+      ,display: false
+      ,text: 'V'
+     }
+*/
+  ]
+
   filter = {
 /*
     perro: { value: 'perro', display: true, qry: {}}
@@ -89,7 +258,7 @@ export class ArticulosListComponent implements OnInit {
                 private modalService: NgbModal,
                 private list: ListasArtProdService
               ) {
-                  this.list.filter = this.filter;
+                  //this.list.filter = this.filter;
                 }
 
   triggerModal(content) {
@@ -137,16 +306,54 @@ export class ArticulosListComponent implements OnInit {
   newReg(ev){
     console.log("Add New Articulo")
   }
+  makeQry (): any {
+    const qry: any = {
+      Articulo: {}
+      ,Producto: {}
+      ,Extra: {}
+      ,searchItem: this.searchItem
+    }
+
+    const array = this.filterButtons;
+    for (let i = 0; i < array.length; i++) {
+      const el = array[i];
+      switch (el.tipo) {
+        case 'radioButton':
+          for (let n = 0; n < el.buttons.length; n++) {
+            const sb = el.buttons[n];
+            if (sb.value > 0) {
+              qry[sb.qryName][sb.qryKey] = sb.qryValue[sb.value-1];
+            }
+          }
+          break;
+        default:
+          if (el.value > 0) {
+            qry[el.qryName][el.qryKey] = el.qryValue[el.value-1];
+          }
+          break;
+      }
+    }
+    console.log("qry",qry);
+    return qry;
+  }
+
+  buttonMsg(array){
+    console.log("Procesa Buttons Msg", array)
+    this.filterButtons = array;
+    this.searchArticulos();
+  }
 
   searchArticulos(): void {
     if (this.wait) { return; }
     this.wait = true;
-    const Articulo: any = {};
-    const Producto: any = {};
-    const Extra: any = {};
+    const qry:any = this.makeQry();
+    const Articulo: any = (qry ? qry.Articulo : {});
+    const Producto: any = (qry ? qry.Producto : {});
+    const Extra: any = (qry ? qry.Extra : {});
+    const searchItem: any = (qry ? qry.searchItem : "" );
 
 //    if (this.filter.pesable.value) { Extra.pesable = this.filter.pesable.qry; }
-    if (this.filter.private_web.value) { Articulo.private_web = this.filter.private_web.qry; }
+//    if (this.filter.private_web.value) { Articulo.private_web = this.filter.private_web.qry; }
 //    if (this.filter.precio.value) { Extra.precio = this.filter.precio.qry; }
 //    if (this.filter.stock.value) { Extra.stock = this.filter.stock.qry; }
 //    if (this.filter.servicio.value) { Producto.servicio = this.filter.servicio.qry; }

@@ -1,1 +1,21 @@
-<p>cargalistas works!</p>
+<div class="sticky-top">
+  <app-top-menu></app-top-menu>
+</div>
+<app-read-file
+[encode] = 'encode'
+(onGotData)="gotData($event)"
+></app-read-file>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th *ngFor="let fld of fields" scope="col">{{fld}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let reg of data; index as i;">
+      <th scope="row">{{i}}</th>
+      <td *ngFor="let fld of reg">{{fld}}</td>
+    </tr>
+  </tbody>
+</table>

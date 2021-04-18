@@ -3,10 +3,11 @@
 
   <app-articulo-card-select-header
     [filter]="filter"
+    [filterButtons]='filterButtons'
     [searchItem]='searchItem'
     [order]='articuloOrder'
     [listaOrden]='listaOrden'
-
+    (onButtonMsg)='buttonMsg($event)'
     (onCardSelectHeaderEvent)='filterEvent($event)'
     (onNewRegEvent)='newReg($event)'
   >
@@ -300,9 +301,6 @@
       </article>
     </div>
     </div>
-
-
-
   <div class="modal-footer">
     <button type="button" class="btn btn-danger" (click)="modal.close('Cancel')">Cancel</button>
     <button type="button" class="btn btn-danger" (click)="modal.close('Save click')">Save</button>
