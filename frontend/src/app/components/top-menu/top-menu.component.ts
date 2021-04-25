@@ -10,6 +10,7 @@ export class TopMenuComponent implements OnInit { // , AfterViewInit, AfterViewC
 
   user: any;
   autorized: boolean;
+  isMenuCollapsed = true;
 
   constructor(public authService: AuthService) {
     this.user = this.authService.user;

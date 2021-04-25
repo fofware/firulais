@@ -1,0 +1,8 @@
+<div class="input-group ml-0 ml-sm-2 ml-lg-2 ml-xl-2">
+  <select name="ordenTipo" class="form-control" [(ngModel)]="fpago" (change)='cambioFpago()'>
+    <option value="{{n}}" *ngFor="let pago of listaPago;index as n">{{pago.name}}</option>
+  </select>
+  <div class="input-group-append">
+    <span class="input-group-text"><i class="{{listaPago[fpago].icon}}"></i></span>
+  </div>
+</div>

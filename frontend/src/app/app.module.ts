@@ -33,6 +33,8 @@ import { ProductsCardViewUnoComponent } from './components/products-card-view-un
 import { ArticuloEditComponent } from './components/articulo-edit/articulo-edit.component';
 import { ArticuloCardSelectToolsComponent } from './components/articulo-card-select-tools/articulo-card-select-tools.component';
 import { ProdCardViewDosComponent } from './components/prod-card-view-dos/prod-card-view-dos.component';
+import { ArticuloPagoSelectComponent } from './components/articulo-pago-select/articulo-pago-select.component';
+import {NgbPaginationModule, NgbAlertModule, NgbModule, NgbNav, NgbNavbar, NgbCollapse} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -61,14 +63,18 @@ import { ProdCardViewDosComponent } from './components/prod-card-view-dos/prod-c
     ProductsCardViewUnoComponent,
     ArticuloEditComponent,
     ArticuloCardSelectToolsComponent,
-    ProdCardViewDosComponent
+    ProdCardViewDosComponent,
+    ArticuloPagoSelectComponent
+
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
-
+    FormsModule,
+    NgbPaginationModule,
+    NgbAlertModule,
+    NgbModule
   ],
   providers: [
     AuthGuard

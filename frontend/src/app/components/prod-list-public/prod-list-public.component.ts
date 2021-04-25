@@ -15,6 +15,8 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   ApiUri = API_URI;
   wait = false;
   searchItem = '';
+  fpago = 0;
+  fpagoCoef = 1;
   lista = tpLista;
   cmpSetting = {
     tipo: 'Venta',
@@ -110,6 +112,20 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
         ,text: ''
        }
        , {
+        id: 'box'
+        , tipo: 'button'
+        ,value: 0
+        ,show:[ 'fa fas fa-box fa-2x text-white-50',
+                'fa fas fa-box fa-2x text-white',
+                'fa fas fa-box fa-2x text-danger'
+              ]
+        ,qryName: 'Extra'
+        ,qryValue: [{ $eq: 0 }, { $not: { $eq: 0 } }]
+        ,qryKey: 'count_ins'
+        ,display: true
+        ,text: ''
+       }
+       , {
         id: 'private_web'
         , tipo: 'button'
         ,value: 1
@@ -188,24 +204,6 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
         ,text: 'V'
        }
   ]
-  filter = {
-/*
-    perro: { value: 'perro', display: true, qry: {}}
-  , gato: { value: 'gato', display: true, qry: {}}
-  , ave: { value: 'ave', display: true, qry: {}}
-  , pez: { value: 'pez', display: false, qry: {}}
-  , caballo: { value: 'caballo', display: false, qry: {}}
-  ,
-
-  pesable: { value: false,  display: true, qry: true }
-  , precio: { value: true, display: true,  qry: { $gt: 0 }}
-  , stock:  { value: true, display: true,  qry: { $gte: 1 }}
-  , servicio: { value: false, display: true, qry: {$eq: true} }
-  , pCompra: { value: false, display: true, qry: { $eq: true }}
-  , pVenta: { value: true, display: true, qry: { $eq: true }}
-  , private_web: { value: true, display: true, qry: { $not: { $eq: true } } }
-*/
-  };
   articuloOrder = [
     {
       name: 'Descripción',
@@ -320,15 +318,9 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   }
 
   Prod_filterEvent( ev ): void {
-//    console.log( event );
-    // tslint:disable-next-line:forin
     for (const propName in ev) {
-//      console.log(propName, ev[propName]);
       this[propName] = ev[propName];
     }
-
-//    this.searchItem = event.searchItem;
-  //  this.filter = event.filter;
     this.searchProductos();
   }
 
@@ -343,6 +335,17 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
     console.log( art );
   }
 
+  cambiaPrecio(ev){
+    console.log(ev);
+    this.fpagoCoef = ev.value;
+    this.calculaPrecio();
+  }
+  calculaPrecio() {
+    for (let i = 0; i < this.articuloList.length; i++) {
+      const e:any = this.articuloList[i];
+      e.precioToShow = Math.ceil(e.precio * this.fpagoCoef);
+    }
+  }
   searchProductos(): void {
     if (this.wait) { return; }
     this.wait = true;
@@ -372,6 +375,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
           this.searchProductos();
         } else {
           this.articuloList = data;
+          this.calculaPrecio()
         }
         this.wait = false;
         console.log(this.articuloList);

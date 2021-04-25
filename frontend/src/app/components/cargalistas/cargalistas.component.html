@@ -1,21 +1,75 @@
 <div class="sticky-top">
   <app-top-menu></app-top-menu>
 </div>
-<app-read-file
-[encode] = 'encode'
-(onGotData)="gotData($event)"
-></app-read-file>
+<header>
+  <app-read-file
+  [encode] = 'encode'
+  (onGotData)="gotData($event)"
+  ></app-read-file>
+</header>
+<div id='main' (window:resize)="onResize($event)">
+  <article>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">
+            #
+          </th>
+          <th *ngFor="let fld of fields; index as i" scope="col">
+            <select name="{{fld}}"  [(ngModel)]="typeValues[i]">
+              <option></option>
+              <option *ngFor="let val of fieldsType"  value="{{val}}" >{{val}}</option>
+            </select>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reg of data; index as i;" (click)="selectedlista(i)">
+          <th scope="row">{{i}}</th>
+          <td *ngFor="let fld of reg">{{fld}}</td>
+        </tr>
+      </tbody>
+    </table>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th *ngFor="let fld of fields" scope="col">{{fld}}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let reg of data; index as i;">
-      <th scope="row">{{i}}</th>
-      <td *ngFor="let fld of reg">{{fld}}</td>
-    </tr>
-  </tbody>
-</table>
+
+    <!--app-proveedor-articulos *ngFor="let producto of provArtList;  index as i;"
+      [index]="i" [producto]="producto" (changeProd)="onChangeProduct($event)" (deleteProd)="onDeleteProduct($event)">
+    </app-proveedor-articulos-->
+  </article>
+  <nav>
+    <div *ngFor="let fldn of fields">
+      <label>{{fldn}}</label>
+
+    </div>
+    <!--form class="form-inline">
+      <select (change)="selectProveedor()" name="proveedor" class="custom-select my-1 mr-sm-2" [(ngModel)]="proveedor">
+        <option selected>Choose...</option>
+        <option *ngFor="let persona of personasList" value="{{persona._id}}">{{persona.apellido}} {{persona.nombre}}</option>
+      </select>
+    </form-->
+
+  </nav>
+  <aside class="p-0">
+    <div class="productos-header sticky-top">
+      <app-articulo-card-select-filter
+      [searchItem]='searchItem'
+      [filterButtons]='filterButtons'
+      (onSearchArticulos)='Prod_filterEvent($event)'
+      (onButtonMsg)='buttonMsg($event)'
+    ></app-articulo-card-select-filter>
+    </div>
+    <div class="card-container d-print-flex">
+      <app-prod-card-view-dos
+        class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 no-gutters"
+        *ngFor="let articulo of articuloList; index as i;"
+        [articulo]='articulo'
+        [idx]='i'
+        cmpTipo='venta'
+        [showStock]='showStock'
+        (click)="selected(articulo)"
+      ></app-prod-card-view-dos>
+    </div>
+  </aside>
+</div>
+<footer>footer</footer>
+

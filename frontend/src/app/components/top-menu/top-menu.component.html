@@ -3,36 +3,40 @@
     <div>
       <img width="40" alt="Firulais Logo" src="favicon.ico" />
 
-      <a class="navbar-brand" routerLink="/">Firulais 362-468-3656 <i class="fab fa-whatsapp bg-success"></i></a>
+      <a class="navbar-brand" routerLink="/" (click)='isMenuCollapsed = true'>Firulais</a><a class="navbar-brand" href="https://wa.me/+5493624683656" (click)='isMenuCollapsed = true'>+54 9 (362) 468-3656 <i class="fab fa-whatsapp bg-success"></i></a>
 
     </div>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+    <button
+      class="navbar-toggler"
+      type="button"
+      (click)='isMenuCollapsed = !isMenuCollapsed'
+      >
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarColor01">
+    <div [ngbCollapse]="isMenuCollapsed" class="collapse navbar-collapse">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/inicio" routerLinkActive="active">Inicio</a>
+          <a class="nav-link" routerLink="/inicio"  routerLinkActive="active" (click)='isMenuCollapsed = true'>Inicio</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/articuloslist" routerLinkActive="active">Artículos</a>
+          <a class="nav-link" routerLink="/articuloslist" routerLinkActive="active" (click)='isMenuCollapsed = true'>Artículos</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/productlist" routerLinkActive="active">Productos</a>
+          <a class="nav-link" routerLink="/productlist" routerLinkActive="active" (click)='isMenuCollapsed = true'>Productos</a>
         </li>
         <li class="nav-item">
           <ng-container *ngIf="user.exp">
-            <a class="nav-link" routerLink="/private/menu" routerLinkActive="active"><i class="fa fa-th" aria-hidden="true"></i> &nbsp; Más Aplicaciones</a>
+            <a class="nav-link" routerLink="/private/menu" routerLinkActive="active" (click)='isMenuCollapsed = true'><i class="fa fa-th" aria-hidden="true"></i> &nbsp; Más Aplicaciones</a>
           </ng-container>
         </li>
       </ul>
       <ul class="navbar-nav ml-auto">
         <ng-container *ngIf="!user.exp; else showLogout">
           <li class="nav-item">
-            <a class="nav-link" routerLink="/signin" routerLinkActive="active">Ingresar</a>
+            <a class="nav-link" routerLink="/signin" routerLinkActive="active" (click)='isMenuCollapsed = true'>Ingresar</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="/signup" routerLinkActive="active">Registrarse</a>
+            <a class="nav-link" routerLink="/signup" routerLinkActive="active" (click)='isMenuCollapsed = true'>Registrarse</a>
           </li>
         </ng-container>
         <ng-template #showLogout >
@@ -41,9 +45,9 @@
                 {{user.nickname}}
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-              <a class="dropdown-item" href="#">Perfil</a>
+              <a class="dropdown-item" routeLink="#"  routerLinkActive="active"  (click)='isMenuCollapsed = true'>Perfil</a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" style="cursor: pointer" (click)="authService.logout()" >Logout</a>
+              <a class="dropdown-item" style="cursor: pointer" routerLinkActive="active" (click)="isMenuCollapsed = true;authService.logout()" >Logout</a>
             </div>
           </li>
         </ng-template>

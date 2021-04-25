@@ -1,7 +1,30 @@
 <div class="productos-header sticky-top">
   <app-top-menu></app-top-menu>
-  <app-articulo-card-select-header
-    [filter]="filter"
+  <form class="form-inline bg-dark p-1">
+    <app-articulo-card-select-filter
+      [searchItem]='searchItem'
+      [filterButtons]='filterButtons'
+      (onSearchArticulos)='Prod_filterEvent($event)'
+      (onButtonMsg)='buttonMsg($event)'
+    >
+    </app-articulo-card-select-filter>
+    <app-articulo-card-select-order
+      [order]="articuloOrder"
+      [listaOrden]='listaOrden'
+      (onOrderChangeEvent)='Prod_filterEvent($event)'
+    ></app-articulo-card-select-order>
+    <app-articulo-pago-select
+      [fpago] = 'fpago'
+      (onPagoChange)='cambiaPrecio($event)'
+    >
+    </app-articulo-pago-select>
+    <!--app-articulo-card-select-tools class="float-left"
+      (onNewRegEvent)='newReg($event)'
+    >
+    </app-articulo-card-select-tools-->
+  </form>
+
+  <!--app-articulo-card-select-header
     [filterButtons]='filterButtons'
     [searchItem]='searchItem'
     [order]='articuloOrder'
@@ -9,7 +32,7 @@
     (onCardSelectHeaderEvent)='Prod_filterEvent($event)'
     (onNewRegEvent)='newReg($event)'
     (onButtonMsg)='buttonMsg($event)'
-  ></app-articulo-card-select-header>
+  ></app-articulo-card-select-header-->
 </div>
 <div class="card-container d-print-flex">
   <app-prod-card-view-dos

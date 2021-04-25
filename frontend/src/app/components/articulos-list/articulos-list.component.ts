@@ -249,6 +249,7 @@ export class ArticulosListComponent implements OnInit {
   };
   articuloList: any[] = [];
   prodList: any[] = [];
+  detalles: any[] = [];
   unidades: [{ id: any, name: string }];
   selectedArticulo: any;
 
@@ -351,15 +352,6 @@ export class ArticulosListComponent implements OnInit {
     const Producto: any = (qry ? qry.Producto : {});
     const Extra: any = (qry ? qry.Extra : {});
     const searchItem: any = (qry ? qry.searchItem : "" );
-
-//    if (this.filter.pesable.value) { Extra.pesable = this.filter.pesable.qry; }
-//    if (this.filter.private_web.value) { Articulo.private_web = this.filter.private_web.qry; }
-//    if (this.filter.precio.value) { Extra.precio = this.filter.precio.qry; }
-//    if (this.filter.stock.value) { Extra.stock = this.filter.stock.qry; }
-//    if (this.filter.servicio.value) { Producto.servicio = this.filter.servicio.qry; }
-//    if (this.filter.pCompra.value) { Producto.pCompra = this.filter.pCompra.qry; }
-//    if (this.filter.pVenta.value) { Producto.pVenta = this.filter.pVenta.qry; }
-    //  console.log( 'LISTAORDEN' , this.articuloOrder[this.listaOrden].sort );
     const Sort = this.articuloOrder[this.listaOrden].sort;
 
 //    this.list.buscaArticulos({Articulo, Producto, Extra, searchItem: this.searchItem, Sort })
@@ -392,20 +384,25 @@ export class ArticulosListComponent implements OnInit {
   }
 
   SelectEvent(ev,modalData){
-    console.log(ev);
+    console.log("SelectEvent",ev);
     this.selectedArticulo = ev.articulo;
     this.selectedArticulo.idx = ev.idx;
     this.prodList = ev.articulo.productos;
+    this.detalles = ev.articulo.detalles || [];
+
     this.unidades = [{ id: null, name: null }];
 
     for (let index = 0; index < this.prodList.length; index++) {
       const e = this.prodList[index];
-      this.prodList[index].parentname = this.readParent(e.parent);
-      const unid = { id: e._id, name: this.readParent(e._id) };
-      this.prodList[index].infile = true;
-      this.prodList[index].changed = false;
-      if (!this.unidades) { this.unidades = [unid]; }
-      else { this.unidades.push(unid); }
+      if(e.count_parte !== 0 && e.count_ins !== 0) // No se muestran los pesables ni las cajas o Packs
+      {
+        this.prodList[index].parentname = this.readParent(e.parent);
+        const unid = { id: e._id, name: this.readParent(e._id) };
+        this.prodList[index].infile = true;
+        this.prodList[index].changed = false;
+        if (!this.unidades) { this.unidades = [unid]; }
+        else { this.unidades.push(unid); }
+      }
     }
     this.triggerModal(modalData);
   }

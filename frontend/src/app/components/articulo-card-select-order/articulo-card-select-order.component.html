@@ -1,6 +1,8 @@
-<select name="ordenTipo" class="form-control mr-sm-2 m-2"
-[(ngModel)]="listaOrden"
-(change)='cambioOrden()'
->
-<option value="{{n}}" *ngFor="let ord of order;index as n">{{ord.name}}</option>
-</select>
+<div class="input-group ml-0 ml-sm-2 ml-lg-2 ml-xl-2">
+  <select name="ordenTipo" class="form-control" [(ngModel)]="listaOrden" (change)='cambioOrden()'>
+    <option value="{{n}}" *ngFor="let ord of order;index as n">{{ord.name}}</option>
+  </select>
+  <div class="input-group-append">
+    <span class="input-group-text"><i class="fas fa-sort-amount-down"></i></span>
+  </div>
+</div>
