@@ -9,9 +9,9 @@
     <h4 class="nombre">
       <span *ngIf="articulo.d_fabricante">{{articulo.fabricante}} </span>
       <span *ngIf="articulo.d_marca">{{articulo.marca}} </span>
-      <span>{{articulo.name}} </span>
       <span *ngIf="articulo.d_especie">{{articulo.especie}} </span>
       <span *ngIf="articulo.d_edad">{{articulo.edad}} </span>
+      <span>{{articulo.name}} </span>
       <span *ngIf="articulo.d_raza">{{articulo.raza}} </span>
       <span *ngIf="articulo.d_rubro">{{articulo.rubro}} </span>
       <span *ngIf="articulo.d_linea">{{articulo.linea}} </span>
@@ -27,28 +27,44 @@
     </div>
   </div>
   <div>
-    <span *ngIf="articulo.d_fabricante">{{articulo.fabricante}} </span>
+    <!--span *ngIf="articulo.d_fabricante">{{articulo.fabricante}} </span>
     <span *ngIf="articulo.d_marca">{{articulo.marca}} </span>
-    <span>{{articulo.name}} </span>
     <span *ngIf="articulo.d_especie">{{articulo.especie}} </span>
     <span *ngIf="articulo.d_edad">{{articulo.edad}} </span>
+    <span>{{articulo.name}} </span>
     <span *ngIf="articulo.d_raza">{{articulo.raza}} </span>
     <span *ngIf="articulo.d_rubro">{{articulo.rubro}} </span>
-    <span *ngIf="articulo.d_linea">{{articulo.linea}} </span>
+    <span *ngIf="articulo.d_linea">{{articulo.linea}} </span-->
+    <span>{{articulo.fullName}}</span>
 <!--    {{articulo.marca}} {{articulo.name}} {{articulo.especie}} {{articulo.edad}} {{articulo.raza}} {{articulo.rubro}} {{articulo.linea}} -->
   </div>
   <table>
-    <tr *ngFor="let producto of articulo.productos; index as i;" >
-      <td width='250px'>{{producto.name}} {{producto.strContiene}} {{producto.unidad}} {{producto.sname}} {{producto.sStrContiene}} {{producto.sunidad}}</td>
-      <td width='35px' align="right">{{producto.stock}}</td>
-      <td width='70px' align="right">{{producto.compra}}</td>
-      <td width='70px' align="right">{{producto.reposicion}}</td>
-      <td width='70px' align="right">{{producto.margen}}%</td>
-      <td width='70px' align="right">{{producto.lista}}</td>
-      <td width='70px' align="right">{{producto.precio}}</td>
-      <td width='70px' align="right">{{producto.reventa}}</td>
-      <td width='70px' align="right">{{producto.reventa1}}</td>
-    </tr>
+    <thead>
+        <th width='250px'>Presentación</th>
+        <th width='35px' align="right">Stock</th>
+        <th width='70px' align="right">Compra</th>
+        <th width='70px' align="right">Reposición</th>
+        <th width='70px' align="right">Pre/Un</th>
+        <th width='70px' align="right">% Mgen</th>
+        <th width='70px' align="right">Lista</th>
+        <th width='70px' align="right">Precio</th>
+        <th width='70px' align="right">Reventa</th>
+        <th width='70px' align="right">Reventa1</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let producto of articulo.productos; index as i;" >
+        <td width='250px'>{{producto.name}} {{producto.strContiene}} {{producto.unidad}} {{producto.sname}} {{producto.sStrContiene}} {{producto.sunidad}}</td>
+        <td width='35px' align="right">{{producto.stock}}</td>
+        <td width='70px' align="right">{{producto.compra}}</td>
+        <td width='70px' align="right">{{producto.reposicion}}</td>
+        <td width='70px' align="right">{{producto.precioxunidad}}/{{producto.unidad}}</td>
+        <td width='70px' align="right">{{producto.margen}}%</td>
+        <td width='70px' align="right">{{producto.lista}}</td>
+        <td width='70px' align="right">{{producto.precio}}</td>
+        <td width='70px' align="right">{{producto.reventa}}</td>
+        <td width='70px' align="right">{{producto.reventa1}}</td>
+      </tr>
+    </tbody>
   </table>
 </article>
 <nav>

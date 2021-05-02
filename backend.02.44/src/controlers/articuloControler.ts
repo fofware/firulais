@@ -76,6 +76,8 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 							{ $cond: ['$art.d_fabricante', '$art.fabricante', '']},
 							{ $cond: ['$art.d_marca', ' ', '']},
 							{ $cond: ['$art.d_marca', '$art.marca', '']},
+							{ $cond: ['$art.d_rubro', ' ', '']},
+							{ $cond: ['$art.d_rubro', '$art.rubro', '']},
 							{ $cond: ['$art.d_linea', ' ', '']},
 							{ $cond: ['$art.d_linea', '$art.linea', '']},
 							{ $cond: ['$art.d_especie', ' ', '']},
@@ -600,12 +602,12 @@ export const artProject = {
 				{ $cond: ['$d_fabricante', 'fabricante', '']},
 				{ $cond: ['$d_marca', ' ', '']},
 				{ $cond: ['$d_marca', '$marca', '']},
-				{ $cond: [ { $or: ['$d_marca','$d_fabricante'] }, ' ', '']},
-				'$name',
 				{ $cond: ['$d_especie', ' ', '']},
 				{ $cond: ['$d_especie', '$especie', '']},
 				{ $cond: ['$d_edad', ' ', '']},
 				{ $cond: ['$d_edad', '$edad', '']},
+				{ $cond: [ { $or: ['$d_marca','$d_fabricante','$d_especie','$d_edad'] }, ' ', '']},
+				'$name',
 				{ $cond: ['$d_raza', ' ', '']},
 				{ $cond: ['$d_raza', '$raza', '']},
 				{ $cond: ['$d_rubro', ' ', '']},
@@ -616,6 +618,831 @@ export const artProject = {
 			}
 		}
 	}
+};
+
+export const saleProduct =
+{
+	from: "productos",
+	let: { articuloId: "$_id" },
+	pipeline: [
+		{
+			$match: {
+				$expr:
+					{ $eq: ["$articulo", "$$articuloId"] },
+			}
+		},
+		{
+			$addFields: {
+				"strContiene": { $toString: '$contiene' }
+			}
+		},
+		{
+			$lookup:
+			{
+				from: "productos",
+				let: { productoId: "$parent", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
+				pipeline: [
+					{
+						$match:
+						{
+							$expr:
+							{
+								$and:
+									[
+										{ $eq: ["$_id", "$$productoId"] },
+										// Esto nos asegura que es un producto que se vende
+										// fraccionando
+										{ $eq: ["$$pVenta", true] },
+										{ $eq: ["$$pCompra", true] },
+										//{ $eq: [ "$$pServicio", false ] },
+										{ $eq: ["$$pesable", false] },
+										//{ $eq: [ "$pVenta", true ] },
+										//{ $eq: [ "$pCompra", true ] },
+										//{ $eq: [ "$pesable", false ] }
+									]
+							}
+						}
+					},
+
+					{
+						$project: {
+							_id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: { $toString: '$contiene' },
+						}
+						//$project: { name: 1, contiene: 1, unidad: 1, _id: 0 } 
+					}
+
+				],
+				as: "ins"
+			}
+		},
+		{
+			$lookup:
+			{
+				from: "productos",
+				let: { productoId: "$parent", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
+				pipeline: [
+					{
+						$match:
+						{
+							$expr:
+							{
+								$and:
+									[
+										{ $eq: ["$_id", "$$productoId"] },
+										// Esto nos asegura que es un producto que se vende
+										// fraccionando
+										{ $eq: ["$$pVenta", true] },
+										{ $eq: ["$$pCompra", false] },
+										//{ $eq: [ "$$pServicio", false ] },
+										{ $eq: ["$$pesable", true] },
+
+										//{ $eq: [ "$pVenta", true ] },
+										//{ $eq: [ "$pCompra", true ] },
+										//{ $eq: [ "$pesable", false ] }
+									]
+							}
+						}
+					},
+					{
+						$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: { $toString: '$contiene' } }
+					}
+				],
+				as: "parte"
+			}
+		},
+		{
+			$lookup:
+			{
+				from: "productos",
+				let: { productoId: "$_id", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
+				pipeline: [
+					{
+						$match:
+						{
+							$expr:
+							{
+								$and:
+									[
+										{ $eq: ["$parent", "$$productoId"] },
+										// esto asegura que es un producto de venta que no se compra 
+										// y se incluye dentro de este pack no se fracciona
+										{ $eq: ["$$pVenta", true] },
+										{ $eq: ["$$pCompra", false] },
+										//{ $eq: [ "$$pServicio", false ] },
+										{ $eq: ["$$pesable", false] },
+										// no es necesario
+										//{ $eq: [ "$pVenta", true ] },
+										//{ $eq: [ "$pCompra", true ] },
+										//{ $eq: [ "$pesable", false ] }
+									]
+							}
+						}
+					},
+
+					{
+						$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: { $toString: '$contiene' } }
+					}
+				],
+				as: "cerrado"
+			}
+		},
+		{
+			$unwind: {
+				path: '$parte',
+				includeArrayIndex: 'count_parte',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$unwind: {
+				path: '$cerrado',
+				includeArrayIndex: 'count_cerrado',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$unwind: {
+				path: '$ins',
+				includeArrayIndex: 'count_ins',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$project:
+			{
+				"_id": 1,
+				"name": 1,
+				"contiene": 1,
+				"strContiene": { $cond: [{ $eq: ['$count_ins', 0] }, { $concat: ['con ', '$strContiene'] }, '$strContiene'] },
+				"unidad": 1,
+				"compra": {
+					$round: [
+						{
+							$cond: [{ $eq: ['$count_parte', 0] },
+							{ $divide: ['$parte.compra', '$parte.contiene'] },
+							{
+								$cond: [{ $eq: ['$count_cerrado', 0] },
+								{ $divide: ['$cerrado.compra', '$cerrado.contiene'] },
+									'$compra'
+								]
+							}
+							]
+						}
+						,
+						3//qry.Decimales
+					]
+				},
+				"reposicion": {
+					$round: [
+						{
+							$cond: [{ $eq: ['$count_parte', 0] },
+							{ $divide: ['$parte.reposicion', '$parte.contiene'] },
+							{
+								$cond: [{ $eq: ['$count_cerrado', 0] },
+								{ $divide: ['$cerrado.reposicion', '$cerrado.contiene'] },
+									'$reposicion'
+								]
+							}
+							]
+
+						}
+						, 3 // qry.Decimales
+					]
+				},
+				"promedio":
+				{
+					$round: [
+						{
+							$cond: [{ $eq: ['$count_parte', 0] },
+							{ $divide: [{ $divide: [{ $add: ['$parte.reposicion', '$parte.compra'] }, 2] }, '$parte.contiene'] },
+							{
+								$cond: [{ $eq: ['$count_cerrado', 0] },
+								{ $divide: [{ $divide: [{ $add: ['$cerrado.reposicion', '$cerrado.compra'] }, 2] }, '$cerrado.contiene'] },
+								{ $divide: [{ $add: ['$reposicion', '$compra'] }, 2] }
+								]
+							}
+							]
+						}
+						, 3 //qry.Decimales
+					]
+				},
+				precio: 1,
+				"calc_precio": {
+					$ceil:
+					{
+						$cond: [{ $eq: ['$count_parte', 0] },
+						{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+						{
+							$cond:
+								[{ $eq: ['$count_cerrado', 0] },
+								{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
+								{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
+								]
+						}]
+					}
+				},
+				"precioref": {
+					$round: [
+						{
+							$cond: [{ $eq: ['$count_parte', 0] },
+							{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+							{
+								$cond: [{ $eq: ['$count_cerrado', 0] },
+								{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$cerrado.compra'] }, { $cond: [{ $eq: ['$cerrado.contiene', 0] }, 1, { $multiply: ['$cerrado.contiene', '$contiene'] }] }] },
+								{
+									$cond: [{ $eq: ['$count_ins', 0] },
+									{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$ins.contiene', 0] }, '$contiene', { $multiply: ['$contiene', '$ins.contiene'] }] }] },
+									{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }] }
+									]
+								}
+								]
+							}
+							]
+						},
+						{
+							$cond: [
+								{
+									$lt: [
+										{
+											$cond: [{ $eq: ['$count_parte', 0] },
+											{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+											{
+												$cond: [{ $eq: ['$count_cerrado', 0] },
+												{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$cerrado.compra'] }, { $cond: [{ $eq: ['$cerrado.contiene', 0] }, 1, { $multiply: ['$cerrado.contiene', '$contiene'] }] }] },
+												{
+													$cond: [{ $eq: ['$count_ins', 0] },
+													{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$ins.contiene', 0] }, '$contiene', { $multiply: ['$contiene', '$ins.contiene'] }] }] },
+													{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }] }
+													]
+												}
+												]
+											}
+											]
+										},
+										1
+									]
+								},
+								2,
+								3 //qry.Decimales
+
+							]
+						}
+					]
+				},
+				'sub': {
+					$cond: [{ $eq: ['$count_ins', 0] },
+						'$ins',
+					{
+						$cond: [{ $eq: ['$count_parte', 0] },
+							'$parte',
+						{
+							$cond: [{ $eq: ['$count_cerrado', 0] },
+								'$cerrado',
+							{ 'name': '', 'strContiene': '', 'unidad': '' }
+							]
+						}
+						]
+					}
+					]
+				},
+				"pesable": 1,
+				"servicio": 1,
+				"pVenta": 1,
+				"pCompra": 1,
+				"codigo": 1,
+				"plu": 1,
+				"image": 1,
+				"stock": {
+					$floor:
+					{
+						$cond: [{ $eq: ['$count_parte', 0] },
+						{ $multiply: ['$parte.stock', '$parte.contiene'] },
+						{
+							$cond: [{ $eq: ['$count_cerrado', 0] },
+							{ $multiply: ['$cerrado.stock', '$cerrado.contiene'] },
+							{
+								$cond: [{ $eq: ['$ins_count', 0] },
+								{ $cond: [{ $gte: ['$stock', 1] }, '$stock', 0] },
+								{ $cond: [{ $gte: ['$stock', 1] }, '$stock', 0] }
+								]
+							}
+							]
+						}
+						]
+					}
+				},
+				"divisor": {
+					$cond: [{ $eq: ['$count_parte', 0] },
+						'$parte.contiene',
+					{
+						$cond: [{ $eq: ['$count_cerrado', 0] },
+							'$cerrado.contiene',
+						{
+							$cond: [{ $eq: ['$ins_count', 0] },
+								'$ins.contiene',
+								1]
+						}
+						]
+					}
+					]
+				},
+				"scontiene": {
+					$cond: [{ $eq: ['$count_parte', 0] },
+						'',
+					{
+						$cond: [{ $eq: ['$count_cerrado', 0] },
+							'',
+						{
+							$cond: [{ $eq: ['$count_ins', 0] },
+								'$ins.contiene',
+								'']
+						}
+						]
+					}
+					]
+				},
+				"sStrContiene": {
+					$cond: [{ $eq: ['$count_parte', 0] },
+						'',
+					{
+						$cond: [{ $eq: ['$count_cerrado', 0] },
+							'',
+						{
+							$cond: [{ $eq: ['$count_ins', 0] },
+								'$ins.strContiene',
+								'']
+						}
+						]
+					}
+					]
+				},
+				"sname": {
+					$cond: [{ $eq: ['$count_parte', 0] },
+						'',
+					{
+						$cond: [{ $eq: ['$count_cerrado', 0] },
+							'',
+						{
+							$cond: [{ $eq: ['$count_ins', 0] },
+								'$ins.name',
+								'']
+						}
+						]
+					}
+					]
+				},
+				"sunidad": {
+					$cond: [{ $eq: ['$count_parte', 0] },
+						'',
+					{
+						$cond: [{ $eq: ['$count_cerrado', 0] },
+							'',
+						{
+							$cond: [{ $eq: ['$count_ins', 0] },
+								'$ins.unidad',
+								'']
+						}
+						]
+					}
+					]
+				},
+				"stockMin": 1,
+				"iva": 1,
+				"margen": 1,
+				"tipo": 1,
+				//'ins': 1,
+				'count_ins': 1,
+				//'cerrado':1,
+				'count_cerrado': 1,
+				//'parte':1,
+				'count_parte': 1,
+				'parent': 1
+			}
+		},
+		{
+			$sort: { 'name': 1, 'contiene': -1, 'sub.contiene': -1 }
+		}
+
+	],
+	as: "productos"
+};
+
+export const dataProduct =
+{
+	from: "productos",
+	let: { articuloId: "$_id" },
+	pipeline: [
+		{
+			$match: {
+				$expr:
+					{ $eq: ["$articulo", "$$articuloId"] },
+			}
+		},
+		{
+			$addFields: {
+				"strContiene": { $toString: '$contiene' }
+			}
+		},
+		{
+			$lookup:
+			{
+				from: "productos",
+				let: { productoId: "$parent", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
+				pipeline: [
+					{
+						$match:
+						{
+							$expr:
+							{
+								$and:
+									[
+										{ $eq: ["$_id", "$$productoId"] },
+										// Esto nos asegura que es un producto que se vende
+										// fraccionando
+										{ $eq: ["$$pVenta", true] },
+										{ $eq: ["$$pCompra", true] },
+										//{ $eq: [ "$$pServicio", false ] },
+										{ $eq: ["$$pesable", false] },
+										//{ $eq: [ "$pVenta", true ] },
+										//{ $eq: [ "$pCompra", true ] },
+										//{ $eq: [ "$pesable", false ] }
+									]
+							}
+						}
+					},
+
+					{
+						$project: {
+							_id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: { $toString: '$contiene' },
+						}
+						//$project: { name: 1, contiene: 1, unidad: 1, _id: 0 } 
+					}
+
+				],
+				as: "ins"
+			}
+		},
+		{
+			$lookup:
+			{
+				from: "productos",
+				let: { productoId: "$parent", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
+				pipeline: [
+					{
+						$match:
+						{
+							$expr:
+							{
+								$and:
+									[
+										{ $eq: ["$_id", "$$productoId"] },
+										// Esto nos asegura que es un producto que se vende
+										// fraccionando
+										{ $eq: ["$$pVenta", true] },
+										{ $eq: ["$$pCompra", false] },
+										//{ $eq: [ "$$pServicio", false ] },
+										{ $eq: ["$$pesable", true] },
+
+										//{ $eq: [ "$pVenta", true ] },
+										//{ $eq: [ "$pCompra", true ] },
+										//{ $eq: [ "$pesable", false ] }
+									]
+							}
+						}
+					},
+					{
+						$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: { $toString: '$contiene' } }
+					}
+				],
+				as: "parte"
+			}
+		},
+		{
+			$lookup:
+			{
+				from: "productos",
+				let: { productoId: "$_id", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
+				pipeline: [
+					{
+						$match:
+						{
+							$expr:
+							{
+								$and:
+									[
+										{ $eq: ["$parent", "$$productoId"] },
+										// esto asegura que es un producto de venta que no se compra 
+										// y se incluye dentro de este pack no se fracciona
+										{ $eq: ["$$pVenta", true] },
+										{ $eq: ["$$pCompra", false] },
+										//{ $eq: [ "$$pServicio", false ] },
+										{ $eq: ["$$pesable", false] },
+										// no es necesario
+										//{ $eq: [ "$pVenta", true ] },
+										//{ $eq: [ "$pCompra", true ] },
+										//{ $eq: [ "$pesable", false ] }
+									]
+							}
+						}
+					},
+
+					{
+						$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: { $toString: '$contiene' } }
+					}
+				],
+				as: "cerrado"
+			}
+		},
+		{
+			$unwind: {
+				path: '$parte',
+				includeArrayIndex: 'count_parte',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$unwind: {
+				path: '$cerrado',
+				includeArrayIndex: 'count_cerrado',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$unwind: {
+				path: '$ins',
+				includeArrayIndex: 'count_ins',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$project:
+			{
+				"_id": 1,
+				"name": 1,
+				"contiene": 1,
+				"strContiene": { $cond: [{ $eq: ['$count_ins', 0] }, { $concat: ['con ', '$strContiene'] }, '$strContiene'] },
+				"unidad": 1,
+				"compra": 1,
+				/*
+				 {
+					$round: [
+						{
+							$cond: [{ $eq: ['$count_parte', 0] },
+							{ $divide: ['$parte.compra', '$parte.contiene'] },
+							{
+								$cond: [{ $eq: ['$count_cerrado', 0] },
+								{ $divide: ['$cerrado.compra', '$cerrado.contiene'] },
+									'$compra'
+								]
+							}
+							]
+						}
+						,
+						3//qry.Decimales
+					]
+				},
+				*/
+				"reposicion": 1,
+				/*
+				{
+					$round: [
+						{
+							$cond: [{ $eq: ['$count_parte', 0] },
+							{ $divide: ['$parte.reposicion', '$parte.contiene'] },
+							{
+								$cond: [{ $eq: ['$count_cerrado', 0] },
+								{ $divide: ['$cerrado.reposicion', '$cerrado.contiene'] },
+									'$reposicion'
+								]
+							}
+							]
+
+						}
+						, 3 // qry.Decimales
+					]
+				},
+				"promedio":
+				{
+					$round: [
+						{
+							$cond: [{ $eq: ['$count_parte', 0] },
+							{ $divide: [{ $divide: [{ $add: ['$parte.reposicion', '$parte.compra'] }, 2] }, '$parte.contiene'] },
+							{
+								$cond: [{ $eq: ['$count_cerrado', 0] },
+								{ $divide: [{ $divide: [{ $add: ['$cerrado.reposicion', '$cerrado.compra'] }, 2] }, '$cerrado.contiene'] },
+								{ $divide: [{ $add: ['$reposicion', '$compra'] }, 2] }
+								]
+							}
+							]
+						}
+						, 3 //qry.Decimales
+					]
+				},
+				*/
+				precio: 1,
+				/*
+				"calc_precio": {
+					$ceil:
+					{
+						$cond: [{ $eq: ['$count_parte', 0] },
+						{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+						{
+							$cond:
+								[{ $eq: ['$count_cerrado', 0] },
+								{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
+								{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
+								]
+						}]
+					}
+				},
+				"precioref": {
+					$round: [
+						{
+							$cond: [{ $eq: ['$count_parte', 0] },
+							{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+							{
+								$cond: [{ $eq: ['$count_cerrado', 0] },
+								{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$cerrado.compra'] }, { $cond: [{ $eq: ['$cerrado.contiene', 0] }, 1, { $multiply: ['$cerrado.contiene', '$contiene'] }] }] },
+								{
+									$cond: [{ $eq: ['$count_ins', 0] },
+									{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$ins.contiene', 0] }, '$contiene', { $multiply: ['$contiene', '$ins.contiene'] }] }] },
+									{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }] }
+									]
+								}
+								]
+							}
+							]
+						},
+						{
+							$cond: [
+								{
+									$lt: [
+										{
+											$cond: [{ $eq: ['$count_parte', 0] },
+											{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+											{
+												$cond: [{ $eq: ['$count_cerrado', 0] },
+												{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$cerrado.compra'] }, { $cond: [{ $eq: ['$cerrado.contiene', 0] }, 1, { $multiply: ['$cerrado.contiene', '$contiene'] }] }] },
+												{
+													$cond: [{ $eq: ['$count_ins', 0] },
+													{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$ins.contiene', 0] }, '$contiene', { $multiply: ['$contiene', '$ins.contiene'] }] }] },
+													{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }] }
+													]
+												}
+												]
+											}
+											]
+										},
+										1
+									]
+								},
+								2,
+								3 //qry.Decimales
+
+							]
+						}
+					]
+				},
+				*/
+				'sub': {
+					$cond: [{ $eq: ['$count_ins', 0] },
+						'$ins',
+					{
+						$cond: [{ $eq: ['$count_parte', 0] },
+							'$parte',
+						{
+							$cond: [{ $eq: ['$count_cerrado', 0] },
+								'$cerrado',
+							{ 'name': '', 'strContiene': '', 'unidad': '' }
+							]
+						}
+						]
+					}
+					]
+				},
+				"pesable": 1,
+				"servicio": 1,
+				"pVenta": 1,
+				"pCompra": 1,
+				"codigo": 1,
+				"plu": 1,
+				"image": 1,
+				"stock": 1,
+				/*
+				{
+					$floor:
+					{
+						$cond: [{ $eq: ['$count_parte', 0] },
+						{ $multiply: ['$parte.stock', '$parte.contiene'] },
+						{
+							$cond: [{ $eq: ['$count_cerrado', 0] },
+							{ $multiply: ['$cerrado.stock', '$cerrado.contiene'] },
+							{
+								$cond: [{ $eq: ['$ins_count', 0] },
+								{ $cond: [{ $gte: ['$stock', 1] }, '$stock', 0] },
+								{ $cond: [{ $gte: ['$stock', 1] }, '$stock', 0] }
+								]
+							}
+							]
+						}
+						]
+					}
+				},
+				"divisor": {
+					$cond: [{ $eq: ['$count_parte', 0] },
+						'$parte.contiene',
+					{
+						$cond: [{ $eq: ['$count_cerrado', 0] },
+							'$cerrado.contiene',
+						{
+							$cond: [{ $eq: ['$ins_count', 0] },
+								'$ins.contiene',
+								1]
+						}
+						]
+					}
+					]
+				},
+				*/
+				"scontiene": {
+					$cond: [{ $eq: ['$count_parte', 0] },
+						'',
+					{
+						$cond: [{ $eq: ['$count_cerrado', 0] },
+							'',
+						{
+							$cond: [{ $eq: ['$count_ins', 0] },
+								'$ins.contiene',
+								'']
+						}
+						]
+					}
+					]
+				},
+				"sStrContiene": {
+					$cond: [{ $eq: ['$count_parte', 0] },
+						'',
+					{
+						$cond: [{ $eq: ['$count_cerrado', 0] },
+							'',
+						{
+							$cond: [{ $eq: ['$count_ins', 0] },
+								'$ins.strContiene',
+								'']
+						}
+						]
+					}
+					]
+				},
+				"sname": {
+					$cond: [{ $eq: ['$count_parte', 0] },
+						'',
+					{
+						$cond: [{ $eq: ['$count_cerrado', 0] },
+							'',
+						{
+							$cond: [{ $eq: ['$count_ins', 0] },
+								'$ins.name',
+								'']
+						}
+						]
+					}
+					]
+				},
+				"sunidad": {
+					$cond: [{ $eq: ['$count_parte', 0] },
+						'',
+					{
+						$cond: [{ $eq: ['$count_cerrado', 0] },
+							'',
+						{
+							$cond: [{ $eq: ['$count_ins', 0] },
+								'$ins.unidad',
+								'']
+						}
+						]
+					}
+					]
+				},
+				"stockMin": 1,
+				"iva": 1,
+				"margen": 1,
+				"tipo": 1,
+				//'ins': 1,
+				'count_ins': 1,
+				//'cerrado':1,
+				'count_cerrado': 1,
+				//'parte':1,
+				'count_parte': 1,
+				'parent': 1
+			}
+		},
+		{
+			$sort: { 'name': 1, 'contiene': -1, 'sub.contiene': -1 }
+		}
+
+	],
+	as: "productos"
 };
 
 export const readArticulos = async function (qry: any): Promise<any> {
@@ -668,7 +1495,7 @@ export const readProductos1 = function ( qry: any ): PromiseLike<any[]> {
 	]);
 }	
 
-export const readProductos = function ( qry: any ): PromiseLike<any[]> {
+export const readProductos = function ( qry: any, prodTemplate ): PromiseLike<any[]> {
 	if (!qry.Articulo) qry.Articulo = {};
 	if (!qry.Producto) qry.Producto = {};
 	if (!qry.Project){
@@ -677,363 +1504,427 @@ export const readProductos = function ( qry: any ): PromiseLike<any[]> {
 	}
 	if (!qry.Sort) qry.Sort = {fullName: 1};
 	qry.Decimales = 0;
-	return articulo.aggregate([
-		{ $match: qry.Articulo },
-		{ $lookup:
+	return articulo.aggregate(
+		[
+			{ $match: qry.Articulo },
 			{
-				from: "productos",
-				let: { articuloId: "$_id"},
-				pipeline: [
-					{ $match: { 
-						 $expr:
-									 { $eq: [ "$articulo",  "$$articuloId" ] },
-					 }
-					} ,
-					{
-						$addFields: {
-						"strContiene": {$toString: '$contiene'}
-				 }},
+				$lookup: prodTemplate
+/*
 				{
-					$lookup:
-						 {
-							 from: "productos",
-							 let: { productoId: "$parent", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
-							 pipeline: [
-									{ $match:
-										 { $expr:
-												{ $and:
-													 [
-														 { $eq: [ "$_id",  "$$productoId" ] },
-														 // Esto nos asegura que es un producto que se vende
-														 // fraccionando
-														 { $eq: [ "$$pVenta", true ] },
-														 { $eq: [ "$$pCompra", true ] },
-		 //                        { $eq: [ "$$pServicio", false ] },
-														 { $eq: [ "$$pesable", false ] },
-		
-		//												 { $eq: [ "$pVenta", true ] },
-		//                         { $eq: [ "$pCompra", true ] },
-		//                         { $eq: [ "$pesable", false ] }
-													 ]
-												}
-										 }
-									},
-		
-									{
-										$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: {$toString: '$contiene'},
-									} 
-		//								$project: { name: 1, contiene: 1, unidad: 1, _id: 0 } 
-									}
-		
-							 ],
-							 as: "ins"
-						 }
-				},
-				{
-					$lookup:
-						 {
-							 from: "productos",
-							 let: { productoId: "$parent", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
-							 pipeline: [
-									{ $match:
-										 { $expr:
-												{ $and:
-													 [
-														 { $eq: [ "$_id",  "$$productoId" ] },
-														 // Esto nos asegura que es un producto que se vende
-														 // fraccionando
-														 { $eq: [ "$$pVenta", true ] },
-														 { $eq: [ "$$pCompra", false ] },
-		 //                        { $eq: [ "$$pServicio", false ] },
-														 { $eq: [ "$$pesable", true ] },
-		
-		//												 { $eq: [ "$pVenta", true ] },
-		//                         { $eq: [ "$pCompra", true ] },
-		//                         { $eq: [ "$pesable", false ] }
-													 ]
-												}
-										 }
-									},
-									{
-										$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: {$toString: '$contiene'} } 
-									}
-							 ],
-							 as: "parte"
-						 }
-				},
-				{
-					$lookup:
-						 {
-							 from: "productos",
-							 let: { productoId: "$_id", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
-							 pipeline: [
-									{ $match:
-										 { $expr:
-												{ $and:
-													 [
-														 { $eq: [ "$parent",  "$$productoId" ] },
-														 // esto asegura que es un producto de venta que no se compra 
-														 // y se incluye dentro de este pack no se fracciona
-														 { $eq: [ "$$pVenta", true ] },
-														 { $eq: [ "$$pCompra", false ] },
-		//                         { $eq: [ "$$pServicio", false ] },
-														 { $eq: [ "$$pesable", false ] },
-														 // no es necesario
-		//                         { $eq: [ "$pVenta", true ] },
-		//                         { $eq: [ "$pCompra", true ] },
-		//                         { $eq: [ "$pesable", false ] }
-													 ]
-												}
-										 }
-									},
-		
-									{
-										$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: {$toString: '$contiene'} } 
-									}
-							 ],
-							 as: "cerrado"
-						 }
-				},
-				{
-					$unwind: {
-						path: '$parte',
-						includeArrayIndex: 'count_parte',
-						preserveNullAndEmptyArrays: true
-					}				
-				},
-				{
-					$unwind: {
-						path: '$cerrado',
-						includeArrayIndex: 'count_cerrado',
-						preserveNullAndEmptyArrays: true
-					}				
-				},
-				{
-					$unwind: {
-						path: '$ins',
-						includeArrayIndex: 'count_ins',
-						preserveNullAndEmptyArrays: true
-					}				
-				},	
-				{ $project: 
-				{
-					"_id": 1,
-					"name": 1,
-					"contiene": 1,
-					"strContiene": {$cond: [{$eq:['$count_ins',0]}, {$concat: ['con ','$strContiene']}, '$strContiene']},
-					"unidad": 1,
-					"compra": {
-						$round:[ 
-							{ $cond: [ {$eq: ['$count_parte', 0]}, 
-									{ $divide: ['$parte.compra', '$parte.contiene']}, 
-									{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-										{ $divide: ['$cerrado.compra', '$cerrado.contiene']},
-										'$compra'
-									]}
-								]}
-							,
-							qry.Decimales
-						]
-					},
-					"reposicion": {
-						$round: [
-							{
-								$cond: [ {$eq: ['$count_parte', 0]}, 
-								{ $divide: ['$parte.reposicion', '$parte.contiene']}, 
-								{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-									{ $divide: ['$cerrado.reposicion', '$cerrado.contiene']}, 
-									'$reposicion' 
-								]}
-							]
-		
+					from: "productos",
+					let: { articuloId: "$_id" },
+					pipeline: [
+						{
+							$match: {
+								$expr:
+									{ $eq: ["$articulo", "$$articuloId"] },
 							}
-							, qry.Decimales
-						]
-					},
-					"promedio": 
-					{
-						$round: [
-							{ $cond: [ {$eq: ['$count_parte', 0 ] }, 
-								{ $divide: [ { $divide: [ { $add: ['$parte.reposicion','$parte.compra'] }, 2 ] } , '$parte.contiene']}, 
-								{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-									{ $divide: [ { $divide: [ { $add: ['$cerrado.reposicion','$cerrado.compra'] }, 2 ] }, '$cerrado.contiene']}, 
-									{ $divide: [ { $add: ['$reposicion','$compra'] } , 2 ] } 
-								]}
-							]}
-						, qry.Decimales
-						] 
-					},
-					precio: 1,
-					"calc_precio": { $ceil:
-						{ 
-							$cond: [ {$eq: ['$count_parte', 0]}, 
-								{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, { $divide: ['$parte.compra', '$parte.contiene'] } ] }, 
-								{ $cond: 
-									[ {$eq:[ '$count_cerrado', 0 ]}, 
-									{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] } ] }, 
-									{ $multiply:[ {$add: [ '$margen', 100 ] },0.01, '$compra' ] }
-									]
-								}]
-						}
-					},
-					"precioref": {
-						$round: [
+						},
+						{
+							$addFields: {
+								"strContiene": { $toString: '$contiene' }
+							}
+						},
+						{
+							$lookup:
 							{
-								$cond: [{ $eq: ['$count_parte', 0] },
-								{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
-								{
-									$cond: [{ $eq: ['$count_cerrado', 0] },
-									{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$cerrado.compra'] }, { $cond: [{ $eq: ['$cerrado.contiene', 0] }, 1, { $multiply: ['$cerrado.contiene', '$contiene'] }] }] },
+								from: "productos",
+								let: { productoId: "$parent", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
+								pipeline: [
 									{
-										$cond: [{ $eq: ['$count_ins', 0] },
-										{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$ins.contiene', 0] }, '$contiene', { $multiply: ['$contiene', '$ins.contiene'] }] }] },
-										{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }] }
-										]
-									}
-									]
-								}
-								]
-							},
-							{
-								$cond: [
-									{
-										$lt: [
+										$match:
+										{
+											$expr:
 											{
-												$cond: [{ $eq: ['$count_parte', 0] },
-												{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+												$and:
+													[
+														{ $eq: ["$_id", "$$productoId"] },
+														// Esto nos asegura que es un producto que se vende
+														// fraccionando
+														{ $eq: ["$$pVenta", true] },
+														{ $eq: ["$$pCompra", true] },
+														//{ $eq: [ "$$pServicio", false ] },
+														{ $eq: ["$$pesable", false] },
+														//{ $eq: [ "$pVenta", true ] },
+														//{ $eq: [ "$pCompra", true ] },
+														//{ $eq: [ "$pesable", false ] }
+													]
+											}
+										}
+									},
+
+									{
+										$project: {
+											_id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: { $toString: '$contiene' },
+										}
+										//$project: { name: 1, contiene: 1, unidad: 1, _id: 0 } 
+									}
+
+								],
+								as: "ins"
+							}
+						},
+						{
+							$lookup:
+							{
+								from: "productos",
+								let: { productoId: "$parent", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
+								pipeline: [
+									{
+										$match:
+										{
+											$expr:
+											{
+												$and:
+													[
+														{ $eq: ["$_id", "$$productoId"] },
+														// Esto nos asegura que es un producto que se vende
+														// fraccionando
+														{ $eq: ["$$pVenta", true] },
+														{ $eq: ["$$pCompra", false] },
+														//{ $eq: [ "$$pServicio", false ] },
+														{ $eq: ["$$pesable", true] },
+
+														//{ $eq: [ "$pVenta", true ] },
+														//{ $eq: [ "$pCompra", true ] },
+														//{ $eq: [ "$pesable", false ] }
+													]
+											}
+										}
+									},
+									{
+										$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: { $toString: '$contiene' } }
+									}
+								],
+								as: "parte"
+							}
+						},
+						{
+							$lookup:
+							{
+								from: "productos",
+								let: { productoId: "$_id", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
+								pipeline: [
+									{
+										$match:
+										{
+											$expr:
+											{
+												$and:
+													[
+														{ $eq: ["$parent", "$$productoId"] },
+														// esto asegura que es un producto de venta que no se compra 
+														// y se incluye dentro de este pack no se fracciona
+														{ $eq: ["$$pVenta", true] },
+														{ $eq: ["$$pCompra", false] },
+														//{ $eq: [ "$$pServicio", false ] },
+														{ $eq: ["$$pesable", false] },
+														// no es necesario
+														//{ $eq: [ "$pVenta", true ] },
+														//{ $eq: [ "$pCompra", true ] },
+														//{ $eq: [ "$pesable", false ] }
+													]
+											}
+										}
+									},
+
+									{
+										$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: { $toString: '$contiene' } }
+									}
+								],
+								as: "cerrado"
+							}
+						},
+						{
+							$unwind: {
+								path: '$parte',
+								includeArrayIndex: 'count_parte',
+								preserveNullAndEmptyArrays: true
+							}
+						},
+						{
+							$unwind: {
+								path: '$cerrado',
+								includeArrayIndex: 'count_cerrado',
+								preserveNullAndEmptyArrays: true
+							}
+						},
+						{
+							$unwind: {
+								path: '$ins',
+								includeArrayIndex: 'count_ins',
+								preserveNullAndEmptyArrays: true
+							}
+						},
+						{
+							$project:
+							{
+								"_id": 1,
+								"name": 1,
+								"contiene": 1,
+								"strContiene": { $cond: [{ $eq: ['$count_ins', 0] }, { $concat: ['con ', '$strContiene'] }, '$strContiene'] },
+								"unidad": 1,
+								"compra": {
+									$round: [
+										{
+											$cond: [{ $eq: ['$count_parte', 0] },
+											{ $divide: ['$parte.compra', '$parte.contiene'] },
+											{
+												$cond: [{ $eq: ['$count_cerrado', 0] },
+												{ $divide: ['$cerrado.compra', '$cerrado.contiene'] },
+													'$compra'
+												]
+											}
+											]
+										}
+										,
+										qry.Decimales
+									]
+								},
+								"reposicion": {
+									$round: [
+										{
+											$cond: [{ $eq: ['$count_parte', 0] },
+											{ $divide: ['$parte.reposicion', '$parte.contiene'] },
+											{
+												$cond: [{ $eq: ['$count_cerrado', 0] },
+												{ $divide: ['$cerrado.reposicion', '$cerrado.contiene'] },
+													'$reposicion'
+												]
+											}
+											]
+
+										}
+										, qry.Decimales
+									]
+								},
+								"promedio":
+								{
+									$round: [
+										{
+											$cond: [{ $eq: ['$count_parte', 0] },
+											{ $divide: [{ $divide: [{ $add: ['$parte.reposicion', '$parte.compra'] }, 2] }, '$parte.contiene'] },
+											{
+												$cond: [{ $eq: ['$count_cerrado', 0] },
+												{ $divide: [{ $divide: [{ $add: ['$cerrado.reposicion', '$cerrado.compra'] }, 2] }, '$cerrado.contiene'] },
+												{ $divide: [{ $add: ['$reposicion', '$compra'] }, 2] }
+												]
+											}
+											]
+										}
+										, qry.Decimales
+									]
+								},
+								precio: 1,
+								"calc_precio": {
+									$ceil:
+									{
+										$cond: [{ $eq: ['$count_parte', 0] },
+										{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+										{
+											$cond:
+												[{ $eq: ['$count_cerrado', 0] },
+												{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
+												{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
+												]
+										}]
+									}
+								},
+								"precioref": {
+									$round: [
+										{
+											$cond: [{ $eq: ['$count_parte', 0] },
+											{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+											{
+												$cond: [{ $eq: ['$count_cerrado', 0] },
+												{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$cerrado.compra'] }, { $cond: [{ $eq: ['$cerrado.contiene', 0] }, 1, { $multiply: ['$cerrado.contiene', '$contiene'] }] }] },
 												{
-													$cond: [{ $eq: ['$count_cerrado', 0] },
-													{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$cerrado.compra'] }, { $cond: [{ $eq: ['$cerrado.contiene', 0] }, 1, { $multiply: ['$cerrado.contiene', '$contiene'] }] }] },
-													{
-														$cond: [{ $eq: ['$count_ins', 0] },
-														{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$ins.contiene', 0] }, '$contiene', { $multiply: ['$contiene', '$ins.contiene'] }] }] },
-														{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }] }
-														]
-													}
+													$cond: [{ $eq: ['$count_ins', 0] },
+													{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$ins.contiene', 0] }, '$contiene', { $multiply: ['$contiene', '$ins.contiene'] }] }] },
+													{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }] }
 													]
 												}
 												]
-											},
-											1
-										]
-									},
-									2,
-									qry.Decimales
-	
-								]
-							}
-						]
-					},
-					'sub': {
-						$cond: [ {$eq: ['$count_ins',0]},
-							'$ins',
-							{$cond: [{$eq: ['$count_parte',0]},
-								'$parte',
-								{$cond: [{$eq: ['$count_cerrado',0]},
-									'$cerrado',
-									{'name':'','strContiene': '','unidad':''}
-								]}
-							]}
-						]
-					},
-					"pesable": 1,
-					"servicio": 1,
-					"pVenta": 1,
-					"pCompra": 1,
-					"codigo": 1,
-					"plu": 1,
-					"image": 1,
-					"stock":{ $floor: 
-						{ $cond: [ {$eq: ['$count_parte', 0]}, 
-							{ $multiply: ['$parte.stock', '$parte.contiene']}, 
-							{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-								{ $multiply: ['$cerrado.stock', '$cerrado.contiene']},
-								{ $cond: [ {$eq: ['$ins_count',0]},
-									{ $cond: [ {$gte: [ '$stock', 1] }, '$stock', 0]}, 
-									{ $cond: [ {$gte: [ '$stock', 1] }, '$stock', 0]} 
-								]}
-							]}
-						]}
-					},
-					"divisor": { $cond: [ {$eq: ['$count_parte', 0]}, 
-						'$parte.contiene', 
-						{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-							'$cerrado.contiene', 
-							{ $cond: [ {$eq: ['$ins_count',0]},
-								'$ins.contiene',
-								1 ] }
-							]}
-						]
-					},
-					"scontiene": { $cond: [ {$eq: ['$count_parte', 0]}, 
-						'', 
-						{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-							'', 
-							{ $cond: [ {$eq: ['$count_ins',0]},
-								'$ins.contiene',
-								'' ] }
-							]}
-						]
-					},
-					"sStrContiene": { $cond: [ {$eq: ['$count_parte', 0]}, 
-						'', 
-						{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-							'', 
-							{ $cond: [ {$eq: ['$count_ins',0]},
-								'$ins.strContiene',
-								'' ] }
-							]}
-						]
-					},
-					"sname": { $cond: [ {$eq: ['$count_parte', 0]}, 
-						'', 
-						{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-							'', 
-							{ $cond: [ {$eq: ['$count_ins',0]},
-								'$ins.name',
-								'' ] }
-							]}
-						]
-					},
-					"sunidad": { $cond: [ {$eq: ['$count_parte', 0]}, 
-						'', 
-						{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-							'', 
-							{ $cond: [ {$eq: ['$count_ins',0]},
-								'$ins.unidad',
-								'' ] }
-							]}
-						]
-					},
-					"stockMin": 1,
-					"iva": 1,
-					"margen": 1,
-					"tipo": 1,
-//					'ins': 1,
-					'count_ins':1,
-//					'cerrado':1,
-					'count_cerrado': 1,
-//					'parte':1,
-					'count_parte': 1,
-					'parent': 1
-				}
-				},
-				{
-					$sort: { 'name': 1, 'contiene': -1, 'sub.contiene': -1 }
-				}
-	
-			],
-			as: "productos"
-		}
-	},
-	{
-		$project: qry.Project
-	},
-	{
-		$sort: qry.Sort
-	}
+											}
+											]
+										},
+										{
+											$cond: [
+												{
+													$lt: [
+														{
+															$cond: [{ $eq: ['$count_parte', 0] },
+															{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+															{
+																$cond: [{ $eq: ['$count_cerrado', 0] },
+																{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$cerrado.compra'] }, { $cond: [{ $eq: ['$cerrado.contiene', 0] }, 1, { $multiply: ['$cerrado.contiene', '$contiene'] }] }] },
+																{
+																	$cond: [{ $eq: ['$count_ins', 0] },
+																	{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$ins.contiene', 0] }, '$contiene', { $multiply: ['$contiene', '$ins.contiene'] }] }] },
+																	{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }] }
+																	]
+																}
+																]
+															}
+															]
+														},
+														1
+													]
+												},
+												2,
+												qry.Decimales
 
-	]);
+											]
+										}
+									]
+								},
+								'sub': {
+									$cond: [{ $eq: ['$count_ins', 0] },
+										'$ins',
+									{
+										$cond: [{ $eq: ['$count_parte', 0] },
+											'$parte',
+										{
+											$cond: [{ $eq: ['$count_cerrado', 0] },
+												'$cerrado',
+											{ 'name': '', 'strContiene': '', 'unidad': '' }
+											]
+										}
+										]
+									}
+									]
+								},
+								"pesable": 1,
+								"servicio": 1,
+								"pVenta": 1,
+								"pCompra": 1,
+								"codigo": 1,
+								"plu": 1,
+								"image": 1,
+								"stock": {
+									$floor:
+									{
+										$cond: [{ $eq: ['$count_parte', 0] },
+										{ $multiply: ['$parte.stock', '$parte.contiene'] },
+										{
+											$cond: [{ $eq: ['$count_cerrado', 0] },
+											{ $multiply: ['$cerrado.stock', '$cerrado.contiene'] },
+											{
+												$cond: [{ $eq: ['$ins_count', 0] },
+												{ $cond: [{ $gte: ['$stock', 1] }, '$stock', 0] },
+												{ $cond: [{ $gte: ['$stock', 1] }, '$stock', 0] }
+												]
+											}
+											]
+										}
+										]
+									}
+								},
+								"divisor": {
+									$cond: [{ $eq: ['$count_parte', 0] },
+										'$parte.contiene',
+									{
+										$cond: [{ $eq: ['$count_cerrado', 0] },
+											'$cerrado.contiene',
+										{
+											$cond: [{ $eq: ['$ins_count', 0] },
+												'$ins.contiene',
+												1]
+										}
+										]
+									}
+									]
+								},
+								"scontiene": {
+									$cond: [{ $eq: ['$count_parte', 0] },
+										'',
+									{
+										$cond: [{ $eq: ['$count_cerrado', 0] },
+											'',
+										{
+											$cond: [{ $eq: ['$count_ins', 0] },
+												'$ins.contiene',
+												'']
+										}
+										]
+									}
+									]
+								},
+								"sStrContiene": {
+									$cond: [{ $eq: ['$count_parte', 0] },
+										'',
+									{
+										$cond: [{ $eq: ['$count_cerrado', 0] },
+											'',
+										{
+											$cond: [{ $eq: ['$count_ins', 0] },
+												'$ins.strContiene',
+												'']
+										}
+										]
+									}
+									]
+								},
+								"sname": {
+									$cond: [{ $eq: ['$count_parte', 0] },
+										'',
+									{
+										$cond: [{ $eq: ['$count_cerrado', 0] },
+											'',
+										{
+											$cond: [{ $eq: ['$count_ins', 0] },
+												'$ins.name',
+												'']
+										}
+										]
+									}
+									]
+								},
+								"sunidad": {
+									$cond: [{ $eq: ['$count_parte', 0] },
+										'',
+									{
+										$cond: [{ $eq: ['$count_cerrado', 0] },
+											'',
+										{
+											$cond: [{ $eq: ['$count_ins', 0] },
+												'$ins.unidad',
+												'']
+										}
+										]
+									}
+									]
+								},
+								"stockMin": 1,
+								"iva": 1,
+								"margen": 1,
+								"tipo": 1,
+								//'ins': 1,
+								'count_ins': 1,
+								//'cerrado':1,
+								'count_cerrado': 1,
+								//'parte':1,
+								'count_parte': 1,
+								'parent': 1
+							}
+						},
+						{
+							$sort: { 'name': 1, 'contiene': -1, 'sub.contiene': -1 }
+						}
+
+					],
+					as: "productos"
+				}
+			*/
+			},
+			{
+				$project: qry.Project
+			},
+			{
+				$sort: qry.Sort
+			}
+
+		]);
 }	
 
 	export const articuloSanitize = async function (qry: any) {
@@ -1205,6 +2096,7 @@ class ArticuloControler {
 		this.router.get( '/articulos/productos/list', this.searchProductos );
 		this.router.get( '/articulos/productos/list/:search', this.searchProductos );
 		this.router.post( '/articulos/productos/list', this.findProductos );
+		this.router.post( '/articulos/productos/listdata', this.findProductosData );
 	}
 
 	public index(req: Request, res: Response) {
@@ -1225,7 +2117,7 @@ class ArticuloControler {
 	async leerProductos(req: Request, res: Response) {
 		try {
 			const qry = {Articulo:{_id: new ObjectID(req.params.id) }};
-			const rpta = await readProductos(qry)
+			const rpta = await readProductos(qry,saleProduct);
 			res.status(200).json(rpta[0])
 		} catch (error) {
 			res.status(404).json(error)
@@ -1378,7 +2270,7 @@ class ArticuloControler {
 			*/
 			}
 			const qry = { Articulo, Producto:{}, Sort: { 'fabricante': 1, 'marca': 1, 'rubro': 1, 'linea': 1, 'especie': 1, 'edad': 1, 'raza': 1, 'name': 1 } }
-			const rpta = await readProductos(qry);
+			const rpta = await readProductos(qry,saleProduct);
 			res.status(200).json(rpta);
 		} catch (error) {
 			res.status(403).json(error);
@@ -1393,7 +2285,22 @@ class ArticuloControler {
 			console.log('ret',ret)
 			qry.Articulo = { _id: { $in: [ret.lista]}};
 			qry.Articulo =  ret.Articulo;
-			const rpta = await readProductos(qry);
+			const rpta = await readProductos(qry,saleProduct);
+			res.status(200).json(rpta);
+		} catch (error) {
+			res.status(408).json(error);
+		}
+	}
+
+	async findProductosData ( req: Request, res: Response ) {
+		try {
+			const qry = req.body;
+			console.log('Entra qry', qry);
+			const ret = await articuloSanitize(qry);
+			console.log('ret',ret)
+			qry.Articulo = { _id: { $in: [ret.lista]}};
+			qry.Articulo =  ret.Articulo;
+			const rpta = await readProductos(qry,dataProduct);
 			res.status(200).json(rpta);
 		} catch (error) {
 			res.status(408).json(error);

@@ -6,25 +6,19 @@
     (onCardSelectHeaderEvent)='filterEvent($event)' (onNewRegEvent)='newReg($event)'>
   </app-articulo-card-select-header>
 </div>
-<ng-template #modalData let-modal class="modal fade bd-example-modal-xl">
+<ng-template #modalData let-modal class="modal fade">
   <div class="modal-header">
     <div class='d-flex flex-column w-100 bd-highlight'>
       <h4 class="modal-title" id="modal-basic-title">
         <span *ngIf="selectedArticulo.d_fabricante">{{selectedArticulo.fabricante}} </span>
         <span *ngIf="selectedArticulo.d_marca">{{selectedArticulo.marca}} </span>
-        <span>{{selectedArticulo.name}} </span>
         <span *ngIf="selectedArticulo.d_especie">{{selectedArticulo.especie}} </span>
         <span *ngIf="selectedArticulo.d_edad">{{selectedArticulo.edad}} </span>
+        <span>{{selectedArticulo.name}} </span>
         <span *ngIf="selectedArticulo.d_raza">{{selectedArticulo.raza}} </span>
         <span *ngIf="selectedArticulo.d_rubro">{{selectedArticulo.rubro}} </span>
         <span *ngIf="selectedArticulo.d_linea">{{selectedArticulo.linea}} </span>
-
-        <!--
-        {{selectedArticulo.fullName}}
-        -->
-
       </h4>
-
     </div>
     <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
       <span aria-hidden="true">×</span>
@@ -34,7 +28,7 @@
   <div class="modal-body">
     <ul ngbNav #nav="ngbNav" [activeId]="1" class="nav-tabs justify-content-center">
       <li [ngbNavItem]="1">
-        <a ngbNavLink>Articulo</a>
+        <a ngbNavLink><b>Articulo</b></a>
         <ng-template ngbNavContent>
           <div class="d-flex flex-row">
             <div class="d-flex flex-row bd-highlight justify-content-between" style="width: 150px; height: 100%;">
@@ -166,7 +160,7 @@
       </li>
       <!--li ngbNavItem [disabled]="true" class="ml-auto"-->
       <li [ngbNavItem]="2">
-        <a ngbNavLink>Características</a>
+        <a ngbNavLink><b>Características</b></a>
         <ng-template ngbNavContent>
           <ul>
             <li *ngFor="let item of detalles"></li>
@@ -174,7 +168,61 @@
           </ul>
         </ng-template>
       </li>
-      <li [ngbNavItem]="3" class="mr-auto">
+      <li [ngbNavItem]="3">
+        <a ngbNavLink><b>Beneficios</b></a>
+        <ng-template ngbNavContent>
+          <ul>
+            <li *ngFor="let item of detalles"></li>
+
+          </ul>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="4">
+        <a ngbNavLink><b>Fórmula</b></a>
+        <ng-template ngbNavContent>
+          <div class="row col-6 offset-3">
+            <!--div *ngFor="let item of formula;index as i" class="col-10 col-sm-10 col-lg-6 col-xl-4 bg-alternate d-flex flex-row bd-highlight justify-content-between"-->
+            <table>
+              <thead>
+                <th>#</th>
+                <th>Descripción</th>
+                <th>Valor</th>
+                <th>Mostrar</th>
+                <th>boton</th>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of formula; index as i;" class="">
+                  <td>{{i}}</td>
+                  <td>
+                    <input type="text" name="name_{{i}}" [(ngModel)]="formula[i].name">
+                  </td>
+                  <td>
+                    <input type="text" name="value_{{i}}" [(ngModel)]="formula[i].value">
+                  </td>
+                  <td>
+                    <input type='checkbox' name="show_{{i}}" [(ngModel)]="formula[i].show">
+                  </td>
+                  <td><button class='btn btn-outline-danger'><i class="fas fa-trash-alt"></i></button></td>
+                </tr>
+                <tr class="">
+                  <td></td>
+                  <td>
+                    <input type="text" name="new_name">
+                  </td>
+                  <td>
+                    <input type="text" name="new_value">
+                  </td>
+                  <td>
+                    <input type='checkbox' name="new_show">
+                  </td>
+                  <td><button class='btn btn-outline-primary'><i class="fas fa-plus"></i></button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </ng-template>
+      </li>
+      <li [ngbNavItem]="5" class="mr-auto">
         <a ngbNavLink><b>Presentaciones</b></a>
         <ng-template ngbNavContent>
           <div class="product-card" *ngFor="let ite of prodList;index as i;">

@@ -19,6 +19,7 @@ export class ArticuloCardViewUnoComponent implements OnInit, OnChanges {
   ngOnInit(): void {
     for (let i = 0; i < this.articulo.productos.length; i++) {
       const e = this.articulo.productos[i];
+      this.articulo.productos[i].precioxunidad = Math.round(e.compra/e.contiene);
       this.articulo.productos[i].lista = Math.ceil(e.precio*1.07);
       this.articulo.productos[i].reventa = Math.ceil((e.compra*((e.margen/3*2)+100)/100));
       this.articulo.productos[i].reventa1 = Math.ceil((e.compra*((e.margen/3*1)+100)/100));

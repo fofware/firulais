@@ -35,6 +35,7 @@ import { ArticuloCardSelectToolsComponent } from './components/articulo-card-sel
 import { ProdCardViewDosComponent } from './components/prod-card-view-dos/prod-card-view-dos.component';
 import { ArticuloPagoSelectComponent } from './components/articulo-pago-select/articulo-pago-select.component';
 import {NgbPaginationModule, NgbAlertModule, NgbModule, NgbNav, NgbNavbar, NgbCollapse} from '@ng-bootstrap/ng-bootstrap';
+import { ArticuloFormComponent } from './components/articulo-form/articulo-form.component';
 
 @NgModule({
   declarations: [
@@ -64,7 +65,8 @@ import {NgbPaginationModule, NgbAlertModule, NgbModule, NgbNav, NgbNavbar, NgbCo
     ArticuloEditComponent,
     ArticuloCardSelectToolsComponent,
     ProdCardViewDosComponent,
-    ArticuloPagoSelectComponent
+    ArticuloPagoSelectComponent,
+    ArticuloFormComponent
 
   ],
   imports: [

@@ -250,8 +250,16 @@ export class ArticulosListComponent implements OnInit {
   articuloList: any[] = [];
   prodList: any[] = [];
   detalles: any[] = [];
+  formula:any[] = [
+    {id: 0, name: 'Proteína bruta (mín.)', value: '25,0%', show: true}
+    ,{id: 1, name: 'Extracto etéreo / Grasa bruta (mín.)', value: '2.5%', show: false}
+    ,{id: 2, name: 'Fibra bruta (máx.)', value: '12,0%', show: false}
+    ,{id: 3, name: 'Minerales/Cenizas (máx.)', value: '8,0%', show: false}
+    ,{id: 4, name: 'Calcio (mín./máx.)', value: '0,90%/1,4%', show: false}
+  ]
   unidades: [{ id: any, name: string }];
   selectedArticulo: any;
+  editedArticulo: any;
 
   closeModal: string;
 
@@ -263,9 +271,24 @@ export class ArticulosListComponent implements OnInit {
                 }
 
   triggerModal(content) {
-    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title', size: 'xl', scrollable: true, centered: true }).result.then((res) => {
+    this.modalService.open(content,
+      {
+        ariaLabelledBy: 'modal-basic-title'
+        , size: 'xl'
+        //, windowClass: 'xlModal'
+        , scrollable: true
+        , centered: true
+        , backdrop: false
+      }).result.then((res) => {
       this.closeModal = `Closed with: ${res}`;
-      console.log(this.closeModal)
+      console.log(this.closeModal);
+      if (res == 'Save click'){
+        this.articuloList[this.editedArticulo] = JSON.parse(JSON.stringify(this.selectedArticulo));
+        this.editedArticulo = null;
+        this.selectedArticulo = {};
+      } else {
+        console.log('No graba')
+      }
     }, (res) => {
       this.closeModal = `Dismissed ${this.getDismissReason(res)}`;
       console.log(this.closeModal)
@@ -290,8 +313,6 @@ export class ArticulosListComponent implements OnInit {
   }
 
   filterEvent(ev){
-    //  console.log( event );
-    //  tslint:disable-next-line:forin
     for (const propName in ev) {
       console.log(propName, ev[propName]);
       this[propName] = ev[propName];
@@ -300,13 +321,16 @@ export class ArticulosListComponent implements OnInit {
     //  this.filter = event.filter;
     this.searchArticulos();
   }
+
   listArticulos(): void {
     this.searchItem = ([] as any);
     this.searchArticulos();
   }
+
   newReg(ev){
     console.log("Add New Articulo")
   }
+
   makeQry (): any {
     const qry: any = {
       Articulo: {}
@@ -356,17 +380,16 @@ export class ArticulosListComponent implements OnInit {
 
 //    this.list.buscaArticulos({Articulo, Producto, Extra, searchItem: this.searchItem, Sort })
     this.list.readData(
-      `${API_URI}/articulos/productos/list`,
+      `${API_URI}/articulos/productos/listdata`,
       {Articulo, Producto, Extra, searchItem: this.searchItem, Sort }
     ).subscribe(
       res => {
         //        this.calculaPrecios(res);
         const data = res as any;
-        // tslint:disable-next-line:no-string-literal
+
         if ( data.length === 1 && Articulo['$and'] && Articulo['$and'].length === 1
         && ( this.searchItem === data[0].codigo || this.searchItem === data[0].plu ))
         {
-//          this.onHeaderArticuloSelect.emit(data[0]);
           this.searchItem = '';
           this.wait = false;
           this.searchArticulos();
@@ -385,10 +408,12 @@ export class ArticulosListComponent implements OnInit {
 
   SelectEvent(ev,modalData){
     console.log("SelectEvent",ev);
-    this.selectedArticulo = ev.articulo;
-    this.selectedArticulo.idx = ev.idx;
-    this.prodList = ev.articulo.productos;
-    this.detalles = ev.articulo.detalles || [];
+    this.editedArticulo = ev.articulo;
+    this.selectedArticulo = JSON.parse(JSON.stringify(ev.articulo));
+    this.editedArticulo = ev.idx;
+    this.prodList = this.selectedArticulo.productos;
+    this.detalles = this.selectedArticulo.detalles || [];
+//    this.formula = this.selectedArticulo.formula || [];
 
     this.unidades = [{ id: null, name: null }];
 
