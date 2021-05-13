@@ -65,6 +65,9 @@ const full_project = {
 	'count_cerrado': 1,
 	'parte':1,
 	'count_parte': 1,
+	'formula': 1,
+	'detalles': 1,
+	'beneficios': 1,
 	'private_web': 1,
 	'fullName': {
 		$trim: 
@@ -192,6 +195,9 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				'tags': { $ifNull: [ '$art.tags', '' ] },
 				'art_margen': '$art.margen',
 				'private_web': { $ifNull: [ '$art.private_web', false ] },
+				'formula': '$art.formula',
+				'detalles': '$art.detalles',
+				'beneficios': '$art.beneficios',
 				'tipo': {
 					$cond: ['$parent', 
 						// Tine parent 
@@ -544,6 +550,9 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				'cerrado':1,
 				'count_cerrado': 1,
 				'parte':1,
+				'formula': 1,
+				'detalles': 1,
+				'beneficios': 1,
 				'count_parte': 1,
 				'private_web': 1
 			}
@@ -622,6 +631,7 @@ class ProductoControler {
 		let myMatch: any;
 		let artList: any[] = [];
 
+/*
 		if (qry.searchItem && qry.searchItem.length == 1){
 			myMatch = {
 				'$or': [
@@ -631,6 +641,7 @@ class ProductoControler {
 			}
 			artList = await producto.find(myMatch);
 		}
+*/
 		const ret:any = await articuloSanitize(qry);
 //		console.log('ret',ret);
 		artList = ret.lista;

@@ -23,6 +23,9 @@ export interface IArticulo extends Document {
   iva: number;
   margen: number;
   tags: string;
+  formula: [];
+  detalles: [];
+  beneficios: [];
 //  getFullName: () => Promise<string>
   setObjectIDs: () => Promise<void>
 };
@@ -48,7 +51,10 @@ const articuloSchema = new Schema({
   url: { type: String, trim: true, required: false, default:'' },
   iva: {type:Number, default: 0},
   margen: { type: Number, default: 35},
-  tags: { type: String, trim: true, default: '' }
+  tags: { type: String, trim: true, default: '' },
+  formula: [],
+  detalles: [],
+  beneficios: []
 });
 
 articuloSchema.methods.setObjectIDs = async function (): Promise<void> {

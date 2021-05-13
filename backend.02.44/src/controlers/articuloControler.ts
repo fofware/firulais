@@ -112,6 +112,9 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				'tags': { $ifNull: [ '$art.tags', '' ] },
 				'art_margen': '$art.margen',
 				'private_web': { $ifNull: [ '$art.private_web', false ] },
+				'formula': 1,
+				'detalles': 1,
+				'beneficios': 1,
 				'tipo': {
 					$cond: ['$parent', 
 						// Tine parent 
@@ -457,6 +460,9 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				'cerrado':1,
 				'count_cerrado': 1,
 				'parte':1,
+				'formula': 1,
+				'detalles': 1,
+				'beneficios': 1,
 				'count_parte': 1,
 				'private_web': 1
 			}
@@ -512,6 +518,9 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 			'parte':1,
 			'count_parte': 1,
 			'private_web': 1,
+			'formula': 1,
+			'detalles': 1,
+			'beneficios': 1,
 			'fullName': //{
 //				$trim: 
 //				{ input: 
@@ -596,6 +605,9 @@ export const artProject = {
 	'url': 1,
 	'iva': 1,
 	'margen': 1,
+	'formula': 1,
+	'detalles': 1,
+	'beneficios': 1,
 	'fullName': { $trim: 
 		{ input: 
 			{	$concat: [
@@ -1929,7 +1941,7 @@ export const readProductos = function ( qry: any, prodTemplate ): PromiseLike<an
 
 	export const articuloSanitize = async function (qry: any) {
 		//	if(!search || search.length == 0) return null;
-		const artFlds = ['name','fabricante','marca','rubro', 'linea', 'especie', 'edad', 'raza', 'tags'];
+		const artFlds = ['name', 'fabricante', 'marca', 'rubro', 'linea', 'especie', 'edad', 'raza', 'tags'];
 		const Articulo = {};
 		const Extra = {};
 		const In = [];
@@ -1941,9 +1953,15 @@ export const readProductos = function ( qry: any, prodTemplate ): PromiseLike<an
 				if (Object.prototype.hasOwnProperty.call(qry.Articulo, key)) {
 					const e = qry.Articulo[key];
 					Articulo[key] = (e['$regex'] ? {$regex: new RegExp(e['$regex'].params, e['$regex'].flags )} : e); 
-					artFlds.splice (artFlds.indexOf(key), 1)
+					const idx = artFlds.indexOf(key);
+//					console.log(key,idx)
+					if( idx !== -1){
+//						console.log('splice', key)
+						artFlds.splice ( idx, 1)
+					}
 				}
 			}
+//			console.log(Articulo);
 			const lista = await readArticulos({ Articulo, Project: {'_id': 1}, Sort: {'_id': 1} });
 			for (let index = 0; index < lista.length; index++) {
 				lista[index] = new ObjectID(lista[index]._id);
@@ -1959,11 +1977,13 @@ export const readProductos = function ( qry: any, prodTemplate ): PromiseLike<an
 				const str = array[index];
 				const v = {}
 				v['$or'] = [];
+//				console.log(artFlds.length)
 				for (let n = 0; n < artFlds.length; n++) {
 					const fld = artFlds[n];
 					const o = {};
 					o[fld] = { $regex: new RegExp( str, 'i' ) } 
 					v['$or'].push(o);
+//					console.log(fld);
 				}
 				const testQry = v; //{ '$or':[ v['$or'][v['$or'].length-1]] }
 				const lista = await readArticulos({ Articulo: { '$and': [ {_id: { $in: t}}, testQry ] }, Project: {'_id': 1}, Sort: {'_id': 1} });
@@ -1983,6 +2003,7 @@ export const readProductos = function ( qry: any, prodTemplate ): PromiseLike<an
 			}
 		}
 		a = t
+//		console.log(a);
 		if(Articulo['$and'] && Articulo['$and'].length === 0) delete Articulo['$and'];
 		return { Articulo, lista: a, failString: e, Extra } 
 	}
@@ -2097,6 +2118,7 @@ class ArticuloControler {
 		this.router.get( '/articulos/productos/list/:search', this.searchProductos );
 		this.router.post( '/articulos/productos/list', this.findProductos );
 		this.router.post( '/articulos/productos/listdata', this.findProductosData );
+		this.router.post( '/articulos/productos/updatefullData', passport.authenticate('jwt', { session: false }), this.updateFullData );
 	}
 
 	public index(req: Request, res: Response) {
@@ -2154,24 +2176,11 @@ class ArticuloControler {
 
 	async add( req: Request, res: Response ){
 		try {
-/*
-			const art = await articulo.findOne({ name: req.body.name });
-			if (art)
-				return res.status(400).json({ msg: 'Registro ya existe', art });
-			const newArticulo = new articulo(req.body);
-			const rpta = await newArticulo.save();
-			return res.status(200).json({ msg: 'Registro creado satisfactoriamente', newArticulo });
-		*/
 			if ( req.body._id ) req.body._id = new ObjectID( req.body._id );
 			const newReg = await articulo.updateOne({ _id: req.body._id },   // Query parameter
-			{ $set: req.body }, 
-			{ upsert: true }    // Options
-	 )
-/*
-			console.log(req.body)
-			const newReg = new articulo(req.body);
-			await newReg.save();
-*/
+																							{ $set: req.body }, 
+																							{ upsert: true }    // Options
+	 																					)
 			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
 
 		} catch (error) {
@@ -2297,8 +2306,7 @@ class ArticuloControler {
 			const qry = req.body;
 			console.log('Entra qry', qry);
 			const ret = await articuloSanitize(qry);
-			console.log('ret',ret)
-			qry.Articulo = { _id: { $in: [ret.lista]}};
+//			qry.Articulo = { _id: { $in: [ret.lista]}};
 			qry.Articulo =  ret.Articulo;
 			const rpta = await readProductos(qry,dataProduct);
 			res.status(200).json(rpta);
@@ -2418,5 +2426,85 @@ class ArticuloControler {
 		}
 	}
 */
+	async updateFullData( req: Request, res: Response ){
+		try {
+			const artReg = {
+				_id: new ObjectID( req.body._id ),
+				fabricante: req.body.fabricante,
+				marca: req.body.marca,
+				rubro: req.body.rubro,
+				linea: req.body.linea,
+				especie: req.body.especie,
+				edad: req.body.edad,
+				raza: req.body.raza,
+				name: req.body.name,
+				d_fabricante: req.body.d_fabricante,
+				d_marca: req.body.d_marca,
+				d_rubro: req.body.d_rubro,
+				d_linea: req.body.d_linea,
+				d_especie: req.body.d_especie,
+				d_edad: req.body.d_edad,
+				d_raza: req.body.d_raza,
+				private_web: req.body.private_web,
+				image: req.body.image,
+				url: req.body.url,
+				iva: req.body.iva,
+				margen: req.body.margen,
+				tags: req.body.tags,
+				formula: req.body.formula,
+				detalles: req.body.detalles,
+				beneficios: req.body.beneficios
+			}
+	
+			const prod_ids = [];
+			const prod_regs = [];
+			for (let i = 0; i < req.body.productos.length; i++) {
+				const e = req.body.productos[i];
+				e._id = new ObjectID(e._id);
+				e.parent = (e.parent === null ? null : new ObjectID(e.parent));
+				prod_ids.push(e._id);
+				prod_regs.push({
+					_id: e._id
+					,articulo: artReg._id
+					,parent: e.parent
+					,name: e.name
+					,contiene: e.contiene
+					,unidad: e.unidad
+					,precio: e.precio
+					,compra: e.compra
+					,reposicion: e.reposicion
+					,pesable: e.pesable
+					,servicio: e.servicio
+					,pVenta: e.pVenta
+					,pCompra: e.pCompra
+					,codigo: e.codigo
+					,plu: e.plu
+					,image: e.image
+					,stock: e.stock
+					,stockMin: e.stockMin
+					,stockMax: e.stockMax
+					,iva: e.iva
+					,margen: e.margen
+					,tags: e.tags
+				})
+			}
+			const art_rpta = await articulo.updateOne( {_id: artReg._id}, { $set :  artReg  }, { upsert: true });
+			console.log(art_rpta);
+			const del_regs = await producto.deleteMany({articulo: artReg._id, _id: { $nin: prod_ids } })
+			console.log(del_regs);
+			for (let i = 0; i < prod_regs.length; i++) {
+				const e = prod_regs[i];
+				const rpta = await producto.updateOne( {_id: e._id}, { $set :  e  }, { upsert: true });
+				console.log(rpta);
+			}
+			const qry = {Articulo: { _id: artReg._id } };
+			const rpta = await readProductos(qry,dataProduct);
+
+			res.status(200).json({ rpta, del_regs, artReg, prod_regs });
+
+		} catch (error) {
+			res.status(403).json({ error });
+		}
+	}
 }
 export const articuloCtrl = new ArticuloControler();

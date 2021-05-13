@@ -344,6 +344,18 @@ export class CargalistasComponent implements OnInit, OnChanges {
         if(reg.contiene) Extra['scontiene'] = { $eq: reg.bultocontiene };
       }
     }
+    try {
+      const data:any = this.list.readData(
+        `${this.ApiUri}/productos/list`,
+        {Articulo, Producto, Extra, searchItem, Sort }
+      );
+      this.articuloList = data;
+      console.log(this.articuloList);
+    } catch (error) {
+      console.log(error);
+    }
+    this.wait = false;
+    /*
     this.list.readData(
       `${this.ApiUri}/productos/list`,
       {Articulo, Producto, Extra, searchItem, Sort }
@@ -359,7 +371,7 @@ export class CargalistasComponent implements OnInit, OnChanges {
         this.wait = false;
       }
     );
-
+    */
   }
 
   /*********************************/
@@ -427,6 +439,18 @@ export class CargalistasComponent implements OnInit, OnChanges {
     const Extra: any = (qry ? qry.Extra : {});
     const searchItem: any = (qry ? qry.searchItem : "" );
     const Sort = this.articuloOrder[this.listaOrden].sort;
+    try {
+      const data:any = this.list.readData(
+        `${this.ApiUri}/productos/list`,
+        {Articulo, Producto, Extra, searchItem, Sort }
+      );
+      this.articuloList = data;
+      console.log(this.articuloList);
+    } catch (error) {
+      console.log(error);
+    }
+    this.wait = false;
+    /*
     this.list.readData(
       `${this.ApiUri}/productos/list`,
       {Articulo, Producto, Extra, searchItem, Sort }
@@ -450,6 +474,7 @@ export class CargalistasComponent implements OnInit, OnChanges {
         this.wait = false;
       }
     );
+    */
   }
 
 }

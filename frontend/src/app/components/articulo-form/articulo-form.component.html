@@ -1,1 +1,429 @@
-<p>articulo-form works!</p>
+<div class="modal-header">
+  <div class='d-flex flex-column w-100 bd-highlight'>
+    <h4 class="modal-title" id="modal-basic-title">
+      <span *ngIf="selectedArticulo.d_fabricante">{{selectedArticulo.fabricante}} </span>
+      <span *ngIf="selectedArticulo.d_marca">{{selectedArticulo.marca}} </span>
+      <span *ngIf="selectedArticulo.d_especie">{{selectedArticulo.especie}} </span>
+      <span *ngIf="selectedArticulo.d_edad">{{selectedArticulo.edad}} </span>
+      <span>{{selectedArticulo.name}} </span>
+      <span *ngIf="selectedArticulo.d_raza">{{selectedArticulo.raza}} </span>
+      <span *ngIf="selectedArticulo.d_rubro">{{selectedArticulo.rubro}} </span>
+      <span *ngIf="selectedArticulo.d_linea">{{selectedArticulo.linea}} </span>
+    </h4>
+  </div>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+    <span aria-hidden="true">×</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <ul ngbNav #nav="ngbNav" [activeId]="1" class="nav-tabs justify-content-center">
+    <li [ngbNavItem]="1">
+      <a ngbNavLink><b>Articulo</b></a>
+      <ng-template ngbNavContent>
+        <div class="d-flex flex-row">
+          <div class="d-flex flex-row bd-highlight justify-content-between" style="width: 150px; height: 100%;">
+            <div class="align-self-center">
+              <div class="" class="d-flex flex-colum bd-highlight" style="width: 150px;">
+                <img src="{{selectedArticulo.image}}" alt="" style="height: auto; width: 100%;">
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="input-group input-group-sm mb-1 mt-1">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="far fa-image"></i></span>
+              </div>
+              <input type="text" class="form-control" name="image" placeholder="Imagen del Producto"
+                [(ngModel)]="selectedArticulo.image">
+            </div>
+            <div class="input-group input-group-sm mb-1">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-cloud"></i></span>
+              </div>
+              <input type="text" class="form-control form-control-sm" name="url" placeholder="Url del fabricante"
+                [(ngModel)]="selectedArticulo.url">
+            </div>
+            <div class="input-group input-group-sm mb-1">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+              </div>
+              <input type="text" class="form-control form-control-sm" name="tags" placeholder="Tags"
+                [(ngModel)]="selectedArticulo.tags">
+            </div>
+            <div class="card">
+              <div class="row">
+                <div class="input-group mb-1 col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                  <input type="text" class="form-control form-control-sm" name="fabricante" placeholder="Fabricante"
+                    [(ngModel)]="selectedArticulo.fabricante">
+                  <div class="input-group-append">
+                    <div class="input-group-text">
+                      <input type="checkbox" name="d_fabricante" [(ngModel)]="selectedArticulo.d_fabricante">
+                    </div>
+                  </div>
+                </div>
+                <div class="input-group mb-1 col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                  <input type="text" class="form-control form-control-sm" name="marca" placeholder="Marca"
+                    [(ngModel)]="selectedArticulo.marca">
+                  <div class="input-group-append">
+                    <div class="input-group-text">
+                      <input type="checkbox" name="d_marca" [(ngModel)]="selectedArticulo.d_marca">
+                    </div>
+                  </div>
+                </div>
+                <div class="input-group mb-1 col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                  <input type="text" class="form-control form-control-sm" name="rubro" placeholder="Rubro"
+                    [(ngModel)]="selectedArticulo.rubro">
+                  <div class="input-group-append">
+                    <div class="input-group-text">
+                      <input type="checkbox" name="d_rubro" [(ngModel)]="selectedArticulo.d_rubro">
+                    </div>
+                  </div>
+                </div>
+                <div class="input-group mb-1 col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                  <input type="text" class="form-control form-control-sm" name="linea" placeholder="Linea"
+                    [(ngModel)]="selectedArticulo.linea">
+                  <div class="input-group-append">
+                    <div class="input-group-text">
+                      <input type="checkbox" name="d_linea" [(ngModel)]="selectedArticulo.d_linea">
+                    </div>
+                  </div>
+                </div>
+                <div class="input-group mb-1 col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                  <input type="text" class="form-control form-control-sm" name="especie" placeholder="Especie"
+                    [(ngModel)]="selectedArticulo.especie">
+                  <div class="input-group-append">
+                    <div class="input-group-text">
+                      <input type="checkbox" name="d_especie" [(ngModel)]="selectedArticulo.d_especie">
+                    </div>
+                  </div>
+                </div>
+                <div class="input-group mb-1 col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                  <input type="text" class="form-control form-control-sm" name="edad" placeholder="Edad"
+                    [(ngModel)]="selectedArticulo.edad">
+                  <div class="input-group-append">
+                    <div class="input-group-text">
+                      <input type="checkbox" name="d_edad" [(ngModel)]="selectedArticulo.d_edad">
+                    </div>
+                  </div>
+                </div>
+                <div class="input-group mb-1 col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                  <input type="text" class="form-control form-control-sm" name="raza" placeholder="Raza"
+                    [(ngModel)]="selectedArticulo.raza">
+                  <div class="input-group-append">
+                    <div class="input-group-text">
+                      <input type="checkbox" name="d_raza" [(ngModel)]="selectedArticulo.d_raza">
+                    </div>
+                  </div>
+                </div>
+                <div class="input-group mb-1 col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                  <input type="text" class="form-control form-control-sm" name="name"
+                    placeholder="Nombre del Artículo" [(ngModel)]="selectedArticulo.name">
+                </div>
+                <div class="form-check col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                  <input class="form-check-input" type="checkbox" name="private_web"
+                    [(ngModel)]="selectedArticulo.private_web">
+                  <label for="">Private Web</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </li>
+    <!--li [ngbNavItem]="2">
+      <a ngbNavLink><b>Características</b></a>
+      <ng-template ngbNavContent>
+        <ul>
+          <li *ngFor="let item of detalles"></li>
+
+        </ul>
+      </ng-template>
+    </li-->
+    <li [ngbNavItem]="3">
+      <a ngbNavLink><b>Beneficios</b></a>
+      <ng-template ngbNavContent>
+        <div class="row col-6 offset-3">
+          <table>
+            <thead>
+              <th>#</th>
+              <th>Descripción</th>
+              <th>Valor</th>
+              <th>Mostrar</th>
+              <th>boton</th>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of selectedArticulo.beneficios; index as i;" class="">
+                <td>{{i}}</td>
+                <td>
+                  <input type="text" name="bname_{{i}}" [(ngModel)]="item.name">
+                </td>
+                <td>
+                  <input type='checkbox' name="bshowname_{{i}}" [(ngModel)]="item.showname">
+                </td>
+                <td>
+                  <input type="text" name="bvalue_{{i}}" [(ngModel)]="item.value">
+                </td>
+                <td>
+                  <input type='checkbox' name="bshow_{{i}}" [(ngModel)]="item.showvalue">
+                </td>
+                <td><button class='btn btn-outline-danger'><i class="fas fa-trash-alt"></i></button></td>
+              </tr>
+              <tr class="">
+                <td></td>
+                <td>
+                  <input type="text" name="new_bname" [(ngModel)]="newBeneficios.name">
+                </td>
+                <td>
+                  <input type='checkbox' name="new_bshowname" [(ngModel)]="newBeneficios.showname">
+                </td>
+                <td>
+                  <input type="text" name="new_bvalue" [(ngModel)]="newBeneficios.value">
+                </td>
+                <td>
+                  <input type='checkbox' name="new_bshowvalue" [(ngModel)]="newBeneficios.showvalue">
+                </td>
+                <td><button class='btn btn-outline-primary' (click)='addBeneficios()'><i class="fas fa-plus"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </li>
+    <li [ngbNavItem]="4">
+      <a ngbNavLink><b>Fórmula</b></a>
+      <ng-template ngbNavContent>
+        <div class="row col-6 offset-3">
+          <table>
+            <thead>
+              <th>#</th>
+              <th>Descripción</th>
+              <th>Valor</th>
+              <th>Mostrar</th>
+              <th>boton</th>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of selectedArticulo.formula; index as i;" class="">
+                <td>{{i}}</td>
+                <td>
+                  <input type="text" name="name_{{i}}" [(ngModel)]="item.name">
+                </td>
+                <td>
+                  <input type='checkbox' name="shwowname_{{i}}" [(ngModel)]="item.showname">
+                </td>
+                <td>
+                  <input type="text" name="value_{{i}}" [(ngModel)]="item.value">
+                </td>
+                <td>
+                  <input type='checkbox' name="show_{{i}}" [(ngModel)]="item.showvalue">
+                </td>
+                <td><button class='btn btn-outline-danger'><i class="fas fa-trash-alt"></i></button></td>
+              </tr>
+              <tr class="">
+                <td></td>
+                <td>
+                  <input type="text" name="new_name" [(ngModel)]="newFormula.name">
+                </td>
+                <td>
+                  <input type='checkbox' name="new_showname" [(ngModel)]="newFormula.showname">
+                </td>
+                <td>
+                  <input type="text" name="new_value" [(ngModel)]="newFormula.value">
+                </td>
+                <td>
+                  <input type='checkbox' name="new_showvalue" [(ngModel)]="newFormula.showvalue">
+                </td>
+                <td><button class='btn btn-outline-primary' (click)='addFormula()'><i class="fas fa-plus"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </li>
+    <li [ngbNavItem]="5" class="mr-auto">
+      <a ngbNavLink><b>Presentaciones</b></a>
+      <ng-template ngbNavContent>
+        <div class="d-flex">
+          <button class="btn btn-info ml-auto mb-2">add</button>
+        </div>
+        <div class="product-card" *ngFor="let item of selectedArticulo.productos;index as i;">
+          <nav>
+            <i class="pesable fa fa-balance-scale fa-fw fa-2x" aria-hidden="true" [hidden]="!item.pesable"></i>
+            <i class="pesable fas fa-box fa-2x" aria-hidden="true"
+              [hidden]="!(item.parent !== null && item.pVenta && item.pCompra)"></i>
+            <div class="imgbox">
+              <img class="caja-img" src="{{item.image}}" alt="">
+            </div>
+          </nav>
+          <article>
+            <div class="delproduct" (click)="borrarProducto(i)" >
+              <i class="fas fa-window-close"></i>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+                    <div class="row">
+                      <div class="col-12">
+                        <input type="text" class="form-control form-control-sm mb-1" name="name_{{i}}"
+                          placeholder="Nombre" [(ngModel)]="item.name">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-6 pr-1">
+                        <input type="text" class="form-control form-control-sm mb-1" name="contiene_{{i}}"
+                          placeholder="Contiene"
+                          [(ngModel)]="item.contiene">
+                      </div>
+                      <div class="col-6 pl-1">
+                        <input type="text" class="form-control form-control-sm mb-1" name="unidad_{{i}}"
+                          placeholder="Unidad" [(ngModel)]="item.unidad">
+                      </div>
+                      <div class="col-12">
+                        <select class="form-control form-control-sm mb-1" name="parent_{{i}}"
+                          aria-placeholder="de Articulo" (change)="eventos('change');"
+                          [(ngModel)]="item.parent">
+                          <option value="{{pack.id}}" *ngFor="let pack of unidades;">
+                            {{pack.name}}
+                          </option>
+                        </select>
+                      </div>
+                      <div class="col-12">
+                        <input type="text" class="form-control form-control-sm mb-1" name="image_{{i}}"
+                          placeholder="url imagen"
+                          [(ngModel)]="item.image">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 no-gutters">
+                    <div class="row">
+                      <div class="col-6 pr-1">
+                        <input type="text" class="form-control form-control-sm mb-1" name="compra_{{i}}"
+                          placeholder="compra" [(ngModel)]="item.compra">
+                      </div>
+                      <div class="col-6 pl-1 ">
+                        <input type="text" class="form-control form-control-sm mb-1" name="reposicion_{{i}}"
+                          placeholder="Reposicion"
+                          [(ngModel)]="item.reposicion">
+                      </div>
+                      <div class="col-6 pr-1">
+                        <input type="text" class="form-control form-control-sm mb-1" name="margen_{{i}}"
+                          placeholder="Margen" [(ngModel)]="item.margen">
+                      </div>
+                      <div class="col-6 pl-1">
+                        <input type="text" class="form-control form-control-sm mb-1" name="precio_{{i}}"
+                          placeholder="precio vta"
+                          [(ngModel)]="item.precio">
+                      </div>
+                      <div class="col-6 pr-1">
+                        <input type="text" class="form-control form-control-sm mb-1" name="iva_{{i}}"
+                          placeholder="% IVA" [(ngModel)]="item.iva">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+                    <div class="row">
+                      <div class="col-6 pr-1">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="pesable_{{i}}"
+                            name="pesable_{{i}}"
+                            [(ngModel)]="item.pesable">
+                          <label class="form-check-label" for="pesable_{{i}}">
+                            <i class="fa fa-balance-scale fa-fw" aria-hidden="true"></i>
+                          </label>&nbsp;
+                        </div>
+                      </div>
+                      <div class="col-6 pl-1">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="servicio_{{i}}"
+                            name="servicio_{{i}}"
+                            [(ngModel)]="item.servicio">
+                          <label class="form-check-label" for="servicio_{{i}}">
+                            Servicio
+                          </label>&nbsp;
+                        </div>
+                      </div>
+                      <div class="col-6 pr-1">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="pCompra_{{i}}"
+                            name="pCompra_{{i}}"
+                            [(ngModel)]="item.pCompra">
+                          <label class="form-check-label" for="pCompra_{{i}}">
+                            Compra
+                          </label>&nbsp;
+                        </div>
+                      </div>
+                      <div class="col-6 pl-1">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="pVenta_{{i}}"
+                            name="pVenta_{{i}}"
+                            [(ngModel)]="item.pVenta">
+                          <label class="form-check-label" for="pVenta_{{i}}">
+                            Venta
+                          </label>&nbsp;
+                        </div>
+                      </div>
+                      <div class="col-6 pr-1">
+                        <input type="text" class="form-control form-control-sm mb-1" name="codigo_{{i}}"
+                          placeholder="Código de Barras"
+                          [(ngModel)]="item.codigo">
+                      </div>
+                      <div class="col-6 pl-1">
+                        <input type="text" class="form-control form-control-sm mb-1" name="plu_{{i}}"
+                          placeholder="PLU" [(ngModel)]="item.plu">
+                      </div>
+                      <div class="col-6 pr-1">
+                        <input type="text" class="form-control form-control-sm mb-1" name="stock_{{i}}"
+                          placeholder="Stock" [(ngModel)]="item.stock">
+                      </div>
+                      <div class="col-6 pl-1">
+                        <input type="text" class="form-control form-control-sm mb-1" name="stockMin_{{i}}"
+                          placeholder="Stock Min"
+                          [(ngModel)]="item.stockMin">
+                      </div>
+                    </div>
+                  </div>
+                  <!--div class="col-1">
+                    <div class="float-right" [hidden]="!item.changed">
+                      <button class="btn btn-primary" (click)="updateProducto(i,item)">
+                        <i class="fa fa-plus"></i>
+                      </button>
+                    </div>
+                    <div class="float-right">
+                      <button class="btn btn-danger" (click)="delProducto(i)">
+                        <i class="fa fa-minus" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div-->
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </ng-template>
+    </li>
+    <!--li [ngbNavItem]="6" class="mr-auto">
+      <a ngbNavLink><b>Add</b></a>
+      <ng-template ngbNavContent>
+      </ng-template>
+    </li>
+    <li ngbDropdown class="nav-item">
+      <a href (click)="false" class="nav-link" ngbDropdownToggle>Dropdown</a>
+      <div ngbDropdownMenu>
+        <button ngbDropdownItem>Action</button>
+        <button ngbDropdownItem>Another action</button>
+        <button ngbDropdownItem>Something else here</button>
+        <div class="dropdown-divider"></div>
+        <button ngbDropdownItem>Separated link</button>
+      </div>
+    </li-->
+  </ul>
+
+  <div [ngbNavOutlet]="nav" class="mt-2"></div>
+
+
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger" (click)="checkData() ? activeModal.close('Cancel') : ''">Cancel</button>
+  <button type="button" class="btn btn-danger" (click)="saveData(); activeModal.close('Save')">Save</button>
+</div>

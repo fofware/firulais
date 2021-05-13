@@ -1,9 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnChanges, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { ObjectUnsubscribedError, Observable } from 'rxjs';
 import { API_URI } from 'src/app/shared/uris';
-import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ModalDismissReasons, NgbModal, NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
+import { ObjectID } from 'bson'
+import { ArticuloFormComponent } from '../articulo-form/articulo-form.component';
 
 @Component({
   selector: 'app-articulos-list',
@@ -12,6 +14,34 @@ import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
 })
 export class ArticulosListComponent implements OnInit {
   wait: boolean = false;
+  modalsNumber = 0;
+  newArticulo = {
+    _id: new ObjectID(),
+    fabricante: '',
+    marca: '',
+    rubro: '',
+    linea: '',
+    especie: '',
+    edad: '',
+    raza: '',
+    name: '',
+    d_fabricante: false,
+    d_marca: false,
+    d_rubro: false,
+    d_linea: false,
+    d_especie: false,
+    d_edad: false,
+    d_raza: false,
+    private_web: false,
+    image: '',
+    url: '',
+    iva: 0,
+    margen: 23,
+    tags: '',
+    formula: [],
+    detalles: [],
+    beneficios: []
+  }
   filterButtons = [
     {
       id: 'especie'
@@ -181,23 +211,6 @@ export class ArticulosListComponent implements OnInit {
 */
   ]
 
-  filter = {
-/*
-    perro: { value: 'perro', display: true, qry: {}}
-  , gato: { value: 'gato', display: true, qry: {}}
-  , ave: { value: 'ave', display: true, qry: {}}
-  , pez: { value: 'pez', display: false, qry: {}}
-  , caballo: { value: 'caballo', display: false, qry: {}}
-  ,
-*/
-    pesable: { value: false,  display: false, qry: true }
-  , precio: { value: true, display: false,  qry: { $gt: 0 }}
-  , stock:  { value: true, display: false,  qry: { $gte: 1 }}
-  , servicio: { value: false, display: false, qry: {$eq: true} }
-  , pCompra: { value: false, display: false, qry: { $eq: true }}
-  , pVenta: { value: true, display: false, qry: { $eq: true }}
-  , private_web: { value: true, display: true, qry: { $not: { $eq: true } } }
-  };
   articuloOrder = [
     {
       name: 'Descripción',
@@ -250,51 +263,70 @@ export class ArticulosListComponent implements OnInit {
   articuloList: any[] = [];
   prodList: any[] = [];
   detalles: any[] = [];
+  beneficios: any[] = [
+    {_id: 0, name: 'Omega 3 y 6', value: 'Ayudan a mantener un pelaje saludable', show: false}
+    ,{_id: 1, name: 'Croqueta Parti-crock', value: 'Mayor disfrute', show: false}
+    ,{_id: 2, name: 'Taurina', value: 'Contribuye a la salud del corazón y la visión', show: false}
+    ,{_id: 3, name: 'Protección urinaria', value: 'pH óptimo que ayuda a evitar la formación de cálculos urinarios', show: true}
+    ,{_id: 4, name: 'Fibras naturales', value: 'Colaboran con el control de las bolas de pelo.', show: true}
+  ]
   formula:any[] = [
-    {id: 0, name: 'Proteína bruta (mín.)', value: '25,0%', show: true}
-    ,{id: 1, name: 'Extracto etéreo / Grasa bruta (mín.)', value: '2.5%', show: false}
-    ,{id: 2, name: 'Fibra bruta (máx.)', value: '12,0%', show: false}
-    ,{id: 3, name: 'Minerales/Cenizas (máx.)', value: '8,0%', show: false}
-    ,{id: 4, name: 'Calcio (mín./máx.)', value: '0,90%/1,4%', show: false}
+    {id: 0, name: 'Proteína bruta (mín.)', showname: true, value: '30,0%', showvalue: true}
+    ,{id: 1, name: 'Extracto etéreo / Grasa bruta (mín.)', showname: false, value: '2.5%', showvalue: false}
+    ,{id: 2, name: 'Fibra bruta (máx.)', showname: false, value: '12,0%', showvalue: false}
+    ,{id: 3, name: 'Minerales/Cenizas (máx.)', showname: false, value: '8,0%', showvalue: false}
+    ,{id: 4, name: 'Calcio (mín./máx.)', showname: false, value: '0,90%/1,4%', showvalue: false}
   ]
   unidades: [{ id: any, name: string }];
   selectedArticulo: any;
+  compareArticulo: any;
   editedArticulo: any;
-
+  dialog: any;
   closeModal: string;
 
   constructor(  private http: HttpClient,
                 private modalService: NgbModal,
                 private list: ListasArtProdService
               ) {
-                  //this.list.filter = this.filter;
-                }
-
+                this.modalService.activeInstances.subscribe((list) => {
+                  this.modalsNumber = list.length;
+                });
+              }
+/*
   triggerModal(content) {
     this.modalService.open(content,
       {
         ariaLabelledBy: 'modal-basic-title'
         , size: 'xl'
+        , beforeDismiss: () => {
+          console.log("BeforeDisMiss");
+          const ret: boolean = this.checkData();
+          return ret;
+        }
         //, windowClass: 'xlModal'
         , scrollable: true
         , centered: true
         , backdrop: false
       }).result.then((res) => {
-      this.closeModal = `Closed with: ${res}`;
-      console.log(this.closeModal);
-      if (res == 'Save click'){
-        this.articuloList[this.editedArticulo] = JSON.parse(JSON.stringify(this.selectedArticulo));
-        this.editedArticulo = null;
-        this.selectedArticulo = {};
-      } else {
-        console.log('No graba')
+        this.closeModal = `Closed with: ${res}`;
+        console.log(this.closeModal);
+        if (res == 'Save'){
+          this.articuloList[this.editedArticulo] = JSON.parse(JSON.stringify(this.selectedArticulo));
+          this.editedArticulo = null;
+          this.selectedArticulo = {};
+        } else {
+          console.log('No graba')
+        }
+      }, (res) => {
+        this.closeModal = `Dismissed ${this.getDismissReason(res)}`;
+        console.log(this.closeModal)
       }
-    }, (res) => {
-      this.closeModal = `Dismissed ${this.getDismissReason(res)}`;
-      console.log(this.closeModal)
-    });
+    );
   }
-
+  beforeDismiss(): boolean | Promise<boolean>{
+    console.log("Dismiss")
+    return false;
+  }
   private getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
       console.log('by pressing ESC')
@@ -307,7 +339,7 @@ export class ArticulosListComponent implements OnInit {
       return  `with: ${reason}`;
     }
   }
-
+*/
   ngOnInit(): void {
     this.listArticulos()
   }
@@ -329,6 +361,8 @@ export class ArticulosListComponent implements OnInit {
 
   newReg(ev){
     console.log("Add New Articulo")
+    this.selectedArticulo = this.newArticulo;
+//    this.triggerModal(modalData);
   }
 
   makeQry (): any {
@@ -368,7 +402,7 @@ export class ArticulosListComponent implements OnInit {
     this.searchArticulos();
   }
 
-  searchArticulos(): void {
+  async searchArticulos() {
     if (this.wait) { return; }
     this.wait = true;
     const qry:any = this.makeQry();
@@ -378,7 +412,29 @@ export class ArticulosListComponent implements OnInit {
     const searchItem: any = (qry ? qry.searchItem : "" );
     const Sort = this.articuloOrder[this.listaOrden].sort;
 
-//    this.list.buscaArticulos({Articulo, Producto, Extra, searchItem: this.searchItem, Sort })
+    //    this.list.buscaArticulos({Articulo, Producto, Extra, searchItem: this.searchItem, Sort })
+    try {
+      const data:any = await this.list.readData(
+        `${API_URI}/articulos/productos/listdata`,
+        {Articulo, Producto, Extra, searchItem: this.searchItem, Sort }
+      );
+      /*
+      if ( data.length === 1 && Articulo['$and'] && Articulo['$and'].length === 1
+      && ( this.searchItem === data[0].codigo || this.searchItem === data[0].plu ))
+      {
+        this.searchItem = '';
+        this.wait = false;
+        this.searchArticulos();
+      } else {
+      */
+        this.articuloList = data;
+      //}
+      console.log(this.articuloList);
+    } catch (error) {
+      console.log(error);
+    }
+    this.wait = false;
+    /*
     this.list.readData(
       `${API_URI}/articulos/productos/listdata`,
       {Articulo, Producto, Extra, searchItem: this.searchItem, Sort }
@@ -404,19 +460,25 @@ export class ArticulosListComponent implements OnInit {
         this.wait = true;
       }
     );
+    */
   }
 
   SelectEvent(ev,modalData){
-    console.log("SelectEvent",ev);
-    this.editedArticulo = ev.articulo;
-    this.selectedArticulo = JSON.parse(JSON.stringify(ev.articulo));
     this.editedArticulo = ev.idx;
-    this.prodList = this.selectedArticulo.productos;
-    this.detalles = this.selectedArticulo.detalles || [];
-//    this.formula = this.selectedArticulo.formula || [];
 
-    this.unidades = [{ id: null, name: null }];
+    if(!this.articuloList[this.editedArticulo].formula) this.articuloList[this.editedArticulo].formula = [];
+    if(!this.articuloList[this.editedArticulo].detalles) this.articuloList[this.editedArticulo].detalles = [];
+    if(!this.articuloList[this.editedArticulo].beneficios) this.articuloList[this.editedArticulo].beneficios = [];
+    if(!this.articuloList[this.editedArticulo].productos) this.articuloList[this.editedArticulo].productos = [];
 
+    this.selectedArticulo = JSON.parse(JSON.stringify(this.articuloList[ev.idx]));
+//    this.compareArticulo = JSON.parse(JSON.stringify(this.selectedArticulo));
+//    this.prodList = JSON.parse(JSON.stringify(this.selectedArticulo.productos));
+//    this.detalles = this.selectedArticulo.detalles;
+//    this.formula = this.selectedArticulo.formula;
+
+//    this.unidades = [{ id: null, name: null }];
+/*
     for (let index = 0; index < this.prodList.length; index++) {
       const e = this.prodList[index];
       if(e.count_parte !== 0 && e.count_ins !== 0) // No se muestran los pesables ni las cajas o Packs
@@ -429,34 +491,23 @@ export class ArticulosListComponent implements OnInit {
         else { this.unidades.push(unid); }
       }
     }
-    this.triggerModal(modalData);
-  }
-
-  readParent(id: any, descr?: string) {
-    if ( descr === undefined ) { descr = ''; }
-    const item = this.findProduct(id);
-    if (item._id) {
-      if (`${item._id}` === `${item.parent}` || item.parent === undefined) { item.parent = null; }
-      descr += `${item.name} ${item.contiene} ${item.unidad}`;
-/*
-      if (item.contiene && item.contiene > 1) { descr += `${item.name} ${item.contiene} ${item.unidad}`; }
-      else if (item.unidad) { descr += `${item.name} ${item.unidad}`; }
-      else { descr += `${item.name}`; }
 */
-      if (item.parent != null) {
-        descr = this.readParent(item.parent, descr);
+    const modalRef = this.modalService.open(ArticuloFormComponent, {
+      ariaLabelledBy: 'modal-basic-title'
+      , size: 'xl'
+      , beforeDismiss: () => {
+        console.log("BeforeDisMiss");
+        const ret: boolean = modalRef.componentInstance.checkData();
+        return ret;
       }
-    }
-    return descr.trim();
+      //, windowClass: 'xlModal'
+      , scrollable: true
+      , centered: false
+      , backdrop: false
+    });
+    modalRef.componentInstance.selectedArticulo = this.selectedArticulo;
+//    this.triggerModal(modalData);
   }
 
-  findProduct(id: any): any {
-    // tslint:disable-next-line:prefer-for-of
-    for (let index = 0; index < this.prodList.length; index++) {
-      const element: any = this.prodList[index];
-      if (element._id === id) { return element; }
-    }
-    return {};
-  }
 
 }

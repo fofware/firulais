@@ -343,10 +343,27 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   calculaPrecio() {
     for (let i = 0; i < this.articuloList.length; i++) {
       const e:any = this.articuloList[i];
-      e.precioToShow = Math.ceil(e.precio * this.fpagoCoef);
+      if ( this.fpagoCoef === 1 ){
+        if ( !e.pesable ){
+          if ( e.calc_precio > 100 ){
+            e.precioToShow = Math.ceil(e.calc_precio/10 * this.fpagoCoef)*10;
+          } else {
+            const diff = e.precio % 5;
+            if (diff < 3 ){
+              e.precioToShow = e.calc_precio - diff;
+            } else {
+              e.precioToShow = e.calc_precio + ( 5 - diff )
+            }
+          }
+        } else {
+          e.precioToShow = Math.ceil(e.calc_precio * this.fpagoCoef);
+        }
+      } else {
+        e.precioToShow = Math.ceil(e.calc_precio * this.fpagoCoef);
+      }
     }
   }
-  searchProductos(): void {
+  async searchProductos() {
     if (this.wait) { return; }
     this.wait = true;
     const qry:any = this.makeQry();
@@ -358,6 +375,19 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
     const Sort = this.articuloOrder[this.listaOrden].sort;
 
 //    this.list.buscaProductos({Articulo, Producto, Extra, searchItem: this.searchItem, Sort })
+    try {
+      const data:any = await this.list.readData(
+        `${this.ApiUri}/productos/list`,
+        {Articulo, Producto, Extra, searchItem, Sort }
+      );
+      this.articuloList = data;
+      console.log(this.articuloList);
+      this.calculaPrecio();
+    } catch (error) {
+      console.log(error);
+    }
+    this.wait = false;
+    /*
     this.list.readData(
       `${this.ApiUri}/productos/list`,
       {Articulo, Producto, Extra, searchItem, Sort }
@@ -382,9 +412,10 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
       },
       err => {
         console.log(err);
-        this.wait = true;
+        this.wait = false;
       }
     );
+    */
   }
 /*
   buscaProductos(params: any): Observable<any> {

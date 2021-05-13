@@ -19,8 +19,11 @@
     <div class="p-0 w-100 bd-highlight">
       <div class="detalles">
         <ul>
-          <li *ngFor="let detail of articulo.details">
-            {{detail.name}}: {{detail.value}}
+          <li *ngFor="let detail of articulo.formula;" [hidden]='!detail.show && !detail.showname'>
+            <span [hidden]='!detail.showname'>{{detail.name}}:</span><span [hidden]='!detail.showvalue'> {{detail.value}}</span>
+          </li>
+          <li *ngFor="let detail of articulo.beneficios;" [hidden]='!detail.showvalue && !detail.showname'>
+            <span [hidden]='!detail.showname'>{{detail.name}}</span><span [hidden]='!(detail.showvalue && detail.showname)'>:</span> <span [hidden]='!detail.showvalue'> {{detail.value}}</span>
           </li>
         </ul>
       </div>
