@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnChanges, OnInit } from '@angular/core';
-import { ObjectUnsubscribedError, Observable } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
 import { API_URI } from 'src/app/shared/uris';
-import {ModalDismissReasons, NgbModal, NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
 import { ObjectID } from 'bson'
 import { ArticuloFormComponent } from '../articulo-form/articulo-form.component';
@@ -362,7 +361,26 @@ export class ArticulosListComponent implements OnInit {
   newReg(ev){
     console.log("Add New Articulo")
     this.selectedArticulo = this.newArticulo;
-//    this.triggerModal(modalData);
+    //const newArticulo = this.modalService.open(ArticuloFormAddModalComponent);
+    const modalRef = this.modalService.open(ArticuloFormComponent, {
+      ariaLabelledBy: 'modal-basic-title'
+      , size: 'xl'
+      , beforeDismiss: () => {
+        console.log("BeforeDisMiss");
+        const ret: boolean = modalRef.componentInstance.checkData();
+        return ret;
+      }
+      //, windowClass: 'xlModal'
+      , scrollable: true
+      , centered: false
+      , backdrop: false
+    });
+    modalRef.componentInstance.selectedArticulo = this.selectedArticulo;
+    modalRef.result.then((result) => {
+      if (result) {
+        console.log(result);
+      }
+    });
   }
 
   makeQry (): any {

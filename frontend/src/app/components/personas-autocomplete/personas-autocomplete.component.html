@@ -1,0 +1,12 @@
+<ng-template #rt class="rt" let-r="result" let-t="term">
+  <!--img [src]="r['image']" class="mr-1" style="width: 40px"-->
+  <ngb-highlight [result]="r.fullName" [term]="t"></ngb-highlight>
+</ng-template>
+<input id="typeahead-template"
+  type="text"
+  class="form-control"
+  [(ngModel)]="model"
+  [ngbTypeahead]="search"
+  [resultTemplate]="rt"
+  [inputFormatter]="formatter"/>
+<pre>Model: {{ model | json }}</pre>

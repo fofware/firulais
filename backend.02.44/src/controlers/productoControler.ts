@@ -604,6 +604,7 @@ class ProductoControler {
 
 		this.router.post('/productos/buscar', this.buscar)
 */
+		this.router.get('/productos/toprovlista', this.toprovlista);
 		this.router.get('/productos/search/:search', this.search);
 		this.router.get('/productos/test', this.test);
 	}
@@ -683,6 +684,7 @@ class ProductoControler {
 		console.log('qry.Articulo-productoControler',qry.Articulo)
 	//	console.log('artList-productoControler', artList)
 */
+		console.log(artList);
 		for (let index = 0; index < artList.length; index++) {
 			artList[index] = new ObjectID(artList[index]._id);
 		}
@@ -694,6 +696,51 @@ class ProductoControler {
 		res.status(200).json(readData)
 	}
 
+	async toprovlista(req: Request, res: Response) {
+		/*
+			*/
+		try {
+			const array:any = await producto.aggregate(
+				[	{
+					$match: {pCompra: true, pesable : { $not: { $eq: true } }}
+				}
+				,{
+					$lookup: {
+						from: "articulos",
+						localField: "articulo",    // field in the orders collection
+						foreignField: "_id",  // field in the items collection
+						as: "articulo"
+				 }
+				}
+				,{
+					$lookup: {
+					from: "productos",
+					localField: "parent",    // field in the orders collection
+					foreignField: "_id",  // field in the items collection
+					as: "subprod"
+			 		}
+				}
+				,{
+					$unwind: {
+						path: '$articulo',
+						includeArrayIndex: 'count_articulos',
+						preserveNullAndEmptyArrays: true
+					}				
+				}
+				,{
+					$unwind: {
+						path: '$subprod',
+						includeArrayIndex: 'count_subprod',
+						preserveNullAndEmptyArrays: true
+					}				
+				}
+
+			]);
+			res.status(200).json(array)
+		} catch (error) {
+			res.status(403).json(error)
+		}
+	}
 	async test(req: Request, res: Response) {
 //		const array:any = await productoGetData({});
 		const qry = { articulo: '' };

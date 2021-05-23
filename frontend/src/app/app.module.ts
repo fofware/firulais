@@ -36,6 +36,14 @@ import { ProdCardViewDosComponent } from './components/prod-card-view-dos/prod-c
 import { ArticuloPagoSelectComponent } from './components/articulo-pago-select/articulo-pago-select.component';
 import {NgbPaginationModule, NgbAlertModule, NgbModule, NgbNav, NgbNavbar, NgbCollapse} from '@ng-bootstrap/ng-bootstrap';
 import { ArticuloFormComponent } from './components/articulo-form/articulo-form.component';
+import { ArticuloFormAddModalComponent } from './components/articulo-form-add-modal/articulo-form-add-modal.component';
+import { ProductoFormAddModalComponent } from './components/producto-form-add-modal/producto-form-add-modal.component';
+import { ProductoFormEditComponent } from './components/producto-form-edit/producto-form-edit.component';
+import { ProdCardViewListComponent } from './components/prod-card-view-list/prod-card-view-list.component';
+import { ReadFileModalComponent } from './components/read-file-modal/read-file-modal.component';
+import { ReadCsvFileModalComponent } from './components/read-csv-file-modal/read-csv-file-modal.component';
+import { ReadXlsxFileModalComponent } from './components/read-xlsx-file-modal/read-xlsx-file-modal.component';
+import { PersonasAutocompleteComponent } from './components/personas-autocomplete/personas-autocomplete.component';
 
 @NgModule({
   declarations: [
@@ -66,7 +74,15 @@ import { ArticuloFormComponent } from './components/articulo-form/articulo-form.
     ArticuloCardSelectToolsComponent,
     ProdCardViewDosComponent,
     ArticuloPagoSelectComponent,
-    ArticuloFormComponent
+    ArticuloFormComponent,
+    ArticuloFormAddModalComponent,
+    ProductoFormAddModalComponent,
+    ProductoFormEditComponent,
+    ProdCardViewListComponent,
+    ReadFileModalComponent,
+    ReadCsvFileModalComponent,
+    ReadXlsxFileModalComponent,
+    PersonasAutocompleteComponent
 
   ],
   imports: [

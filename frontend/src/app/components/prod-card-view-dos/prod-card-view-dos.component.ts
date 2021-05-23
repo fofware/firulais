@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { round } from 'src/app/shared/toolbox';
 
 @Component({
   selector: 'app-prod-card-view-dos',
@@ -14,6 +15,7 @@ export class ProdCardViewDosComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    this.articulo.precioref = round(this.articulo.precioToShow/this.articulo.contiene,2)
   }
 
 }

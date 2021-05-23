@@ -1,0 +1,7 @@
+<input type="file" (change)="chooseFile($event)" />
+
+<button class="btn btn-primary" [disabled]="!chosenFiles" (click)="load()">
+  Upload
+</button>
+
+<div class="alert alert-light">{{ msg }}</div>

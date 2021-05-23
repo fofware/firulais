@@ -11,7 +11,8 @@ class PersonaControler {
 	}
 
 	config () {
-    this.router.get('/api/personas/list',passport.authenticate('jwt', {session:false}), this.list );
+    this.router.get('/api/personas/fulllist',passport.authenticate('jwt', {session:false}), this.fulllist );
+    this.router.post('/api/personas/list',passport.authenticate('jwt', {session:false}), this.list );
     this.router.get('/api/personas/search/:search',passport.authenticate('jwt', {session:false}), this.search );
     this.router.delete('/api/persona/:id',passport.authenticate('jwt', {session:false}), this.delete );
     this.router.get('/api/persona/:id',passport.authenticate('jwt', {session:false}), this.get );
@@ -24,6 +25,15 @@ class PersonaControler {
 
 	public index(req: Request, res: Response) {
 		res.send('Usuarios');
+	}
+
+	async fulllist(req: Request, res: Response): Promise<void> {
+		try {
+			const newReg = await persona.find().sort({'apellido':1, 'nombre':1});
+			res.status(200).json(newReg);
+		} catch (error) {
+			res.status(500).json(error);
+		}
 	}
 
 	async import(req: Request, res: Response): Promise<void> {

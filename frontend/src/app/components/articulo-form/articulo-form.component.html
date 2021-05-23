@@ -244,15 +244,24 @@
       <a ngbNavLink><b>Presentaciones</b></a>
       <ng-template ngbNavContent>
         <div class="d-flex">
-          <button class="btn btn-info ml-auto mb-2">add</button>
+          <button class="btn btn-info ml-auto mb-2" (click)="add_producto()">add</button>
         </div>
-        <div class="product-card" *ngFor="let item of selectedArticulo.productos;index as i;">
+        <app-producto-form-edit
+          *ngFor="let producto of selectedArticulo.productos;index as i;"
+          [producto]='producto'
+          [unidades]='unidades'
+          [articulo]='selectedArticulo'
+          [idx]='i'
+          (onBorrar)='borrarProducto($event)'
+        ></app-producto-form-edit>
+
+        <!--div class="product-card" *ngFor="let item of selectedArticulo.productos;index as i;">
           <nav>
             <i class="pesable fa fa-balance-scale fa-fw fa-2x" aria-hidden="true" [hidden]="!item.pesable"></i>
             <i class="pesable fas fa-box fa-2x" aria-hidden="true"
               [hidden]="!(item.parent !== null && item.pVenta && item.pCompra)"></i>
             <div class="imgbox">
-              <img class="caja-img" src="{{item.image}}" alt="">
+              <img class="caja-img" src="{{item.image || selectedArticulo.image}}" alt="">
             </div>
           </nav>
           <article>
@@ -262,7 +271,7 @@
             <div class="card">
               <div class="card-body">
                 <div class="row">
-                  <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+                  <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-4">
                     <div class="row">
                       <div class="col-12">
                         <input type="text" class="form-control form-control-sm mb-1" name="name_{{i}}"
@@ -295,7 +304,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 no-gutters">
+                  <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-4 no-gutters">
                     <div class="row">
                       <div class="col-6 pr-1">
                         <input type="text" class="form-control form-control-sm mb-1" name="compra_{{i}}"
@@ -321,9 +330,9 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+                  <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-4">
                     <div class="row">
-                      <div class="col-6 pr-1">
+                      <div class="col-6 col-lg-3 col-xl-6 pr-1">
                         <div class="form-check">
                           <input class="form-check-input" type="checkbox" id="pesable_{{i}}"
                             name="pesable_{{i}}"
@@ -333,7 +342,7 @@
                           </label>&nbsp;
                         </div>
                       </div>
-                      <div class="col-6 pl-1">
+                      <div class="col-6 col-lg-3 col-xl-6 pl-1">
                         <div class="form-check">
                           <input class="form-check-input" type="checkbox" id="servicio_{{i}}"
                             name="servicio_{{i}}"
@@ -343,7 +352,7 @@
                           </label>&nbsp;
                         </div>
                       </div>
-                      <div class="col-6 pr-1">
+                      <div class="col-6 col-lg-3 col-xl-6 pr-1">
                         <div class="form-check">
                           <input class="form-check-input" type="checkbox" id="pCompra_{{i}}"
                             name="pCompra_{{i}}"
@@ -353,7 +362,7 @@
                           </label>&nbsp;
                         </div>
                       </div>
-                      <div class="col-6 pl-1">
+                      <div class="col-6 col-lg-3 col-xl-6 pl-1">
                         <div class="form-check">
                           <input class="form-check-input" type="checkbox" id="pVenta_{{i}}"
                             name="pVenta_{{i}}"
@@ -382,7 +391,7 @@
                           [(ngModel)]="item.stockMin">
                       </div>
                     </div>
-                  </div>
+                  </div-->
                   <!--div class="col-1">
                     <div class="float-right" [hidden]="!item.changed">
                       <button class="btn btn-primary" (click)="updateProducto(i,item)">
@@ -395,11 +404,11 @@
                       </button>
                     </div>
                   </div-->
-                </div>
+                <!--/div>
               </div>
             </div>
           </article>
-        </div>
+        </div-->
       </ng-template>
     </li>
     <!--li [ngbNavItem]="6" class="mr-auto">

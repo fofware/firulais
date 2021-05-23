@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import {ModalDismissReasons, NgbModal, NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
 import { API_URI } from 'src/app/shared/uris';
+import { ProductoFormAddModalComponent } from '../producto-form-add-modal/producto-form-add-modal.component';
 
 @Component({
   selector: 'app-articulo-form',
@@ -76,7 +77,7 @@ export class ArticuloFormComponent implements OnInit {
 
   open() {
     this.modalService.open( NgbdModal2Content, {
-      size: 'lg'
+      size: '100%'
     });
   }
 
@@ -112,7 +113,7 @@ export class ArticuloFormComponent implements OnInit {
   borrarProducto(idx: number) {
     const p = this.prodList[idx];
     console.log("Borrar :", idx, p);
-    console.log('-----------------');
+    console.log('--------');
     const dependen = [];
     if (p.parent !== null && !p.pesable) {
       for (let i = 0; i < this.prodList.length; i++) {
@@ -143,12 +144,41 @@ export class ArticuloFormComponent implements OnInit {
         }
       }
     }
+    let ok = true;
     if (dependen.length){
       console.log(dependen);
       const consulta = this.modalService.open(NgbdModal2Content);
       consulta.componentInstance.titulo ="asdfasdfasdfasdfaasdfa"
       consulta.componentInstance.contenido ="qwerqewrqwerqwerqwerqwerqr"
+      consulta.result.then(ret => {
+        console.log(ret)
+        if(ret == 'Ok') this.selectedArticulo.productos.splice(idx, 1);
+      })
+    } else {
+      this.selectedArticulo.productos.splice(idx, 1);
     }
+  }
+  add_producto(){
+    const add_form = this.modalService.open(ProductoFormAddModalComponent,{
+      beforeDismiss: () => {
+        console.log("BeforeDisMiss");
+        const ret: boolean = add_form.componentInstance.checkData();
+        return ret;
+      }
+      , size: 'xl'
+      , scrollable: true
+      , centered: false
+      , backdrop: false
+    });
+    add_form.componentInstance.titulo = "Agrear Producto";
+    add_form.componentInstance.contenido = "Contenido";
+    add_form.componentInstance.articulo = this.selectedArticulo;
+    add_form.componentInstance.unidades = this.unidades;
+    add_form.result.then( retData => {
+      console.log("Result",retData);
+    }, retData => {
+      console.log("dismissed",retData);
+    })
   }
 }
 
@@ -164,7 +194,8 @@ export class ArticuloFormComponent implements OnInit {
       <p>{{contenido}}</p>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button>
+      <button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Ok')">Ok</button>
+      <button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Cancel')">Cancel</button>
     </div>
   `
 })

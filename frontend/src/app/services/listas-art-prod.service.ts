@@ -11,16 +11,11 @@ export class ListasArtProdService {
 
   constructor(private http: HttpClient) { }
 
+  getData(srv: string, params: any): Promise<any> {
+    return this.http.get( srv, params ).toPromise();
+  }
+
   readData(srv: string, params: any): Promise<any> | Observable<any> {
-    /*
-    return new Observable((observer) => {
-      this.http.post( srv, params ).subscribe(res => {
-      observer.next(res);
-        // observable execution
-      observer.complete();
-      });
-    });
-    */
     return this.http.post( srv, params ).toPromise();
   }
 

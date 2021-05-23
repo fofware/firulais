@@ -1,0 +1,16 @@
+<input type="file" (change)="chooseFile($event)" />
+
+<button class="btn btn-primary" [disabled]="!chosenFiles" (click)="load()">
+  Upload
+</button>
+<select name="encode"
+  class=""
+  [(ngModel)]="encode"
+  >
+  <option value="utf8">utf8</option>
+  <option value="iso8859-1">iso8859-1</option>
+  <option value="iso8859-2">iso8859-2</option>
+  <option value="iso8859-3">iso8859-3</option>
+</select>
+
+<div class="alert alert-light">{{ msg }}</div>

@@ -2,10 +2,10 @@
   <app-top-menu></app-top-menu>
 </div>
 <header>
-  <app-read-file
-  [encode] = 'encode'
-  (onGotData)="gotData($event)"
-  ></app-read-file>
+  <app-personas-autocomplete
+    [dbList]='dbPersonas'
+    [model]='proveedor'
+  ></app-personas-autocomplete>
 </header>
 <div id='main' (window:resize)="onResize($event)">
   <article>
@@ -30,24 +30,11 @@
         </tr>
       </tbody>
     </table>
-
-
-    <!--app-proveedor-articulos *ngFor="let producto of provArtList;  index as i;"
-      [index]="i" [producto]="producto" (changeProd)="onChangeProduct($event)" (deleteProd)="onDeleteProduct($event)">
-    </app-proveedor-articulos-->
   </article>
   <nav>
-    <div *ngFor="let fldn of fields">
-      <label>{{fldn}}</label>
-
+    <div *ngFor="let fldn of fields; index as i;">
+      <label>{{fldn}}</label> {{typeValues[i]}}
     </div>
-    <!--form class="form-inline">
-      <select (change)="selectProveedor()" name="proveedor" class="custom-select my-1 mr-sm-2" [(ngModel)]="proveedor">
-        <option selected>Choose...</option>
-        <option *ngFor="let persona of personasList" value="{{persona._id}}">{{persona.apellido}} {{persona.nombre}}</option>
-      </select>
-    </form-->
-
   </nav>
   <aside class="p-0">
     <div class="productos-header sticky-top">
@@ -59,7 +46,7 @@
     ></app-articulo-card-select-filter>
     </div>
     <div class="card-container d-print-flex">
-      <app-prod-card-view-dos
+      <app-prod-card-view-list
         class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 no-gutters"
         *ngFor="let articulo of articuloList; index as i;"
         [articulo]='articulo'
@@ -67,9 +54,14 @@
         cmpTipo='venta'
         [showStock]='showStock'
         (click)="selected(articulo)"
-      ></app-prod-card-view-dos>
+      ></app-prod-card-view-list>
     </div>
   </aside>
 </div>
-<footer>footer</footer>
+<footer>
+  <button (click)="findSimilares()">Buscar</button>
+  <button (click)="readFile()">Cargar Archivo</button>
+  <button (click)="readXlsxFile()">Cargar XLSX</button>
+
+</footer>
 

@@ -10,8 +10,21 @@ export class CsvfileService {
   proveedorId = "";
 
   constructor() { }
-
+  sanitizeNumber(str): any {
+    if(!isNaN(str*1)) return str*1;
+    const test = str.split(',')
+    if(test.length === 2){
+      if(!isNaN(test[1]*1)){
+        test[0] = test[0].replace(/\.+/g,'')*1;
+        if(!isNaN(test[0])){
+          return parseFloat(`${test[0]}.${test[1]}`)
+        }
+      }
+    }
+    return str;
+  }
   async formatData(data:any): Promise<any> {
+    data = data.replace(/^\r|\n\r|\n$/g,'');
     const retdata = data.split('\r\n');
     let maxFields = 0;
     this.fields = [];
@@ -25,10 +38,12 @@ export class CsvfileService {
 //      console.log(lineData);
       const reg = [];
       for (let n = 0; n < lineData.length; n++) {
-        let val = lineData[n].trim();
+        let val = this.sanitizeNumber(lineData[n].trim());
+        /*
         if(!isNaN(parseFloat(val))) {
           val = parseFloat(val.replace('.','').replace(',','.'));
         }
+        */
         reg.push(val);
       }
       maxFields = (reg.length > maxFields ? reg.length : maxFields );

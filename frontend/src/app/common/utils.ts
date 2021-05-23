@@ -1,3 +1,4 @@
+/*
 export function round(num, dec) {
   if (typeof dec === 'undefined' || dec < 0) { dec = 2; }
 
@@ -18,6 +19,7 @@ export function round(num, dec) {
   return Number(strNumber);
 }
 export const decimales = 2;
+*/
 export const tpPagos: any = [
   { name: 'Efectivo', value: 1, coef: [] },
   { name: 'QR', value: 1, coef: [] },

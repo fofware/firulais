@@ -1,6 +1,7 @@
-import { round, decimales } from '../common/utils';
 
 // export interface IComprobanteItems {}
+
+import { decimales, round } from "../shared/toolbox";
 
 export class ItemComprobante {
   data: {

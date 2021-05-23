@@ -1,0 +1,127 @@
+<div class="product-card">
+  <nav>
+    <i class="pesable fa fa-balance-scale fa-fw fa-2x" aria-hidden="true" [hidden]="!producto.pesable"></i>
+    <i class="pesable fas fa-box fa-2x" aria-hidden="true"
+      [hidden]="!(producto.parent !== null && producto.pVenta && producto.pCompra)"></i>
+    <div class="imgbox">
+      <img class="caja-img" src="{{producto.image || articulo.image}}" alt="">
+    </div>
+  </nav>
+  <article>
+    <div class="card">
+      <div class="close" [hidden]='idx===null' (click)='borrar()'><i class="fas fa-window-close"></i></div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12">
+            <div class="row">
+              <div class="col-6 col-lg-3 col-xl-3 px-1">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="pesable" name="pesable"
+                    [(ngModel)]="producto.pesable">
+                  <label class="form-check-label" for="pesable">
+                    <i class="fa fa-balance-scale fa-fw" aria-hidden="true"></i>
+                  </label>&nbsp;
+                </div>
+              </div>
+              <div class="col-6 col-lg-3 col-xl-3 px-1">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="servicio" name="servicio"
+                    [(ngModel)]="producto.servicio">
+                  <label class="form-check-label" for="servicio">
+                    Servicio
+                  </label>&nbsp;
+                </div>
+              </div>
+              <div class="col-6 col-lg-3 col-xl-3 px-1">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="pCompra" name="pCompra"
+                    [(ngModel)]="producto.pCompra">
+                  <label class="form-check-label" for="pCompra">
+                    Compra
+                  </label>&nbsp;
+                </div>
+              </div>
+              <div class="col-6 col-lg-3 col-xl-3 px-1">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="pVenta" name="pVenta"
+                    [(ngModel)]="producto.pVenta">
+                  <label class="form-check-label" for="pVenta">
+                    Venta
+                  </label>&nbsp;
+                </div>
+              </div>
+              <div class="col-6 col-lg-3 col-xl-3 px-1">
+                <input type="text" class="form-control form-control-sm mb-1" name="codigo"
+                  placeholder="Código de Barras" [(ngModel)]="producto.codigo">
+              </div>
+              <div class="col-6 col-lg-3 col-xl-3 px-1">
+                <input type="text" class="form-control form-control-sm mb-1" name="plu" placeholder="PLU"
+                  [(ngModel)]="producto.plu">
+              </div>
+              <div class="col-12 col-lg-6 col-xl-6 px-1">
+                <input type="text" class="form-control form-control-sm mb-1" name="image" placeholder="url imagen"
+                  [(ngModel)]="producto.image">
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="row">
+              <div class="col-12 col-md-12 col-lg-4 col-xl-3 px-1">
+                <input type="text" class="form-control form-control-sm mb-1" name="name" placeholder="Nombre"
+                  [(ngModel)]="producto.name">
+              </div>
+              <div class="col-6 col-md-3 col-lg-2 col-xl-1 px-1">
+                <input type="text" class="form-control form-control-sm mb-1" name="contiene" placeholder="Contiene"
+                  [(ngModel)]="producto.contiene">
+              </div>
+              <div class="col-6 col-md-3 col-lg-2 col-xl-1 px-1">
+                <input type="text" class="form-control form-control-sm mb-1" name="unidad" placeholder="Unidad"
+                  [(ngModel)]="producto.unidad">
+              </div>
+              <div class="col-6 col-md-6 col-lg-4 col-xl-3 px-1">
+                <select class="form-control form-control-sm mb-1" name="parent" aria-placeholder="de Articulo"
+                  [(ngModel)]="producto.parent">
+                  <option value="{{pack.id}}" *ngFor="let pack of unidades;">
+                    {{pack.name}}
+                  </option>
+                </select>
+              </div>
+              <div class="col-6 col-md-3 col-lg-3 col-xl-2 px-1">
+                <input type="text" class="form-control form-control-sm mb-1" name="stock" placeholder="Stock"
+                  [(ngModel)]="producto.stock">
+              </div>
+              <div class="col-6 col-md-3 col-lg-3 col-xl-2 px-1">
+                <input type="text" class="form-control form-control-sm mb-1" name="stockMin" placeholder="Stock Min"
+                  [(ngModel)]="producto.stockMin">
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="row">
+              <div class="col-6 col-lg-3 col-xl-2 px-1">
+                <input type="text" class="form-control form-control-sm mb-1" name="compra" placeholder="compra"
+                  [(ngModel)]="producto.compra">
+              </div>
+              <div class="col-6 col-lg-3 col-xl-2 px-1">
+                <input type="text" class="form-control form-control-sm mb-1" name="reposicion"
+                  placeholder="Reposicion" [(ngModel)]="producto.reposicion">
+              </div>
+              <div class="col-6 col-md-3 col-lg-2 col-xl-2 px-1">
+                <input type="text" class="form-control form-control-sm mb-1" name="margen" placeholder="Margen"
+                  [(ngModel)]="producto.margen">
+              </div>
+              <div class="col-6 col-md-6 col-lg-3 col-xl-2 px-1">
+                <input type="text" class="form-control form-control-sm mb-1" name="precio" placeholder="precio vta"
+                  [(ngModel)]="producto.precio">
+              </div>
+              <div class="col-6 col-md-3 col-lg-1 col-xl-2 px-1">
+                <input type="text" class="form-control form-control-sm mb-1" name="iva" placeholder="% IVA"
+                  [(ngModel)]="producto.iva">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+</div>

@@ -11,6 +11,12 @@ export class PersonasService {
 
   constructor(private http: HttpClient) { }
 
+  fulllist(): Promise<object> {
+    return this.http
+              .get(`${this.ApiUri}/personas/fulllist`)
+              .toPromise();
+  }
+
   import(persona: any ): Promise<object> {
     return this.http
               .post(`${this.ApiUri}/persona/import`, persona)
