@@ -16,11 +16,11 @@ export class TokenInterceptorInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const user = this.authService.user;
-    console.log(user);
+//    console.log(user);
     const isLoggedIn = user && user._id;
     const isApiUrl = request.url.startsWith(API_URI);
-    console.log(isApiUrl);
-    console.log(request.url.valueOf());
+//    console.log(isApiUrl);
+//    console.log(request.url.valueOf());
     if (isLoggedIn && isApiUrl) {
       request = request.clone({
           setHeaders: { Authorization: `Bearer ${this.authService.getToken()}` }

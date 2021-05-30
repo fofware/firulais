@@ -18,7 +18,7 @@ export class AuthGuard implements CanActivate {
     | boolean | UrlTree
   {
     if ( this.authService.loggedIn() ) {
-      console.log('Autorizado');
+//      console.log('Autorizado');
       return true;
     }
 

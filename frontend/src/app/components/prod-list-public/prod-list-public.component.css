@@ -4,7 +4,7 @@
   justify-content: center;
   margin-top: 16px;
 }
-
+/*
 .card {
   border-radius: 4px;
   border: 1px solid #eee;
@@ -61,91 +61,40 @@
 .card.card.highlight-card span {
   margin-left: 60px;
 }
+*/
 .page-break	{
-  display: block;
-  width: 100%;
+  display: none;
 }
 
 @media print {
   @page {
     /* declaraciones Css */
-    widows: 10;
-    orphans: 10;
+    size: 210mm 297mm;
+    size: A4 portrait;
+    margin: 5mm 5mm 5mm 5mm;
+    orphans: 0;
+    widows: 0;
+  }
+  .card-container {
+    display: inline-block;
+    flex-wrap: unset;
+    justify-content: unset;
+    margin-top: 0;
+    width: 100%;
   }
   .productos-header {
     display: none;
   }
-  .page-break	{ display: block; page-break-before: always; }
 /*
-  app-prod-card-view-dos {
-    display: flex;
-    flex-wrap: wrap;
-    flex-flow: column;
-    justify-content: center;
-    margin-top: 16px;
-  }
-  .card-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 16px;
-  }
-
-  .card {
-    border-radius: 4px;
-    border: 1px solid #eee;
-    background-color: #ffffff;
-    height: 200px;
-    width: 390px;
-    margin: 0 8px 16px;
-    padding: 0px;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.2s ease-in-out;
-    line-height: 24px;
-    position: relative;
-    -webkit-transition: all 0.2s ease-in-out;
-    -moz-transition: all 0.2s ease-in-out;
-    -ms-transition: all 0.2s ease-in-out;
-    -o-transition: all 0.2s ease-in-out;
-  }
-
-  .card-container .card > i {
-    position: absolute;
-    left: 5px;
-  }
-
-  .card-container .card:not(.highlight-card) {
-    cursor: pointer;
-  }
-
-  .card-container .card:not(.highlight-card):hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 17px rgba(0, 0, 0, 0.35);
-    -webkit-transform: translateY(-3px);
-    -moz-transform: translateY(-3px);
-    -ms-transform: translateY(-3px);
-    -o-transform: translateY(-3px);
-  }
-
-  .card-container .card:not(.highlight-card):hover .material-icons path {
-    fill: rgb(105, 103, 103);
-  }
-
-  .card.highlight-card {
-    background-color: #1976d2;
-    color: white;
-    font-weight: 600;
-    border: none;
-    width: auto;
-    min-width: 30%;
-    position: relative;
-  }
-
-  .card.card.highlight-card span {
-    margin-left: 60px;
+  app-prod-card-view-dos:nth-child(7n+0) {
+    page-break-after: always;
+    background: red;
   }
 */
+  app-prod-card-view-dos:nth-child(5n+0) {
+    page-break-inside: always;
+    page-break-after: always;
+    background: red;
+  }
+  .page-break	{ display: block; page-break-before: always; }
 }

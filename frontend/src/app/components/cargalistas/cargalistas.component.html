@@ -2,7 +2,11 @@
   <app-top-menu></app-top-menu>
 </div>
 <header>
-  <app-personas-autocomplete
+  <select name="proveedor"  [(ngModel)]="proveedor">
+    <option value=""></option>
+    <option *ngFor="let val of dbPersonas"  value="{{val._id}}" >{{val.apellido}}{{val.nombre}}</option>
+  </select>
+<app-personas-autocomplete
     [dbList]='dbPersonas'
     [model]='proveedor'
   ></app-personas-autocomplete>
@@ -15,27 +19,77 @@
           <th scope="col">
             #
           </th>
-          <th *ngFor="let fld of fields; index as i" scope="col">
+          <th>Hoja</th>
+          <th>_id</th>
+          <th>Cod.Prov</th>
+          <th>Decripción</th>
+          <th>Fabricante</th>
+          <th>Marca</th>
+          <th>Especie</th>
+          <th>Edad</th>
+          <th>Raza</th>
+          <th>Rubro</th>
+          <th>Linea</th>
+          <th>Código EAN</th>
+          <th>nombre</th>
+          <th>BultoNombre</th>
+          <th>Bulto</th>
+          <th>Cont.Name</th>
+          <th>Contiene</th>
+          <th>Unid.</th>
+          <th>P.Lista</th>
+          <th>Coef.Desc.</th>
+          <th>Coef.Ret.</th>
+          <th>P.Final</th>
+
+          <!--th *ngFor="let fld of fields; index as i" scope="col">
             <select name="{{fld}}"  [(ngModel)]="typeValues[i]">
               <option></option>
               <option *ngFor="let val of fieldsType"  value="{{val}}" >{{val}}</option>
             </select>
-          </th>
+          </th-->
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let reg of data; index as i;" (click)="selectedlista(i)">
+        <tr class="mycolor{{reg.status}}"
+          *ngFor="let reg of data; index as i;"
+          (click)="selectedlista(i)">
+          <th scope="row">{{i}}</th>
+          <th>{{reg.hoja}}</th>
+          <td>{{reg._id}}</td>
+          <td>{{reg.codigo_proveedor}}</td>
+          <td>{{reg.descripcion}}</td>
+          <td>{{reg.fabricante}}</td>
+          <td>{{reg.marca}}</td>
+          <td>{{reg.especie}}</td>
+          <td>{{reg.edad}}</td>
+          <td>{{reg.raza}}</td>
+          <td>{{reg.rubro}}</td>
+          <td>{{reg.linea}}</td>
+          <td>{{reg.codigo_ean}}</td>
+          <td>{{name}}</td>
+          <td>{{reg.bname}}</td>
+          <td>{{reg.bulto}}</td>
+          <td>{{reg.cname}}</td>
+          <td>{{reg.contiene}}</td>
+          <td>{{reg.unidad}}</td>
+          <td>{{reg.precio_lista}}</td>
+          <td>{{reg.coef_descuento}}</td>
+          <td>{{reg.coef_retenciones}}</td>
+          <td>{{reg.precio_final}}</td>
+        </tr>
+        <!--tr *ngFor="let reg of data; index as i;" (click)="selectedlista(i)">
           <th scope="row">{{i}}</th>
           <td *ngFor="let fld of reg">{{fld}}</td>
-        </tr>
+        </tr-->
       </tbody>
     </table>
   </article>
-  <nav>
+  <!--nav>
     <div *ngFor="let fldn of fields; index as i;">
       <label>{{fldn}}</label> {{typeValues[i]}}
     </div>
-  </nav>
+  </nav-->
   <aside class="p-0">
     <div class="productos-header sticky-top">
       <app-articulo-card-select-filter
@@ -62,6 +116,8 @@
   <button (click)="findSimilares()">Buscar</button>
   <button (click)="readFile()">Cargar Archivo</button>
   <button (click)="readXlsxFile()">Cargar XLSX</button>
+  <button (click)="checkIdLista()">Check Lista</button>
+  <button (click)="importarFile()">Importar</button>
 
 </footer>
 

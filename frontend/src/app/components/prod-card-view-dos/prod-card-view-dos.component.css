@@ -91,18 +91,13 @@
   overflow-y: hidden;
 }
 
-.page-break {
-  display: block;
+.saltodepagina {
+  display: none;
 }
 
 @media print {
-  :host {
+  .card {
     width: 48%;
-    -webkit-flex: 1 6 50%;
-    flex: 1 6 50%;
-  }
-  .page-break	{
     display: block;
-    page-break-before: avoid;
   }
 }

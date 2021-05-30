@@ -20,7 +20,7 @@ export class AuthService {
     const token = localStorage.getItem('token');
     if (token && token !== null ) {
       const jwtToken = JSON.parse(atob(token.split('.')[1]));
-      console.log(jwtToken);
+//      console.log(jwtToken);
       return jwtToken;
     }
     return {

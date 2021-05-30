@@ -1,4 +1,4 @@
-<div class="card page-break">
+<div class="card">
   <div class="card-header px-1 py-0 d-flex justify-content-center">
     <span class="d-flex align-items-center">{{articulo.fullName}} </span>
   </div>
@@ -38,7 +38,7 @@
       <i class="fas fa-box fa-1x" aria-hidden="true" [hidden]="!(articulo.count_ins === 0)"></i>
       &nbsp;Stock: {{articulo.stock}}
     </div>
-    <div>{{(idx%8)}}</div>
+    <div>{{(idx%8)}}/asdfasd</div>
     <div *ngIf="articulo.costo">{{articulo.costo}}</div>
     <div>${{articulo.precioref}}/{{articulo.unidad || articulo.sname}}</div>
   </div>

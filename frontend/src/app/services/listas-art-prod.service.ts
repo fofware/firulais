@@ -23,4 +23,10 @@ export class ListasArtProdService {
     return this.http.post( srv, params).toPromise();
   }
 
+  import(data: any): Promise<object>{
+    return this.http.post( `${API_URI}/proveedoreslistas/import`, data ).toPromise();
+  }
+  getId(data: any){
+    return this.http.post( `${API_URI}/proveedoreslistas/getid`, data ).toPromise();
+  }
 }

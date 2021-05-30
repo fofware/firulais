@@ -17,6 +17,7 @@ import { mongoCtrl } from './controlers/mongoTestControler';
 import { cajaCtrl } from './controlers/cajaControlers';
 import { comprobanteCtrl } from './controlers/comprobantesControler';
 import authRoutes from './routes/authRoutes';
+import { ProveedoresListasCtrl } from './controlers/proveedoresListasControlers';
 
 export default class Server {
 
@@ -44,6 +45,7 @@ export default class Server {
 		this.app.use('/api', peoplesRoutes);
 		this.app.use('/api', articulosRt);
 		this.app.use('/api', productoCtrl.router);
+		this.app.use('/api', ProveedoresListasCtrl.router)
 		this.app.use( ProveedoresArticulosCtrl.router)
 		this.app.use( personaCtrl.router );
 		this.app.use( userCtrl.router );
@@ -57,3 +59,4 @@ export default class Server {
 		});
 	}
 }
+
