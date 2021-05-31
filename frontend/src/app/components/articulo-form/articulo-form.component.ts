@@ -37,6 +37,9 @@ export class ArticuloFormComponent implements OnInit {
              ) { }
 
   ngOnInit(): void {
+    this.setProdList();
+  }
+  setProdList(){
     this.compareArticulo = JSON.parse(JSON.stringify(this.selectedArticulo));
     this.prodList = JSON.parse(JSON.stringify(this.selectedArticulo.productos));
     this.unidades = [{ id: null, name: null }];
@@ -52,7 +55,6 @@ export class ArticuloFormComponent implements OnInit {
       }
     }
   }
-
   readParent(id: any, descr?: string) {
     if ( descr === undefined ) { descr = ''; }
     const item = this.findProduct(id);
@@ -104,8 +106,9 @@ export class ArticuloFormComponent implements OnInit {
       } else {
         retData = await this.list.saveData( `${API_URI}/articulos/productos/newfullData`, this.selectedArticulo);
       }
-      this.selectedArticulo = retData.rpta[0];
+      this.selectedArticulo = retData.rpta;
       console.log(retData);
+      this.activeModal.close('Save')
     } catch (error) {
       console.log(error);
     }
@@ -176,6 +179,12 @@ export class ArticuloFormComponent implements OnInit {
     add_form.componentInstance.unidades = this.unidades;
     add_form.result.then( retData => {
       console.log("Result",retData);
+      if(retData){
+        if(retData === 'Save'){
+          this.selectedArticulo.productos.push(add_form.componentInstance.producto);
+          this.setProdList();
+        }
+      }
     }, retData => {
       console.log("dismissed",retData);
     })

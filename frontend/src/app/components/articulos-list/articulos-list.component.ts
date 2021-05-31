@@ -15,7 +15,6 @@ export class ArticulosListComponent implements OnInit {
   wait: boolean = false;
   modalsNumber = 0;
   newArticulo = {
-    _id: new ObjectID(),
     fabricante: '',
     marca: '',
     rubro: '',
@@ -39,7 +38,8 @@ export class ArticulosListComponent implements OnInit {
     tags: '',
     formula: [],
     detalles: [],
-    beneficios: []
+    beneficios: [],
+    productos:[{}]
   }
   filterButtons = [
     {
@@ -361,6 +361,8 @@ export class ArticulosListComponent implements OnInit {
   newReg(ev){
     console.log("Add New Articulo")
     this.selectedArticulo = this.newArticulo;
+    this.selectedArticulo._id = new ObjectID();
+
     //const newArticulo = this.modalService.open(ArticuloFormAddModalComponent);
     const modalRef = this.modalService.open(ArticuloFormComponent, {
       ariaLabelledBy: 'modal-basic-title'
@@ -379,6 +381,9 @@ export class ArticulosListComponent implements OnInit {
     modalRef.result.then((result) => {
       if (result) {
         console.log(result);
+        if (result === 'Save'){
+          this.articuloList.push(modalRef.componentInstance.selectedArticulo);
+        }
       }
     });
   }
@@ -483,33 +488,12 @@ export class ArticulosListComponent implements OnInit {
 
   SelectEvent(ev,modalData){
     this.editedArticulo = ev.idx;
-
     if(!this.articuloList[this.editedArticulo].formula) this.articuloList[this.editedArticulo].formula = [];
     if(!this.articuloList[this.editedArticulo].detalles) this.articuloList[this.editedArticulo].detalles = [];
     if(!this.articuloList[this.editedArticulo].beneficios) this.articuloList[this.editedArticulo].beneficios = [];
     if(!this.articuloList[this.editedArticulo].productos) this.articuloList[this.editedArticulo].productos = [];
 
     this.selectedArticulo = JSON.parse(JSON.stringify(this.articuloList[ev.idx]));
-//    this.compareArticulo = JSON.parse(JSON.stringify(this.selectedArticulo));
-//    this.prodList = JSON.parse(JSON.stringify(this.selectedArticulo.productos));
-//    this.detalles = this.selectedArticulo.detalles;
-//    this.formula = this.selectedArticulo.formula;
-
-//    this.unidades = [{ id: null, name: null }];
-/*
-    for (let index = 0; index < this.prodList.length; index++) {
-      const e = this.prodList[index];
-      if(e.count_parte !== 0 && e.count_ins !== 0) // No se muestran los pesables ni las cajas o Packs
-      {
-        this.prodList[index].parentname = this.readParent(e.parent);
-        const unid = { id: e._id, name: this.readParent(e._id) };
-        this.prodList[index].infile = true;
-        this.prodList[index].changed = false;
-        if (!this.unidades) { this.unidades = [unid]; }
-        else { this.unidades.push(unid); }
-      }
-    }
-*/
     const modalRef = this.modalService.open(ArticuloFormComponent, {
       ariaLabelledBy: 'modal-basic-title'
       , size: 'xl'
@@ -524,8 +508,12 @@ export class ArticulosListComponent implements OnInit {
       , backdrop: false
     });
     modalRef.componentInstance.selectedArticulo = this.selectedArticulo;
-//    this.triggerModal(modalData);
+    modalRef.result.then( res => {
+      console.log(res);
+      if(res === 'Save'){
+        //console.log(modalRef.componentInstance.selectedArticulo);
+        this.articuloList[this.editedArticulo] = modalRef.componentInstance.selectedArticulo;
+      }
+    });
   }
-
-
 }

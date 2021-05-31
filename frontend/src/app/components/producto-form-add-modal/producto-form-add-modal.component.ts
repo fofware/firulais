@@ -50,4 +50,9 @@ export class ProductoFormAddModalComponent implements OnInit {
     console.log('Before Dismiss');
     return true;
   }
+
+  save(){
+    console.log('Save');
+    this.activeModal.close('Save');
+  }
 }

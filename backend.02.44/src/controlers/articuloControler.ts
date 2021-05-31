@@ -2458,6 +2458,7 @@ class ArticuloControler {
 	
 			const prod_ids = [];
 			const prod_regs = [];
+			const prod_saved = [];
 			for (let i = 0; i < req.body.productos.length; i++) {
 				const e = req.body.productos[i];
 				e._id = new ObjectID(e._id);
@@ -2494,13 +2495,12 @@ class ArticuloControler {
 			console.log(del_regs);
 			for (let i = 0; i < prod_regs.length; i++) {
 				const e = prod_regs[i];
-				const rpta = await producto.updateOne( {_id: e._id}, { $set :  e  }, { upsert: true });
-				console.log(rpta);
+				prod_saved.push( await producto.updateOne( {_id: e._id}, { $set :  e  }, { upsert: true }));
 			}
 			const qry = {Articulo: { _id: artReg._id } };
 			const rpta = await readProductos(qry,dataProduct);
 
-			res.status(200).json({ rpta, del_regs, artReg, prod_regs });
+			res.status(200).json({ rpta: rpta[0], del_regs, artReg, prod_regs, prod_saved });
 
 		} catch (error) {
 			res.status(403).json({ error });
