@@ -220,6 +220,15 @@ export const menudata = [
           param: ''
         },
         {
+          title: 'Aparear Productos',
+          icon: 'fas fa-link fa-3x',
+          permiso: 'moderator',
+          target: '',
+          rel: 'noopener',
+          route: '/productoslink',
+          param: ''
+        },
+        {
           title: 'Personas',
           icon: 'fas fa-user-alt fa-3x',
           permiso: 'moderator',

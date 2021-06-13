@@ -1,0 +1,10 @@
+<fieldset class="form-inline">
+  <div class="form-group">
+    <label for="typeahead-http">Search for a wiki page:</label>
+    <input id="typeahead-http" type="text" class="form-control mx-sm-3" [class.is-invalid]="searchFailed" [(ngModel)]="model" [ngbTypeahead]="search" placeholder="Wikipedia search" />
+    <small *ngIf="searching" class="form-text text-muted">searching...</small>
+    <div class="invalid-feedback" *ngIf="searchFailed">Sorry, suggestions could not be loaded.</div>
+  </div>
+  <pre>Model: {{ model | json }}</pre>
+</fieldset>
+<hr>

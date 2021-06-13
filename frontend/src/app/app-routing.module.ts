@@ -8,6 +8,7 @@ import { ImportDataComponent } from './components/import-data/import-data.compon
 import { MenuappComponent } from './components/menuapp/menuapp.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { ProdListPublicComponent } from './components/prod-list-public/prod-list-public.component';
+import { ProductoLinkComponent } from './components/producto-link/producto-link.component';
 import { SigninComponent } from './components/signin/signin.component';
 import { SignupComponent } from './components/signup/signup.component';
 import { AuthGuard } from './guard/auth.guard';
@@ -53,6 +54,11 @@ const routes: Routes = [
     path: 'cargalistas'
     , component: CargalistasComponent
 //    , canActivate: [AuthGuard]
+  }
+  , {
+    path: 'productoslink'
+    , component: ProductoLinkComponent
+    , canActivate: [AuthGuard]
   }
   , {
     path: 'apitoapi'

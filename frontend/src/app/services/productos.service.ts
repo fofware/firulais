@@ -15,6 +15,11 @@ export class ProductosService {
 
   constructor(private http: HttpClient) { }
 
+  lista(): Promise<object>{
+    return this.http
+              .get(`${this.ApiUri}/productos/lista`)
+              .toPromise();
+  }
   list(): Promise<object>{
     return this.http
               .get(`${this.ApiUri}/productos/list`)

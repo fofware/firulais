@@ -5,6 +5,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
 import { ObjectID } from 'bson'
 import { ArticuloFormComponent } from '../articulo-form/articulo-form.component';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-articulos-list',
@@ -54,7 +55,7 @@ export class ArticulosListComponent implements OnInit {
             ,'fas fa-dog fa-2x text-white'
           ]
           ,qryName: 'Articulo'
-          ,qryValue: [{$regex: { params:'perro', flags: 'i'}}]
+          ,qryValue: [{$regex: { patern:'perro', flags: 'i'}}]
           ,qryKey: 'especie'
           ,display: true
           ,text: ''
@@ -67,7 +68,7 @@ export class ArticulosListComponent implements OnInit {
             ,'fas fa-cat fa-2x text-white'
           ]
           ,qryName: 'Articulo'
-          ,qryValue: [{$regex: { params:'gato', flags: 'i'}}]
+          ,qryValue: [{$regex: { patern:'gato', flags: 'i'}}]
           ,qryKey: 'especie'
           ,display: true
           ,text: ''
@@ -80,7 +81,7 @@ export class ArticulosListComponent implements OnInit {
             ,'fas fa-dove fa-2x text-white'
           ]
           ,qryName: 'Articulo'
-          ,qryValue: [{$regex: { params:'ave', flags: 'i'}}]
+          ,qryValue: [{$regex: { patern:'ave', flags: 'i'}}]
           ,qryKey: 'especie'
           ,display: true
           ,text: ''
@@ -93,7 +94,7 @@ export class ArticulosListComponent implements OnInit {
             ,'fas fa-fish fa-2x text-white'
           ]
           ,qryName: 'Articulo'
-          ,qryValue: [{$regex: { params:'pez', flags: 'i'}}]
+          ,qryValue: [{$regex: { patern:'pez', flags: 'i'}}]
           ,qryKey: 'especie'
           ,display: false
           ,text: ''
@@ -106,7 +107,7 @@ export class ArticulosListComponent implements OnInit {
             ,'fas fa-horse fa-2x text-white'
           ]
           ,qryName: 'Articulo'
-          ,qryValue: [{$regex: { params:'caballo', flags: 'i'}}]
+          ,qryValue: [{$regex: { patern:'caballo', flags: 'i'}}]
           ,qryKey: 'especie'
           ,display: false
           ,text: ''
@@ -141,73 +142,6 @@ export class ArticulosListComponent implements OnInit {
       ,display: true
       ,text: ''
      }
-/*
-     , {
-      id: 'precio'
-      , tipo: 'button'
-      ,value: 1
-      ,show:[ 'fas fa-file-invoice-dollar fa-2x text-white-50',
-              'fas fa-file-invoice-dollar fa-2x text-white'
-            ]
-      ,qryName: 'Extra'
-      ,qryValue: [{ $gte: 1 }]
-      ,qryKey: 'precio'
-      ,display: false
-      ,text: ''
-     }
-     , {
-      id: 'stock'
-      , tipo: 'button'
-      ,value: 1
-      ,show:[ 'fa fa-shopping-cart fa-2x text-white-50',
-              'fa fa-shopping-cart fa-2x text-white'
-            ]
-      ,qryName: 'Extra'
-      ,qryValue: [{ $gte: 1 }]
-      ,qryKey: 'stock'
-      ,display: true
-      ,text: ''
-     }
-     , {
-      id: 'servicio'
-      , tipo: 'button'
-      ,value: 0
-      ,show:[ 'fa fa-2x text-white-50',
-              'fa fa-2x text-white'
-            ]
-      ,qryName: 'Producto'
-      ,qryValue: [{ $eq: true }]
-      ,qryKey: 'servicio'
-      ,display: false
-      ,text: 'S'
-     }
-     , {
-      id: 'compra'
-      , tipo: 'button'
-      ,value: 0
-      ,show:[ 'fa fa-2x text-white-50',
-              'fa fa-2x text-white'
-            ]
-      ,qryName: 'Producto'
-      ,qryValue: [{ $eq: true }]
-      ,qryKey: 'pCompra'
-      ,display: false
-      ,text: 'C'
-     }
-     , {
-      id: 'venta'
-      , tipo: 'button'
-      ,value: 1
-      ,show:[ 'fa fa-2x text-white-50',
-              'fa fa-2x text-white'
-            ]
-      ,qryName: 'Producto'
-      ,qryValue: [{ $eq: true }]
-      ,qryKey: 'pVenta'
-      ,display: false
-      ,text: 'V'
-     }
-*/
   ]
 
   articuloOrder = [
@@ -262,83 +196,25 @@ export class ArticulosListComponent implements OnInit {
   articuloList: any[] = [];
   prodList: any[] = [];
   detalles: any[] = [];
-  beneficios: any[] = [
-    {_id: 0, name: 'Omega 3 y 6', value: 'Ayudan a mantener un pelaje saludable', show: false}
-    ,{_id: 1, name: 'Croqueta Parti-crock', value: 'Mayor disfrute', show: false}
-    ,{_id: 2, name: 'Taurina', value: 'Contribuye a la salud del corazón y la visión', show: false}
-    ,{_id: 3, name: 'Protección urinaria', value: 'pH óptimo que ayuda a evitar la formación de cálculos urinarios', show: true}
-    ,{_id: 4, name: 'Fibras naturales', value: 'Colaboran con el control de las bolas de pelo.', show: true}
-  ]
-  formula:any[] = [
-    {id: 0, name: 'Proteína bruta (mín.)', showname: true, value: '30,0%', showvalue: true}
-    ,{id: 1, name: 'Extracto etéreo / Grasa bruta (mín.)', showname: false, value: '2.5%', showvalue: false}
-    ,{id: 2, name: 'Fibra bruta (máx.)', showname: false, value: '12,0%', showvalue: false}
-    ,{id: 3, name: 'Minerales/Cenizas (máx.)', showname: false, value: '8,0%', showvalue: false}
-    ,{id: 4, name: 'Calcio (mín./máx.)', showname: false, value: '0,90%/1,4%', showvalue: false}
-  ]
   unidades: [{ id: any, name: string }];
   selectedArticulo: any;
   compareArticulo: any;
   editedArticulo: any;
   dialog: any;
   closeModal: string;
-
+  user:any;
   constructor(  private http: HttpClient,
                 private modalService: NgbModal,
-                private list: ListasArtProdService
+                private list: ListasArtProdService,
+                private authService: AuthService
               ) {
                 this.modalService.activeInstances.subscribe((list) => {
                   this.modalsNumber = list.length;
                 });
+                this.user = this.authService.user;
+                console.log(this.user);
+
               }
-/*
-  triggerModal(content) {
-    this.modalService.open(content,
-      {
-        ariaLabelledBy: 'modal-basic-title'
-        , size: 'xl'
-        , beforeDismiss: () => {
-          console.log("BeforeDisMiss");
-          const ret: boolean = this.checkData();
-          return ret;
-        }
-        //, windowClass: 'xlModal'
-        , scrollable: true
-        , centered: true
-        , backdrop: false
-      }).result.then((res) => {
-        this.closeModal = `Closed with: ${res}`;
-        console.log(this.closeModal);
-        if (res == 'Save'){
-          this.articuloList[this.editedArticulo] = JSON.parse(JSON.stringify(this.selectedArticulo));
-          this.editedArticulo = null;
-          this.selectedArticulo = {};
-        } else {
-          console.log('No graba')
-        }
-      }, (res) => {
-        this.closeModal = `Dismissed ${this.getDismissReason(res)}`;
-        console.log(this.closeModal)
-      }
-    );
-  }
-  beforeDismiss(): boolean | Promise<boolean>{
-    console.log("Dismiss")
-    return false;
-  }
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      console.log('by pressing ESC')
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      console.log('by clicking on a backdrop')
-      return 'by clicking on a backdrop';
-    } else {
-      console.log(`with: ${reason}`)
-      return  `with: ${reason}`;
-    }
-  }
-*/
   ngOnInit(): void {
     this.listArticulos()
   }
@@ -354,7 +230,7 @@ export class ArticulosListComponent implements OnInit {
   }
 
   listArticulos(): void {
-    this.searchItem = ([] as any);
+//    this.searchItem = ([] as any);
     this.searchArticulos();
   }
 
@@ -435,55 +311,17 @@ export class ArticulosListComponent implements OnInit {
     const searchItem: any = (qry ? qry.searchItem : "" );
     const Sort = this.articuloOrder[this.listaOrden].sort;
 
-    //    this.list.buscaArticulos({Articulo, Producto, Extra, searchItem: this.searchItem, Sort })
     try {
       const data:any = await this.list.readData(
         `${API_URI}/articulos/productos/listdata`,
         {Articulo, Producto, Extra, searchItem: this.searchItem, Sort }
       );
-      /*
-      if ( data.length === 1 && Articulo['$and'] && Articulo['$and'].length === 1
-      && ( this.searchItem === data[0].codigo || this.searchItem === data[0].plu ))
-      {
-        this.searchItem = '';
-        this.wait = false;
-        this.searchArticulos();
-      } else {
-      */
-        this.articuloList = data;
-      //}
+      this.articuloList = data;
       console.log(this.articuloList);
     } catch (error) {
       console.log(error);
     }
     this.wait = false;
-    /*
-    this.list.readData(
-      `${API_URI}/articulos/productos/listdata`,
-      {Articulo, Producto, Extra, searchItem: this.searchItem, Sort }
-    ).subscribe(
-      res => {
-        //        this.calculaPrecios(res);
-        const data = res as any;
-
-        if ( data.length === 1 && Articulo['$and'] && Articulo['$and'].length === 1
-        && ( this.searchItem === data[0].codigo || this.searchItem === data[0].plu ))
-        {
-          this.searchItem = '';
-          this.wait = false;
-          this.searchArticulos();
-        } else {
-          this.articuloList = data;
-        }
-        this.wait = false;
-        console.log(this.articuloList);
-      },
-      err => {
-        console.log(err);
-        this.wait = true;
-      }
-    );
-    */
   }
 
   SelectEvent(ev,modalData){

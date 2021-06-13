@@ -1,0 +1,48 @@
+<article>
+  <div class="d-flex flex-row justify-content-between">
+    <h4 class="nombre">
+      <span *ngIf="articulo.d_fabricante">{{articulo.fabricante}} </span>
+      <span *ngIf="articulo.d_marca">{{articulo.marca}} </span>
+      <span *ngIf="articulo.d_especie">{{articulo.especie}} </span>
+      <span *ngIf="articulo.d_edad">{{articulo.edad}} </span>
+      <span>{{articulo.name}} </span>
+      <span *ngIf="articulo.d_raza">{{articulo.raza}} </span>
+      <span *ngIf="articulo.d_rubro">{{articulo.rubro}} </span>
+      <span *ngIf="articulo.d_linea">{{articulo.linea}} </span>
+    </h4>
+    <div class="d-flex flex-row print-oculta">
+      <!--div class="block" style="width: max-content;">
+        <button class="btn btn-outline-danger" (click)="editdata()"><i class="fas fa-trash-alt"></i></button>
+      </div-->
+    </div>
+  </div>
+  <!--div>
+    <span>{{articulo.fullName}}</span>
+  </div-->
+  <table>
+    <thead>
+      <th width='250px'>Presentación</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let producto of productos; index as i;">
+        <td width='250px' *ngIf="producto.count_cerrado !== 0 && producto.count_parte !==0">
+          <button class='btn btn-outline-secondary btn-block btn-sm' [disabled]="stage===0 || selected.length===0" (click)='setProducto(producto)'>
+            {{producto.name}} {{producto.strContiene}}
+            {{producto.unidad}} {{producto.sname}}
+            {{producto.sStrContiene}} {{producto.sunidad}}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <button class="btn btn-outline-primary btn-block" (click)="setArticulo(articulo)" [disabled]="stage>0"><i class="fas fa-edit"></i> Set Articulo {{articulo._id}}</button>
+</article>
+<nav>
+  <div class="imgbox">
+    <img class="caja-img" src="{{articulo.image}}" alt="">
+  </div>
+  <a class="cajaUrl btn btn-link" href="{{articulo.url}}" target='_blanck'
+    [hidden]="!articulo.url || articulo.url == ''">
+    <i class="fas fa-info-circle" (click)="opLink(articulo.url)"></i>
+  </a>
+</nav>

@@ -1,0 +1,62 @@
+<div id='topmenu' class="sticky-top">
+  <app-top-menu></app-top-menu>
+</div>
+<header [hidden]='stage === 0'>
+  <table>
+    <tr *ngFor="let reg of readyData;index as i;">
+      <td>{{reg.descripcion}}</td>
+      <td style="width: 50px; text-align: right;">{{reg.bulto}}</td>
+      <td style="width: 50px; text-align: right;">{{reg.contiene}}</td>
+      <td>&lt;==&gt;</td>
+      <td>{{reg.prodName}}</td>
+      <td><button (click)='revertReadyData(i)'>cancel</button></td>
+    </tr>
+  </table>
+<!--select name="proveedor"  [(ngModel)]="proveedor">
+    <option value=""></option>
+    <option *ngFor="let val of dbPersonas"  value="{{val._id}}" >{{val.apellido}}{{val.nombre}}</option>
+  </select-->
+<!--app-producto-autocomplete
+></app-producto-autocomplete-->
+</header>
+<div id='main' (window:resize)="onResize($event)">
+  <article>
+    <table>
+      <tr *ngFor="let reg of dbProvProd;index as i;"
+        class="{{reg.class}}"
+      >
+        <td>
+          <input type="checkbox" value='{{i}}' (change)='toggleCheck($event)'>
+        </td>
+        <td >{{reg.marca}}</td>
+        <td >{{reg.especie}}</td>
+        <td>{{reg.edad}}</td>
+        <td>{{reg.descripcion}}</td>
+        <td style="width: 50px; text-align: right;">{{reg.bulto}}</td>
+        <td style="width: 50px; text-align: right;">{{reg.contiene}}</td>
+      </tr>
+    </table>
+  </article>
+  <!--nav>
+  </nav-->
+  <aside class="p-0">
+    <div class="card-container">
+      <app-articulo-card-view-dos
+        class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 no-gutters"
+        *ngFor="let articulo of dbProducto; index as i;"
+        [articulo]='articulo'
+        [idx]='i'
+        [stage]='stage'
+        [selected]='selected'
+        (onSetArticulo)='setArticulo($event)'
+        (onSetProducto)='setProducto($event)'
+      ></app-articulo-card-view-dos>
+    </div>
+    <div [hidden]='stage===0'>
+      <button (click)="ngOnInit()">reset</button>
+      <button (click)="saveReadyData()">save data</button>
+    </div>
+  </aside>
+</div>
+<!--footer>
+</footer-->

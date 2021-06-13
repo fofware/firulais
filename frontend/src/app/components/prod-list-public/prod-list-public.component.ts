@@ -22,7 +22,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
     tipo: 'Venta',
     public: true
   };
-
+  contiene = {};
   articuloList: any[] = [];
   filterButtons = [
       {
@@ -37,7 +37,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
               ,'fas fa-dog fa-2x text-white'
             ]
             ,qryName: 'Articulo'
-            ,qryValue: [{$regex: { params:'perro', flags: 'i'}}]
+            ,qryValue: [{$regex: { patern:'perro', flags: 'i'}}]
             ,qryKey: 'especie'
             ,display: true
             ,text: ''
@@ -50,7 +50,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
               ,'fas fa-cat fa-2x text-white'
             ]
             ,qryName: 'Articulo'
-            ,qryValue: [{$regex: { params:'gato', flags: 'i'}}]
+            ,qryValue: [{$regex: { patern:'gato', flags: 'i'}}]
             ,qryKey: 'especie'
             ,display: true
             ,text: ''
@@ -63,7 +63,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
               ,'fas fa-dove fa-2x text-white'
             ]
             ,qryName: 'Articulo'
-            ,qryValue: [{$regex: { params:'ave', flags: 'i'}}]
+            ,qryValue: [{$regex: { patern:'ave', flags: 'i'}}]
             ,qryKey: 'especie'
             ,display: true
             ,text: ''
@@ -76,7 +76,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
               ,'fas fa-fish fa-2x text-white'
             ]
             ,qryName: 'Articulo'
-            ,qryValue: [{$regex: { params:'pez', flags: 'i'}}]
+            ,qryValue: [{$regex: { patern:'pez', flags: 'i'}}]
             ,qryKey: 'especie'
             ,display: false
             ,text: ''
@@ -89,7 +89,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
               ,'fas fa-horse fa-2x text-white'
             ]
             ,qryName: 'Articulo'
-            ,qryValue: [{$regex: { params:'caballo', flags: 'i'}}]
+            ,qryValue: [{$regex: { patern:'caballo', flags: 'i'}}]
             ,qryKey: 'especie'
             ,display: false
             ,text: ''
@@ -203,7 +203,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
         ,display: false
         ,text: 'V'
        }
-  ]
+    ]
   articuloOrder = [
     {
       name: 'Descripción',
@@ -263,6 +263,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
+    this.contiene['$gte'] = 0;
     this.listProductos();
   }
 
@@ -314,6 +315,13 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   buttonMsg(array){
     console.log("Procesa Buttons Msg", array)
     this.filterButtons = array;
+    this.searchProductos();
+  }
+
+  contieneMsg(array){
+    console.log("Contiene Msg", array);
+    this.contiene = array;
+    //this.filterButtons = array;
     this.searchProductos();
   }
 
@@ -373,7 +381,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
     const searchItem: any = (qry ? qry.searchItem : "" );
 
     const Sort = this.articuloOrder[this.listaOrden].sort;
-
+    Producto['contiene'] = this.contiene;
 //    this.list.buscaProductos({Articulo, Producto, Extra, searchItem: this.searchItem, Sort })
     try {
       const data:any = await this.list.readData(

@@ -44,6 +44,9 @@ import { ReadFileModalComponent } from './components/read-file-modal/read-file-m
 import { ReadCsvFileModalComponent } from './components/read-csv-file-modal/read-csv-file-modal.component';
 import { ReadXlsxFileModalComponent } from './components/read-xlsx-file-modal/read-xlsx-file-modal.component';
 import { PersonasAutocompleteComponent } from './components/personas-autocomplete/personas-autocomplete.component';
+import { ProductoAutocompleteComponent } from './components/producto-autocomplete/producto-autocomplete.component';
+import { ProductoLinkComponent } from './components/producto-link/producto-link.component';
+import { ArticuloCardViewDosComponent } from './components/articulo-card-view-dos/articulo-card-view-dos.component';
 
 @NgModule({
   declarations: [
@@ -82,7 +85,10 @@ import { PersonasAutocompleteComponent } from './components/personas-autocomplet
     ReadFileModalComponent,
     ReadCsvFileModalComponent,
     ReadXlsxFileModalComponent,
-    PersonasAutocompleteComponent
+    PersonasAutocompleteComponent,
+    ProductoAutocompleteComponent,
+    ProductoLinkComponent,
+    ArticuloCardViewDosComponent
 
   ],
   imports: [

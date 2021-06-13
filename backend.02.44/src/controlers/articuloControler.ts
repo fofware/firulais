@@ -4,26 +4,7 @@ import { ObjectID } from 'bson'
 import { sanitize } from '../common/utils'
 import producto, { IProducto } from '../models/producto';
 import passport from "passport";
-/*
-			{ $graphLookup:
-				{
-					from: "productos"
-					,startWith: "$_id"
-					,connectFromField: "parent"
-					,connectToField: "articulo"
-					,as: "productos"
-					,restrictSearchWithMatch: qry.Producto
-				}
-			},
-			{
-				$lookup: {
-					from: 'productos',
-					localField: "_id",
-					foreignField: "articulo",
-					as: 'productos'
-				}
-			},
-*/
+
 export const productoGetData = async function( qry: any ): Promise<IProducto[]> {
 	if( !qry.Producto ) qry.Producto = {};
 	if( !qry.Articulo ) qry.Articulo = {};
@@ -1069,9 +1050,11 @@ export const dataProduct =
 								$and:
 									[
 										{ $eq: ["$_id", "$$productoId"] },
-										// Esto nos asegura que es un producto que se vende
-										// fraccionando
-										{ $eq: ["$$pVenta", true] },
+										// Este es un producto que se compra por caja 
+										// que contiene producto que se pueden vender o no
+										// de forma separada
+										// 
+										//{ $eq: ["$$pVenta", true] },
 										{ $eq: ["$$pCompra", true] },
 										//{ $eq: [ "$$pServicio", false ] },
 										{ $eq: ["$$pesable", false] },
@@ -1939,76 +1922,84 @@ export const readProductos = function ( qry: any, prodTemplate ): PromiseLike<an
 		]);
 }	
 
-	export const articuloSanitize = async function (qry: any) {
-		//	if(!search || search.length == 0) return null;
-		const artFlds = ['name', 'fabricante', 'marca', 'rubro', 'linea', 'especie', 'edad', 'raza', 'tags'];
-		const Articulo = {};
-		const Extra = {};
-		const In = [];
-		let a = [];
-		let t = [];
-		let e = [];
-		if (qry.Articulo){
-			for (const key in qry.Articulo) {
-				if (Object.prototype.hasOwnProperty.call(qry.Articulo, key)) {
-					const e = qry.Articulo[key];
-					Articulo[key] = (e['$regex'] ? {$regex: new RegExp(e['$regex'].params, e['$regex'].flags )} : e); 
-					const idx = artFlds.indexOf(key);
-//					console.log(key,idx)
-					if( idx !== -1){
-//						console.log('splice', key)
-						artFlds.splice ( idx, 1)
-					}
+export const articuloSanitize = async function (qry: any) {
+	const artFlds = ['fabricante', 'marca', 'rubro', 'linea', 'especie', 'edad', 'raza', 'tags', 'name'];
+	const extFlds = ['tags', 'name', 'fullName'];
+	let Articulo = {};
+	const Extra = {};
+	const searchItem = qry.searchItem.replace(/  /g, ' ');
+	const searcharray: any[] = searchItem.trim().split(' ');
+	let e = [];
+	let lista = [];
+	// setea según botonera
+	if (qry.Articulo){
+		for (const key in qry.Articulo) {
+			if (Object.prototype.hasOwnProperty.call(qry.Articulo, key)) {
+				const e = qry.Articulo[key];
+				Articulo[key] = (e['$regex'] ? {$regex: new RegExp(e['$regex'].patern, e['$regex'].flags )} : e); 
+				const idx = artFlds.indexOf(key);
+				if( idx !== -1){
+					artFlds.splice ( idx, 1)
 				}
 			}
-//			console.log(Articulo);
-			const lista = await readArticulos({ Articulo, Project: {'_id': 1}, Sort: {'_id': 1} });
+		}
+	}
+	/*
+	if (qry.Extra){
+		for (const key in qry.Extra) {
+			if (Object.prototype.hasOwnProperty.call(qry.Extra, key)) {
+				const e = qry.Extra[key];
+				Extra[key] = (e['$regex'] ? {$regex: new RegExp(e['$regex'].patern, e['$regex'].flags )} : e); 
+				const idx = extFlds.indexOf(key);
+				if( idx !== -1){
+					extFlds.splice ( idx, 1)
+				}
+			}
+		}
+	}
+	const extRegEx = []
+	*/
+	if (searcharray.length > 0){
+		/*
+		for (let i = 0; i < searcharray.length; i++) {
+			extRegEx.push(new RegExp( searcharray[i], 'i' )); 
+		}
+		for (let i = 0; i < extFlds.length; i++) {
+			const fld = extFlds[i];
+			const o = {};
+			o[fld] = {'$in': extRegEx }
+			e.push(o)
+		}
+		Extra['$or'] = e;
+		*/
+		const v = [];
+		const regStr = [];
+		for (let i = 0; i < searcharray.length; i++) {
+			const str = searcharray[i];
+			const v = [];
+			for (let n = 0; n < artFlds.length; n++) {
+				const fld = artFlds[n];
+				const o = {};
+				o[fld] = new RegExp( str, 'i' );
+				v.push(o);
+			}
+			Articulo['$or'] = v;
+			if( i > 0 ) Articulo['_id'] = {'$in': lista};
+			lista = await articulo.aggregate([{ '$match': Articulo },{'$project': {'_id': 1}}]);
 			for (let index = 0; index < lista.length; index++) {
 				lista[index] = new ObjectID(lista[index]._id);
 			}
-			t = t.concat(lista);
 		}
-
-		if (qry.searchItem.length > 0){
-			const searchItem = qry.searchItem.replace(/  /g, ' ');
-			const array: any[] = searchItem.trim().split(' ');
-			Articulo['$and'] = [];
-			for (let index = 0; index < array.length; index++) {
-				const str = array[index];
-				const v = {}
-				v['$or'] = [];
-//				console.log(artFlds.length)
-				for (let n = 0; n < artFlds.length; n++) {
-					const fld = artFlds[n];
-					const o = {};
-					o[fld] = { $regex: new RegExp( str, 'i' ) } 
-					v['$or'].push(o);
-//					console.log(fld);
-				}
-				const testQry = v; //{ '$or':[ v['$or'][v['$or'].length-1]] }
-				const lista = await readArticulos({ Articulo: { '$and': [ {_id: { $in: t}}, testQry ] }, Project: {'_id': 1}, Sort: {'_id': 1} });
-				if (lista.length > 0){
-					if(Articulo['$and']) Articulo['$and'] = [];
-					Articulo['$and'].push(v);
-					for (let index = 0; index < lista.length; index++) {
-						lista[index] = new ObjectID(lista[index]._id);
-					}
-					t = lista;
-				} else {
-					v['$or'].push({fullName: { $regex: new RegExp(str, 'i')}})
-					if (!Extra['$and']) Extra['$and'] = [];
-					Extra['$and'].push(v)
-					e.push(str);
-				}
-			}
-		}
-		a = t
-//		console.log(a);
-		if(Articulo['$and'] && Articulo['$and'].length === 0) delete Articulo['$and'];
-		return { Articulo, lista: a, failString: e, Extra } 
 	}
 
-	export const articuloSanitizeString = function (search: string, artQry?: any) {
+	if(Articulo['_id'] && Articulo['_id'].length === 0) delete Articulo['_id'];
+	if(Articulo['$or'] && Articulo['$or'].length === 0) delete Articulo['$or'];
+	if(Articulo['$and'] && Articulo['$and'].length === 0) delete Articulo['$and'];
+	if(lista.length) Articulo['_id'] = {'$in': lista }
+	return { Articulo, lista, Extra } 
+}
+
+export const articuloSanitizeString = function (search: string, artQry?: any) {
 //	if(!search || search.length == 0) return null;
 	artQry = (artQry ? artQry : {});
 	const Articulo = [];
@@ -2050,7 +2041,7 @@ export const readProductos = function ( qry: any, prodTemplate ): PromiseLike<an
 						v[fld] = artQry.qryValue
 						break;
 				}
-				console.log("v", fld, v);
+//				console.log("v", fld, v);
 				a.push( v ); 
 			} else {
 				for (let index = 0; index < array.length; index++) {
@@ -2289,7 +2280,7 @@ class ArticuloControler {
 	async findProductos ( req: Request, res: Response ) {
 		try {
 			const qry = req.body;
-			console.log('Entra qry', qry);
+//			console.log('Entra qry', qry);
 			const ret = await articuloSanitize(qry);
 			console.log('ret',ret)
 			qry.Articulo = { _id: { $in: [ret.lista]}};
@@ -2306,8 +2297,8 @@ class ArticuloControler {
 			const qry = req.body;
 			console.log('Entra qry', qry);
 			const ret = await articuloSanitize(qry);
-//			qry.Articulo = { _id: { $in: [ret.lista]}};
-			qry.Articulo =  ret.Articulo;
+			qry.Articulo = ret.Articulo;
+			qry.Extra = ret.Extra;
 			const rpta = await readProductos(qry,dataProduct);
 			res.status(200).json(rpta);
 		} catch (error) {
@@ -2339,6 +2330,86 @@ class ArticuloControler {
 		}
 	}
 
+	async updateFullData( req: Request, res: Response ){
+		try {
+			const artReg = {
+				_id: new ObjectID( req.body._id ),
+				fabricante: req.body.fabricante,
+				marca: req.body.marca,
+				rubro: req.body.rubro,
+				linea: req.body.linea,
+				especie: req.body.especie,
+				edad: req.body.edad,
+				raza: req.body.raza,
+				name: req.body.name,
+				d_fabricante: req.body.d_fabricante,
+				d_marca: req.body.d_marca,
+				d_rubro: req.body.d_rubro,
+				d_linea: req.body.d_linea,
+				d_especie: req.body.d_especie,
+				d_edad: req.body.d_edad,
+				d_raza: req.body.d_raza,
+				private_web: req.body.private_web,
+				image: req.body.image,
+				url: req.body.url,
+				iva: req.body.iva,
+				margen: req.body.margen,
+				tags: req.body.tags,
+				formula: req.body.formula,
+				detalles: req.body.detalles,
+				beneficios: req.body.beneficios
+			}
+	
+			const prod_ids = [];
+			const prod_regs = [];
+			const prod_saved = [];
+			for (let i = 0; i < req.body.productos.length; i++) {
+				const e = req.body.productos[i];
+				e._id = new ObjectID(e._id);
+				e.parent = (e.parent === null ? null : new ObjectID(e.parent));
+				prod_ids.push(e._id);
+				prod_regs.push({
+					_id: e._id
+					,articulo: artReg._id
+					,parent: e.parent
+					,name: e.name
+					,contiene: e.contiene
+					,unidad: e.unidad
+					,precio: e.precio
+					,compra: e.compra
+					,reposicion: e.reposicion
+					,pesable: e.pesable
+					,servicio: e.servicio
+					,pVenta: e.pVenta
+					,pCompra: e.pCompra
+					,codigo: e.codigo
+					,plu: e.plu
+					,image: e.image
+					,stock: e.stock
+					,stockMin: e.stockMin
+					,stockMax: e.stockMax
+					,iva: e.iva
+					,margen: e.margen
+					,tags: e.tags
+				})
+			}
+			const art_rpta = await articulo.updateOne( {_id: artReg._id}, { $set :  artReg  }, { upsert: true });
+			console.log(art_rpta);
+			const del_regs = await producto.deleteMany({articulo: artReg._id, _id: { $nin: prod_ids } })
+			console.log(del_regs);
+			for (let i = 0; i < prod_regs.length; i++) {
+				const e = prod_regs[i];
+				prod_saved.push( await producto.updateOne( {_id: e._id}, { $set :  e  }, { upsert: true }));
+			}
+			const qry = {Articulo: { _id: artReg._id } };
+			const rpta = await readProductos(qry,dataProduct);
+
+			res.status(200).json({ rpta: rpta[0], del_regs, artReg, prod_regs, prod_saved });
+
+		} catch (error) {
+			res.status(403).json({ error });
+		}
+	}
 /*
 	async list(req: Request, res: Response) {
 		try {
@@ -2426,85 +2497,5 @@ class ArticuloControler {
 		}
 	}
 */
-	async updateFullData( req: Request, res: Response ){
-		try {
-			const artReg = {
-				_id: new ObjectID( req.body._id ),
-				fabricante: req.body.fabricante,
-				marca: req.body.marca,
-				rubro: req.body.rubro,
-				linea: req.body.linea,
-				especie: req.body.especie,
-				edad: req.body.edad,
-				raza: req.body.raza,
-				name: req.body.name,
-				d_fabricante: req.body.d_fabricante,
-				d_marca: req.body.d_marca,
-				d_rubro: req.body.d_rubro,
-				d_linea: req.body.d_linea,
-				d_especie: req.body.d_especie,
-				d_edad: req.body.d_edad,
-				d_raza: req.body.d_raza,
-				private_web: req.body.private_web,
-				image: req.body.image,
-				url: req.body.url,
-				iva: req.body.iva,
-				margen: req.body.margen,
-				tags: req.body.tags,
-				formula: req.body.formula,
-				detalles: req.body.detalles,
-				beneficios: req.body.beneficios
-			}
-	
-			const prod_ids = [];
-			const prod_regs = [];
-			const prod_saved = [];
-			for (let i = 0; i < req.body.productos.length; i++) {
-				const e = req.body.productos[i];
-				e._id = new ObjectID(e._id);
-				e.parent = (e.parent === null ? null : new ObjectID(e.parent));
-				prod_ids.push(e._id);
-				prod_regs.push({
-					_id: e._id
-					,articulo: artReg._id
-					,parent: e.parent
-					,name: e.name
-					,contiene: e.contiene
-					,unidad: e.unidad
-					,precio: e.precio
-					,compra: e.compra
-					,reposicion: e.reposicion
-					,pesable: e.pesable
-					,servicio: e.servicio
-					,pVenta: e.pVenta
-					,pCompra: e.pCompra
-					,codigo: e.codigo
-					,plu: e.plu
-					,image: e.image
-					,stock: e.stock
-					,stockMin: e.stockMin
-					,stockMax: e.stockMax
-					,iva: e.iva
-					,margen: e.margen
-					,tags: e.tags
-				})
-			}
-			const art_rpta = await articulo.updateOne( {_id: artReg._id}, { $set :  artReg  }, { upsert: true });
-			console.log(art_rpta);
-			const del_regs = await producto.deleteMany({articulo: artReg._id, _id: { $nin: prod_ids } })
-			console.log(del_regs);
-			for (let i = 0; i < prod_regs.length; i++) {
-				const e = prod_regs[i];
-				prod_saved.push( await producto.updateOne( {_id: e._id}, { $set :  e  }, { upsert: true }));
-			}
-			const qry = {Articulo: { _id: artReg._id } };
-			const rpta = await readProductos(qry,dataProduct);
-
-			res.status(200).json({ rpta: rpta[0], del_regs, artReg, prod_regs, prod_saved });
-
-		} catch (error) {
-			res.status(403).json({ error });
-		}
-	}
 }
 export const articuloCtrl = new ArticuloControler();

@@ -581,6 +581,7 @@ class ProductoControler {
 	}
 
 	config() {
+		this.router.get('/productos/lista', this.lista);
 		this.router.get('/productos/list', this.list);
 
 		this.router.post('/productos/list', this.list);
@@ -624,6 +625,10 @@ class ProductoControler {
 		const readData: any = await productoGetData(qry);
 		res.status(200).json(readData)
 	}
+	async lista(req: Request, res: Response) {
+		const retData = await producto.find();
+		res.status(200).json(retData);
+	}
 
 	async list(req: Request, res: Response) {
 //		const { id } = req.params;
@@ -632,59 +637,9 @@ class ProductoControler {
 		let myMatch: any;
 		let artList: any[] = [];
 
-/*
-		if (qry.searchItem && qry.searchItem.length == 1){
-			myMatch = {
-				'$or': [
-					{ 'codigo': qry.searchItem },
-					{ 'plu': qry.searchItem }
-				]
-			}
-			artList = await producto.find(myMatch);
-		}
-*/
 		const ret:any = await articuloSanitize(qry);
-//		console.log('ret',ret);
 		artList = ret.lista;
-//		artList = await readArticulos({ Articulo: ret.Articulo, Project: {'_id': 1}, Sort: {'_id': 1} });
-/*
-		if (qry.searchItem && qry.searchItem.length == 1){
-			myMatch = {
-				'$or': [
-					{ 'codigo': qry.searchItem },
-					{ 'plu': qry.searchItem }
-				]
-			}
-			artList = await producto.find(myMatch);
-		}
-		if ((myMatch == undefined || artList.length == 0) && qry.searchItem ) {
-			const Articulo = {};
-			const ret:any = articuloSanitizeString(qry.searchItem, qry.Articulo);
-			console.log('ret',ret);
-//			artList = await readArticulos({ Articulo: qry.Articulo, Project: {'_id': 1}, Sort: {'_id': 1} });
-			if(ret){
-				for (let i = 0; i < ret.Articulo.length; i++) {
-					const element = ret.Articulo[i];
-					const List = await readArticulos({ element, Project: {'_id': 1}, Sort: {'_id': 1} });
-					if( List ){
-						artList = artList.concat(artList,List);
-					} else {
-						ret.Extra.push(element);
-					}
-				}
-				if(artList.length === 0 ){
-						artList = await readArticulos({ Articulo: {}, Project: {'_id': 1}, Sort: {'_id': 1} });
-				}
-				if ( ret.Extra.length > 0 )
-				{
-					qry.Extra['$and'] = ret.Extra;
-				}
-			}
-		}
-		console.log('qry.Articulo-productoControler',qry.Articulo)
-	//	console.log('artList-productoControler', artList)
-*/
-		console.log(artList);
+		console.log('ArtList 687',artList);
 		for (let index = 0; index < artList.length; index++) {
 			artList[index] = new ObjectID(artList[index]._id);
 		}
@@ -692,6 +647,13 @@ class ProductoControler {
 			qry.Producto['articulo'] = { '$in': artList };
 			qry.Extra = Object.assign(qry.Extra, ret.Extra);
 		}
+		console.log(qry)
+		/*
+		console.log(qry.Extra['$or'])
+		for (let i = 0; i < qry.Extra['$or'].length; i++) {
+			console.log(qry.Extra['$or'][i]);
+		}
+		*/
 		const readData: any = await productoGetData(qry);
 		res.status(200).json(readData)
 	}

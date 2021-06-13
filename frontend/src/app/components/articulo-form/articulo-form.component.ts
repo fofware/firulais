@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import {ModalDismissReasons, NgbModal, NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import { AuthService } from 'src/app/services/auth.service';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
 import { API_URI } from 'src/app/shared/uris';
 import { ProductoFormAddModalComponent } from '../producto-form-add-modal/producto-form-add-modal.component';
@@ -16,7 +17,7 @@ export class ArticuloFormComponent implements OnInit {
   compareArticulo = {};
   prodList = [];
   unidades = [];
-
+  user: {}
   newFormula: any = {
     name: '',
     showname: false,
@@ -38,6 +39,7 @@ export class ArticuloFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.setProdList();
+    console.log(this.user)
   }
   setProdList(){
     this.compareArticulo = JSON.parse(JSON.stringify(this.selectedArticulo));
@@ -87,7 +89,16 @@ export class ArticuloFormComponent implements OnInit {
     this.selectedArticulo.formula.push(JSON.parse(JSON.stringify(this.newFormula)));
     this.newFormula = {name: '', value: '', show: false}
   }
-
+  addBeneficios(){
+    this.selectedArticulo.beneficios.push(JSON.parse(JSON.stringify(this.newBeneficios)));
+    this.newBeneficios = {name: '', value: '', show: false}
+  }
+  borraBeneficio(idx){
+    this.selectedArticulo.beneficios.splice(idx,1)
+  }
+  borraFormula(idx){
+    this.selectedArticulo.formula.splice(idx,1)
+  }
   checkData(): boolean {
     let equal = (JSON.stringify(this.selectedArticulo) === JSON.stringify(this.compareArticulo));
     console.log("Compara data1", (JSON.stringify(this.selectedArticulo) === JSON.stringify(this.compareArticulo)))

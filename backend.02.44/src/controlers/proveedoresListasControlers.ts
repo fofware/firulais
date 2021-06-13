@@ -11,9 +11,10 @@ class ProveedoresListasControler {
 	}
 
 	config () {
-		this.router.get( '/proveedoreslistas/', this.list );
+		this.router.get( '/proveedoreslistas/list', this.list );
 		this.router.post( '/proveedoreslistas/import', this.import );
 		this.router.post( '/proveedoreslistas/getid', this.provlistaid );
+		this.router.post( '/proveedoreslistas/savelink', this.savelink );
 	}
 
 	public index(req: Request, res: Response) {
@@ -22,8 +23,8 @@ class ProveedoresListasControler {
 
 	async list(req: Request, res: Response) {
 		try {
-      const proveedoresListas = await lista.find();
-      res.json(proveedoresListas);
+      const retData = await lista.find().sort({marca: 1, edad: 1, descripcion: 1});
+      res.status(200).json(retData);
     } catch (error) {
 			return res.status(404).json( error );			
 		}
@@ -44,15 +45,24 @@ class ProveedoresListasControler {
         { $set: req.body }, 
         { upsert: true }    // Options
       );
-/*
+			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
+		} catch (error) {
+			res.status(500).json(error);
+		}
+	}
+  async savelink(req: Request, res: Response){
+    try {
+      if(req.body._id) req.body._id = new ObjectID(req.body._id);
+      if(req.body.id_articulo) req.body.id_articulo = new ObjectID(req.body.id_articulo);
+      if(req.body.id_producto) req.body.id_producto = new ObjectID(req.body.id_producto);
+      if(!(req.body._id)) {
+          return res.status(400).json({msg: 'falta dato requerido', id_proveedor: req.body.id_proveedor, codigo_proveedor: req.body.codigo_proveedor})
+      }
       const newReg = await lista.updateOne(
-								{ id_proveedor: req.body.id_proveedor
-                , codigo_proveedor: req.body.codigo_proveedor
-                },   // Query parameter
-								{ $set: req.body }, 
-								{ upsert: true }    // Options
-							);
-*/
+        { _id: req.body._id },   // Query parameter
+        { $set: req.body }, 
+        { upsert: true }    // Options
+      );
 			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
 		} catch (error) {
 			res.status(500).json(error);

@@ -1,88 +1,23 @@
-<input type="search" id="busca"
-  aria-label="Search"
-  class="form-control mr-sm-2"
-  placeholder="Buscar por Nombre"
-  name="searchItem"
-  (input)="searchArticulos()"
-  [(ngModel)]="searchItem">
-  <span *ngFor="let item of filterButtons">
-      <button *ngIf="item.tipo.search('button')===0"
-        class="btn btn-outline-primary"
-        [hidden]='!item.display'
-        (click)="item.value = (item.value === item.show.length-1 ? 0 : item.value + 1);emitMsg(item)"
-      >
-        <i class="{{item.show[item.value]}}">{{item.text}}</i>
-      </button>
-      <div *ngIf="item.tipo.search('radioButton')===0" class="btn-group btn-group-toggle" data-toggle="buttons">
-        <button *ngFor="let rbitem of item.buttons"
-          class="btn btn-outline-primary"
-          [hidden]='!rbitem.display'
-          (click)="radioItem(item, rbitem)"
-        >
-          <i class="{{rbitem.show[rbitem.value]}}">{{rbitem.text}}</i>
-        </button>
-      </div>
-    </span>
-<!--button *ngIf="setting.perro.display"
-  class="btn btn-outline-primary"
-  (click)="(searchItem.search('perro') ? searchItem='perro' : searchItem='');searchArticulos()"
->
-  <i *ngIf="!searchItem.search('perro')" class="fas fa-dog fa-2x text-white" aria-hidden="true"></i>
-  <i *ngIf="searchItem.search('perro')" class="fas fa-dog fa-2x text-white-50" aria-hidden="true"></i>
-</button>
-<button *ngIf="setting.gato.display" class="btn btn-outline-primary"
-  (click)="(searchItem.search('gato') ? searchItem='gato' : searchItem='');searchArticulos()">
-  <i *ngIf="!searchItem.search('gato')" class="fas fa-cat fa-2x text-white" aria-hidden="true"></i>
-  <i *ngIf="searchItem.search('gato')" class="fas fa-cat fa-2x text-white-50" aria-hidden="true"></i>
-</button>
-<button *ngIf="setting.ave.display" class="btn btn-outline-primary"
-  (click)="(searchItem.search('aves') ? searchItem='aves' : searchItem='');searchArticulos()">
-  <i *ngIf="!searchItem.search('aves')" class="fas fa-dove fa-2x text-white" aria-hidden="true"></i>
-  <i *ngIf="searchItem.search('aves')" class="fas fa-dove fa-2x text-white-50" aria-hidden="true"></i>
-  <i class="fas fa-dove"></i>
-</button>
-<button *ngIf="setting.pez.display" class="btn btn-outline-primary"
-  (click)="(searchItem.search('pez') ? searchItem='pez' : searchItem='');searchArticulos()">
-  <i *ngIf="!searchItem.search('pez')" class="fas fa-fish fa-2x text-white" aria-hidden="true"></i>
-  <i *ngIf="searchItem.search('pez')" class="fas fa-fish fa-2x text-white-50" aria-hidden="true"></i>
-</button>
-<button *ngIf="setting.caballo.display" class="btn btn-outline-primary"
-  (click)="(searchItem.search('caballo') ? searchItem='caballo' : searchItem='');searchArticulos()">
-  <i *ngIf="!searchItem.search('caballo')" class="fas fa-horse-head fa-2x text-white" aria-hidden="true"></i>
-  <i *ngIf="searchItem.search('caballo')" class="fas fa-horse-head fa-2x text-white-50" aria-hidden="true"></i>
-</button-->
-<!--button *ngIf="setting.pesable.display" class="btn btn-outline-primary"
-  (click)="setting.pesable.value=!setting.pesable.value;searchArticulos()">
-  <i *ngIf="setting.pesable.value" class="fa fa-balance-scale fa-2x text-white" aria-hidden="true"></i>
-  <i *ngIf="!setting.pesable.value" class="fa fa-balance-scale fa-2x text-white-50" aria-hidden="true"></i>
-</button>
-<button *ngIf="setting.private_web" class="btn btn-outline-primary"
-  (click)="setting.private_web.value=!setting.private_web.value;searchArticulos()">
-  <i *ngIf="setting.private_web.value" class="fas fa-prescription fa-2x text-white-50" aria-hidden="true"></i>
-  <i *ngIf="!setting.private_web.value" class="fas fa-prescription fa-2x text-white" aria-hidden="true"></i>
-</button>
-<button *ngIf="setting.precio.display" class="btn btn-outline-primary"
-  (click)="setting.precio.value=!setting.precio.value;searchArticulos()">
-  <i *ngIf="setting.precio.value" class="fas fa-file-invoice-dollar fa-2x text-white" aria-hidden="true"></i>
-  <i *ngIf="!setting.precio.value" class="fas fa-file-invoice-dollar fa-2x text-white-50" aria-hidden="true"></i>
-</button>
-<button *ngIf="setting.stock.display" class="btn btn-outline-primary"
-  (click)="setting.stock.value=!setting.stock.value;searchArticulos()">
-  <i *ngIf="setting.stock.value" class="fa fa-shopping-cart fa-2x text-white" aria-hidden="true"></i>
-  <i *ngIf="!setting.stock.value" class="fa fa-shopping-cart fa-2x text-white-50" aria-hidden="true"></i>
-</button>
-<button *ngIf="setting.servicio.display" class="btn btn-outline-primary"
-  (click)="setting.servicio.value=!setting.servicio.value;searchArticulos()">
-  <i *ngIf="setting.servicio.value" class="fa fa-2x text-white" aria-hidden="true">S</i>
-  <i *ngIf="!setting.servicio.value" class="fa fa-2x text-white-50" aria-hidden="true">S</i>
-</button>
-<button *ngIf="setting.pCompra.display" class="btn btn-outline-primary"
-  (click)="setting.pCompra.value=!setting.pCompra.value;searchArticulos()">
-  <i *ngIf="setting.pCompra.value" class="fa fa-2x text-white" aria-hidden="true">C</i>
-  <i *ngIf="!setting.pCompra.value" class="fa fa-2x text-white-50" aria-hidden="true">C</i>
-</button>
-<button *ngIf="setting.pVenta.display" class="btn btn-outline-primary"
-  (click)="setting.pVenta.value=!setting.pVenta.value;searchArticulos()">
-  <i *ngIf="setting.pVenta.value" class="fa fa-2x text-white" aria-hidden="true">V</i>
-  <i *ngIf="!setting.pVenta.value" class="fa fa-2x text-white-50" aria-hidden="true">V</i>
-</button-->
+<input type="search" id="busca" aria-label="Search" class="form-control mr-sm-2" placeholder="Buscar por Nombre"
+  name="searchItem" (input)="searchArticulos()" [(ngModel)]="searchItem">
+<span style="width: 128px;">
+  <select name="compareOp" class="form-control" [(ngModel)]="cmp.op" (change)='cambioCmp()'>
+    <option value='$gte'>&gt;=</option>
+    <option value='$eq'>=</option>
+    <option value='$lte'>&lt;=</option>
+  </select>
+  <input type="text" id="compareValue" class="form-control" style="width: 60px;" placeholder="valor"
+    name="compareValue" [(ngModel)]="cmp.value" (change)='cambioCmp()'>
+</span>
+<span *ngFor="let item of filterButtons">
+  <button *ngIf="item.tipo.search('button')===0" class="btn btn-outline-primary" [hidden]='!item.display'
+    (click)="item.value = (item.value === item.show.length-1 ? 0 : item.value + 1);emitMsg(item)">
+    <i class="{{item.show[item.value]}}">{{item.text}}</i>
+  </button>
+  <div *ngIf="item.tipo.search('radioButton')===0" class="btn-group btn-group-toggle" data-toggle="buttons">
+    <button *ngFor="let rbitem of item.buttons" class="btn btn-outline-primary" [hidden]='!rbitem.display'
+      (click)="radioItem(item, rbitem)">
+      <i class="{{rbitem.show[rbitem.value]}}">{{rbitem.text}}</i>
+    </button>
+  </div>
+</span>

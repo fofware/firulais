@@ -1,13 +1,21 @@
-<div class="sticky-top">
+<div class="sticky-top print-oculta">
   <app-top-menu></app-top-menu>
   <app-articulo-card-select-header [filterButtons]='filterButtons' [searchItem]='searchItem'
     [order]='articuloOrder' [listaOrden]='listaOrden' (onButtonMsg)='buttonMsg($event)'
     (onCardSelectHeaderEvent)='filterEvent($event)' (onNewRegEvent)='newReg($event)'>
   </app-articulo-card-select-header>
 </div>
-<div class="card-container">
-  <div *ngFor="let articulo of articuloList; index as i;" class="card">
-    <app-articulo-card-view-uno [articulo]='articulo' [idx]=i [publico]='publico'
-      (onSelectArticulo)='SelectEvent($event)'></app-articulo-card-view-uno>
-  </div>
+<div class="container">
+<table>
+  <tr *ngFor="let articulo of articuloList; index as i;">
+    <td  class="card">
+    <app-articulo-card-view-uno
+      [articulo]='articulo'
+      [idx]=i
+      [publico]='publico'
+      (onSelectArticulo)='SelectEvent($event)'
+    ></app-articulo-card-view-uno>
+    </td>
+  </tr>
+</table>
 </div>

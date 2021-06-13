@@ -6,10 +6,8 @@
     <option value=""></option>
     <option *ngFor="let val of dbPersonas"  value="{{val._id}}" >{{val.apellido}}{{val.nombre}}</option>
   </select>
-<app-personas-autocomplete
-    [dbList]='dbPersonas'
-    [model]='proveedor'
-  ></app-personas-autocomplete>
+<app-producto-autocomplete
+></app-producto-autocomplete>
 </header>
 <div id='main' (window:resize)="onResize($event)">
   <article>

@@ -1,21 +1,21 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { round } from 'src/app/shared/toolbox';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 
 @Component({
-  selector: 'app-articulo-card-view-uno',
-  templateUrl: './articulo-card-view-uno.component.html',
-  styleUrls: ['./articulo-card-view-uno.component.css']
+  selector: 'app-articulo-card-view-dos',
+  templateUrl: './articulo-card-view-dos.component.html',
+  styleUrls: ['./articulo-card-view-dos.component.css']
 })
-export class ArticuloCardViewUnoComponent implements OnInit, OnChanges {
-
+export class ArticuloCardViewDosComponent implements OnInit {
+  @Input() stage: any;
   @Input() articulo: any;
-  @Input() cmpTipo: any;
-  @Input() publico: any;
   @Input() idx: number;
-  @Output() onSelectArticulo = new EventEmitter<object>();
+  @Input() selected: any;
+  @Output() onSetArticulo = new EventEmitter<object>();
+  @Output() onSetProducto = new EventEmitter<object>();
   productos = []
 
   constructor() { }
+
   ngOnInit(): void {
     this.productos = JSON.parse(JSON.stringify(this.articulo.productos));
 
@@ -35,7 +35,7 @@ export class ArticuloCardViewUnoComponent implements OnInit, OnChanges {
         this.productos[i].showCompra = Math.round(e.compra/e.contiene);
       }
       const recargo = (e.margen+100)*.01;
-      this.productos[i].lista = Math.ceil(Math.ceil((e.compra || this.productos[i].showCompra)*recargo)*1.07);
+      this.productos[i].lista = Math.ceil((e.compra || this.productos[i].showCompra)*recargo*1.07);
       if(e.psable === true){
         this.productos[i].showPrecio = Math.ceil( ((e.compra || this.productos[i].showCompra)*recargo));
       } else {
@@ -53,18 +53,14 @@ export class ArticuloCardViewUnoComponent implements OnInit, OnChanges {
     }
 */
   }
-
-
   opLink(url: string): void {
     const myWin = window.open(url, 'myWindow');
     event.stopPropagation();
   }
-  round(valor: number ): number {
-    return round( valor, 2);
+  setArticulo(articulo){
+    this.onSetArticulo.emit(articulo)
   }
-
-  editdata(){
-    console.log(this.articulo);
-    this.onSelectArticulo.emit({idx: this.idx, articulo: this.articulo})
+  setProducto(producto){
+    this.onSetProducto.emit(producto)
   }
 }

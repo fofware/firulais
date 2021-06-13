@@ -11,6 +11,9 @@ export class ListasArtProdService {
 
   constructor(private http: HttpClient) { }
 
+  list(): Promise<any>{
+    return this.http.get(`${API_URI}/proveedoreslistas/list`).toPromise();
+  }
   getData(srv: string, params: any): Promise<any> {
     return this.http.get( srv, params ).toPromise();
   }
@@ -21,6 +24,10 @@ export class ListasArtProdService {
 
   saveData(srv: string, params: any): Promise<object> {
     return this.http.post( srv, params).toPromise();
+  }
+
+  savelink(data:any): Promise<object>{
+    return this.http.post(`${API_URI}/proveedoreslistas/savelink`, data ).toPromise();
   }
 
   import(data: any): Promise<object>{

@@ -6,8 +6,8 @@
       [filterButtons]='filterButtons'
       (onSearchArticulos)='Prod_filterEvent($event)'
       (onButtonMsg)='buttonMsg($event)'
-    >
-    </app-articulo-card-select-filter>
+      (onContieneMsg)='contieneMsg($event)'
+    ></app-articulo-card-select-filter>
     <app-articulo-card-select-order
       [order]="articuloOrder"
       [listaOrden]='listaOrden'
@@ -16,12 +16,10 @@
     <app-articulo-pago-select
       [fpago] = 'fpago'
       (onPagoChange)='cambiaPrecio($event)'
-    >
-    </app-articulo-pago-select>
+    ></app-articulo-pago-select>
     <!--app-articulo-card-select-tools class="float-left"
       (onNewRegEvent)='newReg($event)'
-    >
-    </app-articulo-card-select-tools-->
+    ></app-articulo-card-select-tools-->
   </form>
 
   <!--app-articulo-card-select-header

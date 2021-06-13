@@ -13,10 +13,11 @@ export class ArticuloCardSelectFilterComponent implements OnInit {
   @Input() setting: any;
   @Input() filterButtons: any;
   @Input() searchItem: string;
-  // tslint:disable-next-line:no-output-on-prefix
+  @Output() onContieneMsg = new EventEmitter<object>();
   @Output() onSearchArticulos = new EventEmitter<object>();
   @Output() onButtonMsg = new EventEmitter<object>();
 
+  cmp: { op: string, value: number } = {op: '$gte', value: 0 };
 
   constructor(private http: HttpClient) { }
 
@@ -40,9 +41,9 @@ export class ArticuloCardSelectFilterComponent implements OnInit {
   radioItem( parent:any, item:any ){
     const array = parent.buttons;
     item.value = (item.value === item.show.length-1 ? 0 : item.value + 1);
-console.log(this.filterButtons);
-console.log(parent);
-console.log(item);
+    console.log(this.filterButtons);
+    console.log(parent);
+    console.log(item);
     if(item.value > 0){
       for (let i = 0; i < array.length; i++) {
         const element = array[i];
@@ -52,5 +53,11 @@ console.log(item);
 
     }
     this.emitMsg(this.filterButtons);
+  }
+  cambioCmp(){
+    console.log(this.cmp);
+    const contiene = {}
+    contiene[this.cmp.op] = Number(this.cmp.value);
+    this.onContieneMsg.emit( contiene );
   }
 }

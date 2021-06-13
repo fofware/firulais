@@ -38,7 +38,7 @@
       <i class="fas fa-box fa-1x" aria-hidden="true" [hidden]="!(articulo.count_ins === 0)"></i>
       &nbsp;Stock: {{articulo.stock}}
     </div>
-    <div>{{(idx%8)}}/asdfasd</div>
+    <!--div>{{(idx%8)}}/asdfasd</div-->
     <div *ngIf="articulo.costo">{{articulo.costo}}</div>
     <div>${{articulo.precioref}}/{{articulo.unidad || articulo.sname}}</div>
   </div>

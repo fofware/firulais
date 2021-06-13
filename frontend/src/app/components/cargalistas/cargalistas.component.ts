@@ -936,10 +936,11 @@ export class CargalistasComponent implements OnInit, OnChanges {
     for (let i = 0; i < this.data.length; i++) {
 //      const e = this.setReg(i);
       const e = this.data[i];
+      if(!e['codigo_proveedor'] || e['codigo_proveedor']=== null) e['codigo_proveedor'] = '';
       e['codigo_proveedor'] = e['codigo_proveedor'] + '';
       if (e['codigo_proveedor'] === '') {
-        const descripcion = e['descripcion'].replace(/ +/g, '');
-        e['codigo_proveedor'] = descripcion;
+        const descripcion = e['descripcion'].replace(/ /g, '');
+        e['codigo_proveedor'] = descripcion.toLowerCase();
         e['codigo_proveedor'] += e['bulto'] + '';
         e['codigo_proveedor'] += e['contiene'] + '';
       }
