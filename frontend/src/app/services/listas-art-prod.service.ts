@@ -18,7 +18,7 @@ export class ListasArtProdService {
     return this.http.get( srv, params ).toPromise();
   }
 
-  readData(srv: string, params: any): Promise<any> | Observable<any> {
+  readData(srv: string, params: any): Promise<any> {
     return this.http.post( srv, params ).toPromise();
   }
 

@@ -1068,7 +1068,7 @@ export const dataProduct =
 
 					{
 						$project: {
-							_id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: { $toString: '$contiene' },
+							_id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, image: 1, strContiene: { $toString: '$contiene' }
 						}
 						//$project: { name: 1, contiene: 1, unidad: 1, _id: 0 } 
 					}
