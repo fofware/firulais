@@ -7,20 +7,20 @@
     [listaOrden]='listaOrden'
     (onButtonMsg)='buttonMsg($event)'
     (onCardSelectHeaderEvent)='filterEvent($event)'
-    (onNewRegEvent)='newReg($event)'>
+    >
   </app-articulo-card-select-header>
 </div>
 <div class="container">
-<table>
-  <tr *ngFor="let articulo of articuloList; index as i;">
-    <td  class="card">
-    <app-articulo-card-view-uno
-      [articulo]='articulo'
-      [idx]=i
-      [publico]='publico'
-      (onSelectArticulo)='SelectEvent($event)'
-    ></app-articulo-card-view-uno>
-    </td>
-  </tr>
-</table>
+  <table>
+    <tr *ngFor="let articulo of articuloList; index as i;">
+      <td  class="card">
+        <app-articulo-card-view-guest
+          [articulo]='articulo'
+          [idx]=i
+          [publico]='publico'
+          (onSelectArticulo)='SelectEvent($event)'
+        ></app-articulo-card-view-guest>
+      </td>
+    </tr>
+  </table>
 </div>

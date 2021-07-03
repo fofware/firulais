@@ -31,6 +31,6 @@ RUN rm -R src
 
 RUN rm -R *.json
 
-EXPOSE 4400
+#EXPOSE 4400
 
 CMD ["node", "dist/index.js"]

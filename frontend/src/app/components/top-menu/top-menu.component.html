@@ -19,11 +19,14 @@
           <a class="nav-link" routerLink="/inicio"  routerLinkActive="active" (click)='isMenuCollapsed = true'>Inicio</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" routerLink="/articulosprecios" routerLinkActive="active" (click)='isMenuCollapsed = true'>Precios</a>
+        </li>
+        <!--li class="nav-item">
           <a class="nav-link" routerLink="/articuloslist" routerLinkActive="active" (click)='isMenuCollapsed = true'>Artículos</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" routerLink="/productlist" routerLinkActive="active" (click)='isMenuCollapsed = true'>Productos</a>
-        </li>
+        </li-->
         <li class="nav-item">
           <ng-container *ngIf="user.exp">
             <a class="nav-link" routerLink="/private/menu" routerLinkActive="active" (click)='isMenuCollapsed = true'><i class="fa fa-th" aria-hidden="true"></i> &nbsp; Más Aplicaciones</a>
@@ -33,21 +36,21 @@
       <ul class="navbar-nav ml-auto">
         <ng-container *ngIf="!user.exp; else showLogout">
           <li class="nav-item">
-            <a class="nav-link" routerLink="/signin" routerLinkActive="active" (click)='isMenuCollapsed = true'>Ingresar</a>
+            <a class="nav-link" routerLink="/auth/signin" routerLinkActive="active" (click)='isMenuCollapsed = true'>Ingresar</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="/signup" routerLinkActive="active" (click)='isMenuCollapsed = true'>Registrarse</a>
+            <a class="nav-link" routerLink="/auth/signup" routerLinkActive="active" (click)='isMenuCollapsed = true'>Registrarse</a>
           </li>
         </ng-container>
         <ng-template #showLogout >
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {{user.nickname}}
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-              <a class="dropdown-item" routeLink="#"  routerLinkActive="active"  (click)='isMenuCollapsed = true'>Perfil</a>
+          <li ngbDropdown class="nav-item">
+            <a href (click)="false" class="nav-link" ngbDropdownToggle>{{user.nickname}}</a>
+            <div ngbDropdownMenu>
+              <button ngbDropdownItem>Perfil</button>
+              <button ngbDropdownItem>Another action</button>
+              <button ngbDropdownItem>Something else here</button>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item" style="cursor: pointer" routerLinkActive="active" (click)="isMenuCollapsed = true;authService.logout()" >Logout</a>
+              <button ngbDropdownItem (click)="isMenuCollapsed = true;authService.logout()">Cerrar Sesión</button>
             </div>
           </li>
         </ng-template>

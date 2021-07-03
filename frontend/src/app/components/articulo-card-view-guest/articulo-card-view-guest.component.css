@@ -1,0 +1,150 @@
+:host {
+  position: relative;
+
+/*
+  border: 1px solid orange;
+  text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+*/
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+  display: -webkit-flex;
+  display:         flex;
+  -webkit-flex-flow: row;
+          flex-flow: row;
+}
+
+:host > article {
+  position: relative;
+/*
+  margin: 1rem;
+*/
+  margin: 0px;
+  padding: 0px;
+  -webkit-flex: 3 1 100%;
+  flex: 3 1 100%;
+  -webkit-order: 2;
+  order: 2;
+  overflow: none;
+  -webkit-border-radius: 7pt;
+  -moz-border-radius: 7pt;
+  -ms-border-radius: 7pt;
+  -o-border-radius: 7pt;
+}
+
+article .control {
+  position: absolute;
+  top: .1rem;
+  right: .1rem;
+/*
+  border: 1px solid brown;
+*/
+}
+:host > nav {
+  margin: 0px;
+  padding: 0px;
+  -webkit-flex: 1 6 30%;
+  flex: 1 6 30%;
+  -webkit-order: 1;
+  order: 1;
+  max-width: 200px;
+  position: relative;
+  -webkit-border-radius:;
+  -moz-border-radius:;
+  -ms-border-radius:;
+  -o-border-radius:;
+}
+
+:host > aside {
+  margin: 0px;
+  padding: 0px;
+  min-width: 235px;
+  border-radius: 7pt;
+  -webkit-flex: 1 6 40%;
+          flex: 1 6 40%;
+  -webkit-order: 3;
+          order: 3;
+  overflow: auto;
+}
+
+.imgbox {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+  .textbox {
+    max-width: 370px;
+    height: 200px;
+  }
+  .caja-img {
+/*
+    height: 100%;
+*/
+    max-height: 100%;
+    max-width: 200px;
+  }
+  .center {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+  }
+
+  .stock {
+    position: absolute;
+    top: 0px;
+    left: 16px;
+    z-index: 10;
+  }
+  .pesable {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 10;
+  }
+  .nombre {
+    position: relative;
+    font-weight: bolder;
+    min-width: 370px;
+    padding-right: 60px;
+  }
+  .precio{
+    position: absolute;
+    right: 10px;
+    bottom: 1rem;
+  }
+  .valor2{
+    position: absolute;
+    right: 5px;
+    top: 1rem;
+  }
+  .valor3{
+    position: absolute;
+    right: 5px;
+    top: 2rem;
+  }
+  .valor4{
+    position: absolute;
+    right: 11px;
+    bottom: -.25rem;
+  }
+  .cajaUrl{
+    position: absolute;
+    right: 5px;
+    bottom: 2px;
+    z-index: 100;
+  }
+  .print-oculta{
+    display: unset;
+  }
+
+@media print {
+  .print-oculta{
+    display: none;
+  }
+}

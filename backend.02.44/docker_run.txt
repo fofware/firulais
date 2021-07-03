@@ -1,0 +1,4 @@
+creacion:
+docker build -t fofware/furulais_backend:v0 .
+
+docker run -t backend:v2 \

@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ApitoapiComponent } from './components/apitoapi/apitoapi.component';
 import { ArticulosListComponent } from './components/articulos-list/articulos-list.component';
+import { ArticulosPreciosComponent } from './components/articulos-precios/articulos-precios.component';
 import { CargalistasComponent } from './components/cargalistas/cargalistas.component';
 import { HomeComponent } from './components/home/home.component';
 import { ImportDataComponent } from './components/import-data/import-data.component';
@@ -23,11 +24,11 @@ const routes: Routes = [
     , component: HomeComponent
   },
   {
-    path: 'signup'
+    path: 'auth/signup'
     , component: SignupComponent
   },
   {
-    path: 'signin'
+    path: 'auth/signin'
     , component: SigninComponent
   },
   {
@@ -48,6 +49,11 @@ const routes: Routes = [
   {
     path: 'articuloslist'
     , component: ArticulosListComponent
+//    , canActivate: [AuthGuard]
+  }
+  , {
+    path: 'articulosprecios'
+    , component: ArticulosPreciosComponent
 //    , canActivate: [AuthGuard]
   }
   , {

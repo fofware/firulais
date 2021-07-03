@@ -1,7 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ArticuloCardSelectComponent } from './components/articulo-card-select/articulo-card-select.component';
@@ -47,6 +46,8 @@ import { PersonasAutocompleteComponent } from './components/personas-autocomplet
 import { ProductoAutocompleteComponent } from './components/producto-autocomplete/producto-autocomplete.component';
 import { ProductoLinkComponent } from './components/producto-link/producto-link.component';
 import { ArticuloCardViewDosComponent } from './components/articulo-card-view-dos/articulo-card-view-dos.component';
+import { ArticulosPreciosComponent } from './components/articulos-precios/articulos-precios.component';
+import { ArticuloCardViewGuestComponent } from './components/articulo-card-view-guest/articulo-card-view-guest.component';
 
 @NgModule({
   declarations: [
@@ -88,8 +89,9 @@ import { ArticuloCardViewDosComponent } from './components/articulo-card-view-do
     PersonasAutocompleteComponent,
     ProductoAutocompleteComponent,
     ProductoLinkComponent,
-    ArticuloCardViewDosComponent
-
+    ArticuloCardViewDosComponent,
+    ArticulosPreciosComponent,
+    ArticuloCardViewGuestComponent,
   ],
   imports: [
     BrowserModule,

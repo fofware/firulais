@@ -19,18 +19,4 @@ export class TopMenuComponent implements OnInit { // , AfterViewInit, AfterViewC
   ngOnInit(): void {
     console.log('Top-Menu-OnInit');
   }
-/*
-  ngAfterViewInit(): void {
-    console.log('Top-Menu-AfterViewInit');
-  }
-  ngAfterViewChecked(): void {
-    console.log('Top-Menu-AfterViewChecked');
-  }
-  ngAfterContentInit(): void {
-    console.log('Top-Menu-AfterContentInit');
-  }
-  ngAfterContentChecked(): void {
-    console.log('Top-Menu-AfterContentChecked');
-  }
-*/
 }

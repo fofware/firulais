@@ -1,0 +1,76 @@
+<article class="px-3">
+  <div class="d-flex flex-row justify-content-between">
+    <h4 class="nombre">
+      <span *ngIf="articulo.d_fabricante">{{articulo.fabricante}} </span>
+      <span *ngIf="articulo.d_marca">{{articulo.marca}} </span>
+      <span *ngIf="articulo.d_especie">{{articulo.especie}} </span>
+      <span *ngIf="articulo.d_edad">{{articulo.edad}} </span>
+      <span>{{articulo.name}} </span>
+      <span *ngIf="articulo.d_raza">{{articulo.raza}} </span>
+      <span *ngIf="articulo.d_rubro">{{articulo.rubro}} </span>
+      <span *ngIf="articulo.d_linea">{{articulo.linea}} </span>
+    </h4>
+    <div class="d-flex flex-row print-oculta">
+      <div class="block" style="width: max-content;">
+        <!--button class="btn btn-outline-primary"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-outline-danger"><i class="fas fa-trash-alt"></i></button-->
+      </div>
+    </div>
+  </div>
+  <div class="p-0 w-100 bd-highlight">
+    <div class="detalles">
+      <ul>
+        <li *ngFor="let detail of articulo.formula;" [hidden]='!detail.show && !detail.showname'>
+          <span [hidden]='!detail.showname'>{{detail.name}}:</span><span [hidden]='!detail.showvalue'> {{detail.value}}</span>
+        </li>
+        <li *ngFor="let detail of articulo.beneficios;" [hidden]='!detail.showvalue && !detail.showname'>
+          <span [hidden]='!detail.showname'>{{detail.name}}</span><span [hidden]='!(detail.showvalue && detail.showname)'>:</span> <span [hidden]='!detail.showvalue'> {{detail.value}}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <table class="table-bordered w-100">
+    <thead>
+      <td *ngIf="!articulo.image"><strong>Picture</strong></td>
+      <td  align="center"><strong>Código</strong></td>
+      <td  align="center"><strong>Presentación</strong></td>
+      <td width='35px' align="right"><strong>Stock</strong></td>
+      <!--td width='80px' align="right"><strong>Compra</strong></td-->
+      <!--td width='80px' align="right"><strong>Reposición</strong></td>
+      <td width='80px' align="right"><strong>Pre/Un</strong></td>
+      <td width='80px' align="right"><strong>% Mgen</strong></td-->
+      <td width='80px' align="right"><strong>Lista</strong></td>
+      <td width='80px' align="right"><strong>Efectivo</strong></td>
+      <!--td width='80px' align="right"><strong>Reventa</strong></td>
+      <td width='80px' align="right"><strong>Reventa1</strong></td-->
+    </thead>
+    <tbody>
+      <tr *ngFor="let producto of productos; index as i;">
+        <td *ngIf="!articulo.image" align='center'><img src="{{producto.image}}" alt="" style="height: 60px; width: auto;"> </td>
+        <td width='35px' align="right">{{producto.codigo}}</td>
+        <td >{{producto.name}} {{producto.strContiene}}
+          {{producto.unidad}} {{producto.sname}}
+          {{producto.sStrContiene}} {{producto.sunidad}}</td>
+        <td width='35px' align="right">{{ producto.showStock }}</td>
+        <!--td width='80px' align="right">{{producto.compra || producto.showCompra }}</td-->
+        <!--td width='80px' align="right">{{producto.reposicion}}</td>
+        <td width='80px' align="right">{{producto.precioxunidad}}/{{producto.unidad}}</td>
+        <td width='80px' align="right">{{producto.margen}}%</td-->
+        <td width='80px' align="right">{{producto.lista}}</td>
+        <td width='80px' align="right">{{producto.showPrecio}}</td>
+        <!--td width='80px' align="right">{{producto.reventa}}</td>
+        <td width='80px' align="right">{{producto.reventa1}}</td-->
+      </tr>
+    </tbody>
+  </table>
+</article>
+<nav [hidden]="!articulo.image">
+  <i class="pesable fa fa-balance-scale fa-fw fa-2x" aria-hidden="true" [hidden]="!articulo.pesable"></i>
+  <div class="imgbox">
+    <img class="caja-img" src="{{articulo.image}}" alt="">
+  </div>
+  <a class="cajaUrl btn btn-link" href="{{articulo.url}}" target='_blanck'
+    [hidden]="!articulo.url || articulo.url == ''">
+    <i class="fas fa-info-circle" (click)="opLink(articulo.url)"></i>
+  </a>
+</nav>
