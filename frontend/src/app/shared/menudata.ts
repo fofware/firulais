@@ -140,7 +140,16 @@ export const menudata = [
           permiso: 'moderator',
           target: '',
           rel: 'noopener',
-          route: '/articulos',
+          route: '/articuloslist',
+          param: ''
+        },
+        {
+          title: 'Productos',
+          icon: 'fas fa-barcode fa-3x',
+          permiso: 'moderator',
+          target: '',
+          rel: 'noopener',
+          route: '/productlist',
           param: ''
         },
         {

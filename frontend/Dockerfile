@@ -6,10 +6,11 @@ FROM nginx:1.20.1
 
 RUN apt-get update \
     && apt-get install -y cron bash wget certbot \
-    && mkdir -p /webroots /scripts
+    && mkdir -p /webroots/images /scripts
 
 # /webroots/DOMAIN.TLD/.well-known/... files go here
 VOLUME /webroots
+
 # This handles book-keeping files for Letsencrypt
 VOLUME /etc/letsencrypt
 # This lets folks inject Nginx config files
@@ -46,7 +47,16 @@ COPY ./conf.d/admin* /etc/nginx/conf.d/
 #COPY ./dist/frontend/assets/images /webroots/images
 #COPY ./dist/frontend/assets/font* /webroots/admin.firulais.net.ar/assets/
 #COPY ./dist/frontend/assets/js /webroots/admin.firulais.net.ar/assets/
-COPY ./dist/frontend /webroots/admin.firulais.net.ar
+#COPY ./dist/frontend/*.txt /webroots/admin.firulais.net.ar/
+#COPY ./dist/frontend/*.ico /webroots/admin.firulais.net.ar/
+#COPY ./dist/frontend/*.css /webroots/admin.firulais.net.ar/
+#COPY ./dist/frontend/*.html /webroots/admin.firulais.net.ar/
+#COPY ./dist/frontend/*.js /webroots/admin.firulais.net.ar/
+#COPY ./dist/frontend/assets/font* /webroots/admin.firulais.net.ar/assets/
+#COPY ./dist/frontend/assets/js/* /webroots/admin.firulais.net.ar/assets/js/
+#COPY ./dist/frontend/assets/images/* /webroots/images/*
+COPY ./dist/frontend/ /webroots/admin.firulais.net.ar/
+
 
 ## Run both nginx and cron together
 #CMD [ "sh", "-c", "cron && nginx -g 'daemon off;'" ]

@@ -1,3 +1,4 @@
+<div [class.isPrinting]="printService.isPrinting">
 <div class="sticky-top print-oculta">
   <app-top-menu></app-top-menu>
   <app-articulo-card-select-header
@@ -9,6 +10,7 @@
     (onCardSelectHeaderEvent)='filterEvent($event)'
     >
   </app-articulo-card-select-header>
+  <button (click)="imprimir()"><i class="fas fa-print"></i></button>
 </div>
 <div class="container">
   <table>
@@ -23,4 +25,5 @@
       </td>
     </tr>
   </table>
+</div>
 </div>

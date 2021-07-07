@@ -1,6 +1,13 @@
+<div [class.isPrinting]="printService.isPrinting">
 <div class="productos-header sticky-top">
   <app-top-menu></app-top-menu>
   <form class="form-inline bg-dark p-1">
+    <span style="width: 140px;">
+      <app-producto-card-select-peso
+        (onContineMsg)="contieneMsg($event)">
+      </app-producto-card-select-peso>
+    </span>
+
     <app-articulo-card-select-filter
       [searchItem]='searchItem'
       [filterButtons]='filterButtons'
@@ -20,17 +27,10 @@
     <!--app-articulo-card-select-tools class="float-left"
       (onNewRegEvent)='newReg($event)'
     ></app-articulo-card-select-tools-->
+    <button (click)="imprimir()"><i class="fas fa-print"></i></button>
+
   </form>
 
-  <!--app-articulo-card-select-header
-    [filterButtons]='filterButtons'
-    [searchItem]='searchItem'
-    [order]='articuloOrder'
-    [listaOrden]='listaOrden'
-    (onCardSelectHeaderEvent)='Prod_filterEvent($event)'
-    (onNewRegEvent)='newReg($event)'
-    (onButtonMsg)='buttonMsg($event)'
-  ></app-articulo-card-select-header-->
 </div>
 <div class="card-container">
   <app-prod-card-view-dos
@@ -42,4 +42,5 @@
     [showStock]='showStock'
     (click)="selected(articulo)"
   ></app-prod-card-view-dos>
+</div>
 </div>

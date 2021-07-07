@@ -48,6 +48,10 @@ import { ProductoLinkComponent } from './components/producto-link/producto-link.
 import { ArticuloCardViewDosComponent } from './components/articulo-card-view-dos/articulo-card-view-dos.component';
 import { ArticulosPreciosComponent } from './components/articulos-precios/articulos-precios.component';
 import { ArticuloCardViewGuestComponent } from './components/articulo-card-view-guest/articulo-card-view-guest.component';
+import { ProductoCardSelectPesoComponent } from './components/producto-card-select-peso/producto-card-select-peso.component';
+import { PrintLayoutComponent } from './components/print-layout/print-layout.component';
+import { ArticulosPreciosPrintComponent } from './components/articulos-precios-print/articulos-precios-print.component';
+import { ProductListPrintComponent } from './components/product-list-print/product-list-print.component';
 
 @NgModule({
   declarations: [
@@ -92,6 +96,10 @@ import { ArticuloCardViewGuestComponent } from './components/articulo-card-view-
     ArticuloCardViewDosComponent,
     ArticulosPreciosComponent,
     ArticuloCardViewGuestComponent,
+    ProductoCardSelectPesoComponent,
+    PrintLayoutComponent,
+    ArticulosPreciosPrintComponent,
+    ProductListPrintComponent,
   ],
   imports: [
     BrowserModule,

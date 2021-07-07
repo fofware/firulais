@@ -3,6 +3,7 @@ import { Component, OnChanges, OnInit } from '@angular/core';
 import { regExpEscape } from '@ng-bootstrap/ng-bootstrap/util/util';
 import { Observable } from 'rxjs';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
+import { PrintService } from 'src/app/services/print.service';
 import { tpLista } from 'src/app/shared/toolbox';
 import { API_URI } from 'src/app/shared/uris';
 
@@ -259,7 +260,8 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
 
   constructor(
     private http: HttpClient,
-    private list: ListasArtProdService
+    private list: ListasArtProdService,
+    public printService: PrintService
   ) {}
 
   ngOnInit(): void {
@@ -370,6 +372,14 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
         e.precioToShow = Math.ceil(e.calc_precio * this.fpagoCoef);
       }
     }
+  }
+  imprimir(){
+    const lsId = Date.now().toString();
+    console.log(lsId);
+    localStorage.setItem( lsId, JSON.stringify(this.articuloList));
+
+    this.printService.printDocument('productlistprint', [lsId] );
+
   }
   async searchProductos() {
     if (this.wait) { return; }

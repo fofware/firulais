@@ -1,0 +1,26 @@
+<div class="container-fluid">
+  <table cellspacing='0' cellpadding='0' >
+    <tr *ngFor="let list of articuloList;">
+      <td *ngFor="let articulo of list; index as i;">
+        <app-prod-card-view-dos
+          class="col-12 no-gutters"
+          [articulo]='articulo'
+          [idx]='i'
+          cmpTipo='venta'
+          [showStock]='showStock'
+        ></app-prod-card-view-dos>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!--div class="card-container">
+  <app-prod-card-view-dos
+    class="col-6"
+    *ngFor="let articulo of articuloList; index as i;"
+    [articulo]='articulo'
+    [idx]='i'
+    cmpTipo='venta'
+    [showStock]='showStock'
+  ></app-prod-card-view-dos>
+</div-->

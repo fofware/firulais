@@ -1,6 +1,6 @@
 <input type="search" id="busca" aria-label="Search" class="form-control mr-sm-2" placeholder="Buscar por Nombre"
   name="searchItem" (input)="searchArticulos()" [(ngModel)]="searchItem">
-<span style="width: 128px;">
+<!--span style="width: 128px;">
   <select name="compareOp" class="form-control" [(ngModel)]="cmp.op" (change)='cambioCmp()'>
     <option value='$gte'>&gt;=</option>
     <option value='$eq'>=</option>
@@ -8,7 +8,7 @@
   </select>
   <input type="text" id="compareValue" class="form-control" style="width: 60px;" placeholder="valor"
     name="compareValue" [(ngModel)]="cmp.value" (change)='cambioCmp()'>
-</span>
+</span-->
 <span *ngFor="let item of filterButtons">
   <button *ngIf="item.tipo.search('button')===0" class="btn btn-outline-primary" [hidden]='!item.display'
     (click)="item.value = (item.value === item.show.length-1 ? 0 : item.value + 1);emitMsg(item)">

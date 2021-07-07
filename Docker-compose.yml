@@ -37,6 +37,5 @@ services:
     restart: always
     ports:
       - 80:80
-    #volumes:
-    #  - /data/etc/nginx/ /etc/nginx/
-    #  - /Users/Fabian/Documents/negocio/firulais/frontend/conf.d/ /etc/nginx/conf.d/
+    volumes:
+      - /C/Users/Fabian/Documents/negocio/firulais/frontend/src/assets/images:/webroots/admin.firulais.net.ar/assets/images

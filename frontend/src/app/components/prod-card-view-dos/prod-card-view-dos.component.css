@@ -95,9 +95,11 @@
   display: none;
 }
 
+/*
 @media print {
   .card {
     width: 48%;
     display: block;
   }
 }
+*/

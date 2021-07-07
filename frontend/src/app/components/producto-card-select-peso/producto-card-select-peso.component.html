@@ -1,0 +1,11 @@
+<select name="compareOp" class="form-control"
+  [(ngModel)]="cmp.op"
+  (change)='cambioCmp()'>
+  <option value='$gte'>&gt;=</option>
+  <option value='$eq'>=</option>
+  <option value='$lte'>&lt;=</option>
+</select>
+<input type="text" id="compareValue" class="form-control" style="width: 60px;" placeholder="valor"
+  name="compareValue"
+  [(ngModel)]="cmp.value"
+  (change)='cambioCmp()'>

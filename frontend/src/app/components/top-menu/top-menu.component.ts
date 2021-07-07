@@ -6,6 +6,7 @@ import { AuthService } from 'src/app/services/auth.service';
   templateUrl: './top-menu.component.html',
   styleUrls: ['./top-menu.component.css']
 })
+
 export class TopMenuComponent implements OnInit { // , AfterViewInit, AfterViewChecked, AfterContentChecked, AfterContentInit
 
   user: any;

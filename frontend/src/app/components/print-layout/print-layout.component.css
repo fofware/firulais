@@ -1,0 +1,10 @@
+.header, .header-space { height: 100px; }
+.footer, .footer-space { height: 25px; }
+.header { position: fixed; top: 0; width: 100%; z-index: 20; border: 1px solid blue}
+.footer { position: fixed; bottom: 0; width: 100%; }
+
+@media screen {
+  :host {
+    display: none;
+  }
+}

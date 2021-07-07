@@ -13,11 +13,9 @@ export class ArticuloCardSelectFilterComponent implements OnInit {
   @Input() setting: any;
   @Input() filterButtons: any;
   @Input() searchItem: string;
-  @Output() onContieneMsg = new EventEmitter<object>();
   @Output() onSearchArticulos = new EventEmitter<object>();
   @Output() onButtonMsg = new EventEmitter<object>();
 
-  cmp: { op: string, value: number } = {op: '$gte', value: 0 };
 
   constructor(private http: HttpClient) { }
 
@@ -53,11 +51,5 @@ export class ArticuloCardSelectFilterComponent implements OnInit {
 
     }
     this.emitMsg(this.filterButtons);
-  }
-  cambioCmp(){
-    console.log(this.cmp);
-    const contiene = {}
-    contiene[this.cmp.op] = Number(this.cmp.value);
-    this.onContieneMsg.emit( contiene );
   }
 }

@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
+import { PrintService } from 'src/app/services/print.service';
 import { API_URI } from 'src/app/shared/uris';
 
 @Component({
@@ -177,7 +179,9 @@ export class ArticulosPreciosComponent implements OnInit {
   constructor(  private http: HttpClient,
   //  private modalService: NgbModal,
     private list: ListasArtProdService,
-    private authService: AuthService
+    private authService: AuthService,
+//    route: ActivatedRoute,
+    public printService: PrintService
   ) {
 /*
     this.modalService.activeInstances.subscribe((list) => {
@@ -264,5 +268,12 @@ export class ArticulosPreciosComponent implements OnInit {
     this.filterButtons = array;
     this.searchArticulos();
   }
+  imprimir(){
+    const lsId = Date.now().toString();
+    console.log(lsId);
+    localStorage.setItem( lsId, JSON.stringify(this.articuloList));
 
+    this.printService.printDocument('articulospreciosprint', [lsId] );
+
+  }
 }

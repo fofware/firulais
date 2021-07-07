@@ -1,5 +1,4 @@
-@media print{
-  .print-oculta{
-    display: none;
-  }
+@media print {
+  .isPrinting > * { display: none; }
+  .isPrinting app-print-layout { display: block; }
 }

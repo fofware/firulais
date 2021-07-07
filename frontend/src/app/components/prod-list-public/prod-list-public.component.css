@@ -67,34 +67,6 @@
 }
 
 @media print {
-  @page {
-    /* declaraciones Css */
-    size: 210mm 297mm;
-    size: A4 portrait;
-    margin: 5mm 5mm 5mm 5mm;
-    orphans: 0;
-    widows: 0;
-  }
-  .card-container {
-    display: inline-block;
-    flex-wrap: unset;
-    justify-content: unset;
-    margin-top: 0;
-    width: 100%;
-  }
-  .productos-header {
-    display: none;
-  }
-/*
-  app-prod-card-view-dos:nth-child(7n+0) {
-    page-break-after: always;
-    background: red;
-  }
-*/
-  app-prod-card-view-dos:nth-child(5n+0) {
-    page-break-inside: always;
-    page-break-after: always;
-    background: red;
-  }
-  .page-break	{ display: block; page-break-before: always; }
+  .isPrinting > * { display: none; }
+  .isPrinting app-print-layout { display: block; }
 }
