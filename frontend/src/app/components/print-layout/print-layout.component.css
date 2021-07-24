@@ -1,7 +1,18 @@
-.header, .header-space { height: 100px; }
-.footer, .footer-space { height: 25px; }
-.header { position: fixed; top: 0; width: 100%; z-index: 20; border: 1px solid blue}
+body {
+  counter-reset: page;
+}
+.header, .header-space { height: 120px; }
+.footer, .footer-space { height: 45px; }
+.header { position: fixed; top: 0; width: 100%; border-bottom: 1px solid black}
 .footer { position: fixed; bottom: 0; width: 100%; }
+
+.page-number::after {
+  counter-increment: page;
+  content: "Page: " counter(page);
+}
+.pagecount::before {
+  content: counters(pages);
+}
 
 @media screen {
   :host {

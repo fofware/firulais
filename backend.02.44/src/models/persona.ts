@@ -9,12 +9,16 @@ export interface IRetencion {
 
 export interface IPersona extends Document {
   _id?: object;
-  email: string;
+  email: string;        // check unique se debe verificar con un correo
+  emailverificado: boolean;
   apellido: string;
   nombre: string;
-  cuit: string;
-  fijo: string;
-  celular: string;
+  cuit: string;         // check unique
+  fijo: string;         // puede ser un array y se debe chequear que no lo tenga otro, puede haber sido otrogado recientemente y era de otro usuario
+  celular: string;      // check unique? lo puede cambiar, alguien pierde el nro y este usuario lo compra puede verificar con whatsapp o msg
+  celularVerificado: boolean;
+  whatsapp: boolean;
+  whatsappverificado: boolean;
   direccion: string;
   localidad: string;
   provincia: string;
@@ -30,11 +34,15 @@ export interface IPersona extends Document {
 const personaSchema = new Schema({
   _id: { type: Schema.Types.ObjectId }
   , email:{ type: String, lowercase: true, trim: true }
+  , emailverificado: { type: Boolean, default: false }
   , apellido: { type: String, trim: true }
   , nombre: { type: String, trim: true }
   , cuit:{ type: String, trim: true }
   , fijo: { type: String, trim: true }
   , celular: { type: String, trim: true }
+  , celularverificado: { type: Boolean, default: false }
+  , whatsapp: { type: Boolean, default: false }
+  , whatsappverificado: { type: Boolean, default: false }
   , direccion: { type: String, trim: true }
   , localidad: { type: String, trim: true }
   , provincia: { type: String, trim: true }

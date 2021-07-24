@@ -1,0 +1,56 @@
+<div [class.isPrinting]="printService.isPrinting">
+  <div id="top" class="sticky-top">
+    <app-top-menu></app-top-menu>
+    <form class="form-inline bg-dark p-1">
+      <app-articulo-card-select-filter
+        [searchItem]='searchItem'
+        [filterButtons]='filterButtons'
+        (onSearchArticulos)='filterEvent($event)'
+        (onButtonMsg)='buttonMsg($event)'
+      >
+      </app-articulo-card-select-filter>
+      <app-articulo-card-select-order
+        [order]="articuloOrder"
+        [listaOrden]='listaOrden'
+        (onOrderChangeEvent)='filterEvent($event)'
+      ></app-articulo-card-select-order>
+      <button (click)="imprimir()"><i class="fas fa-print"></i></button>
+    </form>
+  </div>
+  <div [class.isPrinting]="printService.isPrinting" id="main" (window:resize)="setHeight()">
+    <aside [hidden]="selectedList.length === 0">
+      <div class="formater">
+        <div class="tablecontainer">
+          <table width="100%">
+            <tr *ngFor="let articulo of selectedList; index as i;">
+              <td>{{articulo.fullName}}</td>
+              <td><i class="far fa-trash-alt" (click)="deleteItem(i)"></i></td>
+            </tr>
+          </table>
+        </div>
+        <footer >
+          <button (click)="deleteAll()">Borrar Todo</button>
+
+          asdfasdfasdfasdfasdfadsf
+        </footer>
+      </div>
+    </aside>
+    <article class="d-flex justify-content-center" [class.isPrinting]="printService.isPrinting">
+      <div class="formater">
+        <div class="tablecontainer">
+          <table>
+            <tr *ngFor="let articulo of articuloList; index as i;">
+              <td class="card">
+                <app-articulo-card-view-reventa [articulo]='articulo' (click)="addItem(articulo)">
+                </app-articulo-card-view-reventa>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <footer>
+          <button (click)="addAll()">Cargar Todo</button>
+        </footer>
+      </div>
+    </article>
+  </div>
+</div>

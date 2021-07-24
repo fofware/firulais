@@ -6,6 +6,7 @@ import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
 import { ObjectID } from 'bson'
 import { ArticuloFormComponent } from '../articulo-form/articulo-form.component';
 import { AuthService } from 'src/app/services/auth.service';
+import { PrintService } from 'src/app/services/print.service';
 
 @Component({
   selector: 'app-articulos-list',
@@ -206,6 +207,7 @@ export class ArticulosListComponent implements OnInit {
   constructor(  private http: HttpClient,
                 private modalService: NgbModal,
                 private list: ListasArtProdService,
+                private printService: PrintService,
                 private authService: AuthService
               ) {
                 this.modalService.activeInstances.subscribe((list) => {
@@ -213,7 +215,6 @@ export class ArticulosListComponent implements OnInit {
                 });
                 this.user = this.authService.user;
                 console.log(this.user);
-
               }
   ngOnInit(): void {
     this.listArticulos()
@@ -332,6 +333,7 @@ export class ArticulosListComponent implements OnInit {
     if(!this.articuloList[this.editedArticulo].productos) this.articuloList[this.editedArticulo].productos = [];
 
     this.selectedArticulo = JSON.parse(JSON.stringify(this.articuloList[ev.idx]));
+
     const modalRef = this.modalService.open(ArticuloFormComponent, {
       ariaLabelledBy: 'modal-basic-title'
       , size: 'xl'
@@ -354,4 +356,14 @@ export class ArticulosListComponent implements OnInit {
       }
     });
   }
+
+  imprimir(){
+    const lsId = Date.now().toString();
+    console.log(lsId);
+    localStorage.setItem( lsId, JSON.stringify(this.articuloList));
+
+    this.printService.printDocument('articulospreciosprint', [lsId] );
+
+  }
+
 }

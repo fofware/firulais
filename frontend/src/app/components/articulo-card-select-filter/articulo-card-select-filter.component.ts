@@ -29,8 +29,9 @@ export class ArticuloCardSelectFilterComponent implements OnInit {
   }
   searchArticulos(): void {
     const searchItem = this.searchItem || '';
-//    console.log('FILTER-EMIT-EVENT');
-    this.onSearchArticulos.emit({ setting: this.setting, searchItem });
+    //    console.log('FILTER-EMIT-EVENT');
+    //this.onSearchArticulos.emit({ setting: this.setting, searchItem });
+    this.onSearchArticulos.emit({ searchItem });
   }
   emitMsg(button){
     console.log(button);

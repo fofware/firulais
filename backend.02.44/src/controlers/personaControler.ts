@@ -19,7 +19,7 @@ class PersonaControler {
     this.router.put('/api/persona/:id',passport.authenticate('jwt', {session:false}), this.put );
     this.router.post('/api/persona/add',passport.authenticate('jwt', {session:false}), this.add );
     this.router.post('/api/persona/find',passport.authenticate('jwt', {session:false}), this.find );
-    this.router.post('/api/persona/import', //passport.authenticate('jwt', {session:false}), 
+    this.router.post('/api/persona/import', passport.authenticate('jwt', {session:false}), 
 											this.import );
   }
 

@@ -1235,21 +1235,20 @@ export const dataProduct =
 				},
 				*/
 				precio: 1,
-				/*
 				"calc_precio": {
 					$ceil:
 					{
 						$cond: [{ $eq: ['$count_parte', 0] },
 						{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
-						{
-							$cond:
-								[{ $eq: ['$count_cerrado', 0] },
+						{	$cond:
+								[ { $eq: ['$count_cerrado', 0] },
 								{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
 								{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
 								]
 						}]
 					}
 				},
+				/*
 				"precioref": {
 					$round: [
 						{

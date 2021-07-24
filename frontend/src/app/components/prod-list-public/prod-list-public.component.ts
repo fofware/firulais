@@ -1,10 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnChanges, OnInit } from '@angular/core';
-import { regExpEscape } from '@ng-bootstrap/ng-bootstrap/util/util';
-import { Observable } from 'rxjs';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
+import { ListasToPrintService } from 'src/app/services/listas-to-print.service';
 import { PrintService } from 'src/app/services/print.service';
-import { tpLista } from 'src/app/shared/toolbox';
+import { formapago, productosToShow, tpLista } from 'src/app/shared/toolbox';
 import { API_URI } from 'src/app/shared/uris';
 
 @Component({
@@ -16,15 +15,28 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   ApiUri = API_URI;
   wait = false;
   searchItem = '';
+  buffer_searchItem = '';
   fpago = 0;
-  fpagoCoef = 1;
+  fpagoCoef = {name: "Efectivo",icon:'far fa-money-bill-alt',value: 1, coef: [{comiMP: 0, op: 1}, {RetImpIngBru: 0}] };
   lista = tpLista;
   cmpSetting = {
     tipo: 'Venta',
     public: true
   };
+
+  tools = {
+    new: { display: true },
+    print: {display: true }
+  }
+  collectionSize = 0;
+  page = 1;
+  pageSize = 18;
+  searchBrowseItem = "";
+
+  listasToPrint:any[] = [];
   contiene = {};
   articuloList: any[] = [];
+  articuloFullList: any[] = [];
   filterButtons = [
       {
         id: 'especie'
@@ -261,8 +273,11 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   constructor(
     private http: HttpClient,
     private list: ListasArtProdService,
-    public printService: PrintService
-  ) {}
+    public printService: PrintService,
+    public ltop: ListasToPrintService
+  ) {
+    this.listasToPrint = this.ltop.load('listasproductos');
+  }
 
   ngOnInit(): void {
     this.contiene['$gte'] = 0;
@@ -280,6 +295,17 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
 */
 
   }
+  selected(art) {
+    this.ltop.setunset(art);
+  }
+
+  imprimir(){
+    const lsId = Date.now().toString();
+    console.log(lsId);
+    localStorage.setItem( lsId, JSON.stringify(this.ltop.data.lista[this.ltop.data.selected]));
+    this.printService.printDocument('productlistprint', [lsId] );
+  }
+
   addProducto(event): void {
 
   }
@@ -289,7 +315,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
       Articulo: {}
       ,Producto: {}
       ,Extra: {}
-      ,searchItem: this.searchItem
+      ,searchItem: this.buffer_searchItem
     }
 
     const array = this.filterButtons;
@@ -341,49 +367,23 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   newReg(ev){
     console.log(ev)
   }
-  selected( art ){
-    console.log( art );
-  }
 
   cambiaPrecio(ev){
     console.log(ev);
-    this.fpagoCoef = ev.value;
+    this.fpagoCoef = ev;
     this.calculaPrecio();
   }
   calculaPrecio() {
     for (let i = 0; i < this.articuloList.length; i++) {
-      const e:any = this.articuloList[i];
-      if ( this.fpagoCoef === 1 ){
-        if ( !e.pesable ){
-          if ( e.calc_precio > 100 ){
-            e.precioToShow = Math.ceil(e.calc_precio/10 * this.fpagoCoef)*10;
-          } else {
-            const diff = e.precio % 5;
-            if (diff < 3 ){
-              e.precioToShow = e.calc_precio - diff;
-            } else {
-              e.precioToShow = e.calc_precio + ( 5 - diff )
-            }
-          }
-        } else {
-          e.precioToShow = Math.ceil(e.calc_precio * this.fpagoCoef);
-        }
-      } else {
-        e.precioToShow = Math.ceil(e.calc_precio * this.fpagoCoef);
-      }
+      formapago(this.articuloList[i],this.fpagoCoef);
     }
   }
-  imprimir(){
-    const lsId = Date.now().toString();
-    console.log(lsId);
-    localStorage.setItem( lsId, JSON.stringify(this.articuloList));
-
-    this.printService.printDocument('productlistprint', [lsId] );
-
-  }
   async searchProductos() {
-    if (this.wait) { return; }
+    if (this.wait) {
+      return;
+    }
     this.wait = true;
+    this.buffer_searchItem = this.searchItem;
     const qry:any = this.makeQry();
     const Articulo: any = (qry ? qry.Articulo : {});
     const Producto: any = (qry ? qry.Producto : {});
@@ -399,51 +399,26 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
         {Articulo, Producto, Extra, searchItem, Sort }
       );
       this.articuloList = data;
-      console.log(this.articuloList);
+      this.articuloFullList = data;
+      this.collectionSize = this.articuloList.length;
+
+      console.log(data);
       this.calculaPrecio();
+      this.wait = false;
+      if( this.buffer_searchItem !== this.searchItem ){
+        this.searchProductos();
+      }
     } catch (error) {
       console.log(error);
     }
-    this.wait = false;
-    /*
-    this.list.readData(
-      `${this.ApiUri}/productos/list`,
-      {Articulo, Producto, Extra, searchItem, Sort }
-    ).subscribe(
-      res => {
-//        this.calculaPrecios(res);
-        const data = res as any;
-        // tslint:disable-next-line:no-string-literal
-        if ( data.length === 1 && Articulo['$and'] && Articulo['$and'].length === 1
-        && ( this.searchItem === data[0].codigo || this.searchItem === data[0].plu ))
-        {
-//          this.onHeaderArticuloSelect.emit(data[0]);
-          this.searchItem = '';
-          this.wait = false;
-          this.searchProductos();
-        } else {
-          this.articuloList = data;
-          this.calculaPrecio()
-        }
-        this.wait = false;
-        console.log(this.articuloList);
-      },
-      err => {
-        console.log(err);
-        this.wait = false;
-      }
-    );
-    */
   }
-/*
-  buscaProductos(params: any): Observable<any> {
-    return new Observable((observer) => {
-      this.http.post(`${this.ApiUri}/productos/list`, params ).subscribe(res => {
-      observer.next(res);
-        // observable execution
-      observer.complete();
-      });
-    });
+  browseEvent(evt){
+    console.log("browseEvent",evt);
+    if(evt.page) this.page = evt.page;
+    if(evt.ev === 'search'){
+      this.searchBrowseItem = evt.searchItem;
+      this.page = 1;
+    }
+//    if(evt.ev === 'search') this.filter(evt.searchItem);
   }
-*/
 }

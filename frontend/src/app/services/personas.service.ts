@@ -22,4 +22,10 @@ export class PersonasService {
               .post(`${this.ApiUri}/persona/import`, persona)
               .toPromise();
   }
+
+  save(persona: any): Promise<object> {
+    return this.http
+              .post(`${this.ApiUri}/persona/import/`, persona)
+              .toPromise();
+  }
 }

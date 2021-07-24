@@ -52,3 +52,7 @@ p {
 .toolbar #twitter-logo:hover {
   opacity: 0.8;
 }
+
+.fa-whatsapp {
+  color: chartreuse;
+}

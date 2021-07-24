@@ -112,6 +112,7 @@ export class ArticuloFormComponent implements OnInit {
   async saveData(){
     try {
       let retData: any;
+      console.log("Manda",this.selectedArticulo)
       if( this.selectedArticulo._id){
         retData = await this.list.saveData( `${API_URI}/articulos/productos/updatefullData`, this.selectedArticulo);
       } else {

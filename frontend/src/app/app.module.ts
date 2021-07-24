@@ -52,6 +52,14 @@ import { ProductoCardSelectPesoComponent } from './components/producto-card-sele
 import { PrintLayoutComponent } from './components/print-layout/print-layout.component';
 import { ArticulosPreciosPrintComponent } from './components/articulos-precios-print/articulos-precios-print.component';
 import { ProductListPrintComponent } from './components/product-list-print/product-list-print.component';
+import { PersonasListComponent } from './components/personas-list/personas-list.component';
+import { PersonaModalFormComponent } from './components/persona-modal-form/persona-modal-form.component';
+import { BrowseCtrlComponent } from './components/browse-ctrl/browse-ctrl.component';
+import { PersonasFilterPipe } from './pipes/personas-filter.pipe';
+import { ProductoFilterPipe } from './pipes/producto-filter.pipe';
+import { ArticulosReventaComponent } from './components/articulos-reventa/articulos-reventa.component';
+import { ArticuloCardViewReventaComponent } from './components/articulo-card-view-reventa/articulo-card-view-reventa.component';
+import { ArticulosReventaPrintComponent } from './components/articulos-reventa-print/articulos-reventa-print.component';
 
 @NgModule({
   declarations: [
@@ -100,6 +108,14 @@ import { ProductListPrintComponent } from './components/product-list-print/produ
     PrintLayoutComponent,
     ArticulosPreciosPrintComponent,
     ProductListPrintComponent,
+    PersonasListComponent,
+    PersonaModalFormComponent,
+    BrowseCtrlComponent,
+    PersonasFilterPipe,
+    ProductoFilterPipe,
+    ArticulosReventaComponent,
+    ArticuloCardViewReventaComponent,
+    ArticulosReventaPrintComponent,
   ],
   imports: [
     BrowserModule,

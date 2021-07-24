@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { round } from 'src/app/shared/toolbox';
+import { productosToShow, round } from 'src/app/shared/toolbox';
 
 @Component({
   selector: 'app-articulo-card-view-uno',
@@ -17,8 +17,14 @@ export class ArticuloCardViewUnoComponent implements OnInit, OnChanges {
 
   constructor() { }
   ngOnInit(): void {
-    this.productos = JSON.parse(JSON.stringify(this.articulo.productos));
+    //this.productos = JSON.parse(JSON.stringify(this.articulo.productos));
 
+    this.productos = this.articulo.productos;
+
+    for (let i = 0; i < this.productos.length; i++) {
+      const e = productosToShow(this.productos[i]);
+    }
+/*
     for (let i = 0; i < this.productos.length; i++) {
       const e = this.productos[i];
       let reventa = 30;
@@ -47,6 +53,7 @@ export class ArticuloCardViewUnoComponent implements OnInit, OnChanges {
       this.productos[i].reventa = Math.ceil(((e.compra || this.productos[i].showCompra)*((reventa/3*2)+100)/100));
       this.productos[i].reventa1 = Math.ceil(((e.compra || this.productos[i].showCompra)*((reventa/3*1.5)+100)/100));
     }
+*/
   }
   ngOnChanges(changes: SimpleChanges): void {
 /*

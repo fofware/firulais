@@ -45,7 +45,7 @@
       <td width='80px' align="right"><strong>Reventa1</strong></td-->
     </thead>
     <tbody>
-      <tr *ngFor="let producto of productos; index as i;">
+      <tr *ngFor="let producto of productos; index as i;" [hidden]="!producto.pVenta">
         <td *ngIf="!articulo.image" align='center'><img src="{{producto.image}}" alt="" style="height: 60px; width: auto;"> </td>
         <td width='35px' align="right">{{producto.codigo}}</td>
         <td >{{producto.name}} {{producto.strContiene}}

@@ -4,11 +4,14 @@ import { ApitoapiComponent } from './components/apitoapi/apitoapi.component';
 import { ArticulosListComponent } from './components/articulos-list/articulos-list.component';
 import { ArticulosPreciosPrintComponent } from './components/articulos-precios-print/articulos-precios-print.component';
 import { ArticulosPreciosComponent } from './components/articulos-precios/articulos-precios.component';
+import { ArticulosReventaPrintComponent } from './components/articulos-reventa-print/articulos-reventa-print.component';
+import { ArticulosReventaComponent } from './components/articulos-reventa/articulos-reventa.component';
 import { CargalistasComponent } from './components/cargalistas/cargalistas.component';
 import { HomeComponent } from './components/home/home.component';
 import { ImportDataComponent } from './components/import-data/import-data.component';
 import { MenuappComponent } from './components/menuapp/menuapp.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
+import { PersonasListComponent } from './components/personas-list/personas-list.component';
 import { PrintLayoutComponent } from './components/print-layout/print-layout.component';
 import { ProdListPublicComponent } from './components/prod-list-public/prod-list-public.component';
 import { ProductListPrintComponent } from './components/product-list-print/product-list-print.component';
@@ -62,6 +65,23 @@ const routes: Routes = [
 //    , canActivate: [AuthGuard]
   },
   {
+    path: 'reventalist'
+    , component: ArticulosReventaComponent
+    , canActivate: [AuthGuard]
+  }
+  , {
+    path: 'print'
+    ,outlet: 'print'
+    ,component: PrintLayoutComponent
+    ,children: [
+      {
+        path: 'articulosreventaprint/:ids'
+      , component: ArticulosReventaPrintComponent
+      , canActivate: [AuthGuard]
+      }
+    ]
+  }
+  ,{
     path: 'articuloslist'
     , component: ArticulosListComponent
 //    , canActivate: [AuthGuard]
@@ -77,6 +97,11 @@ const routes: Routes = [
   //    , canActivate: [AuthGuard]
       }
     ]
+  }
+  ,{
+    path: "personas"
+    , component: PersonasListComponent
+    , canActivate: [AuthGuard]
   }
   , {
     path: 'articulosprecios'

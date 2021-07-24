@@ -1,46 +1,54 @@
 <div [class.isPrinting]="printService.isPrinting">
-<div class="productos-header sticky-top">
-  <app-top-menu></app-top-menu>
-  <form class="form-inline bg-dark p-1">
-    <span style="width: 140px;">
-      <app-producto-card-select-peso
-        (onContineMsg)="contieneMsg($event)">
-      </app-producto-card-select-peso>
-    </span>
-
-    <app-articulo-card-select-filter
-      [searchItem]='searchItem'
-      [filterButtons]='filterButtons'
-      (onSearchArticulos)='Prod_filterEvent($event)'
-      (onButtonMsg)='buttonMsg($event)'
-      (onContieneMsg)='contieneMsg($event)'
-    ></app-articulo-card-select-filter>
-    <app-articulo-card-select-order
-      [order]="articuloOrder"
-      [listaOrden]='listaOrden'
-      (onOrderChangeEvent)='Prod_filterEvent($event)'
-    ></app-articulo-card-select-order>
-    <app-articulo-pago-select
-      [fpago] = 'fpago'
-      (onPagoChange)='cambiaPrecio($event)'
-    ></app-articulo-pago-select>
-    <!--app-articulo-card-select-tools class="float-left"
-      (onNewRegEvent)='newReg($event)'
-    ></app-articulo-card-select-tools-->
-    <button (click)="imprimir()"><i class="fas fa-print"></i></button>
-
-  </form>
-
-</div>
-<div class="card-container">
-  <app-prod-card-view-dos
-    class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 no-gutters"
-    *ngFor="let articulo of articuloList; index as i;"
-    [articulo]='articulo'
-    [idx]='i'
-    cmpTipo='venta'
-    [showStock]='showStock'
-    (click)="selected(articulo)"
-  ></app-prod-card-view-dos>
-</div>
+  <div class="productos-header sticky-top">
+    <app-top-menu></app-top-menu>
+    <form class="form-inline bg-dark p-1">
+      <span style="width: 140px;">
+        <app-producto-card-select-peso
+          (onContieneMsg)="contieneMsg($event)">
+        </app-producto-card-select-peso>
+      </span>
+      <app-articulo-card-select-filter
+        [searchItem]='searchItem'
+        [filterButtons]='filterButtons'
+        (onSearchArticulos)='Prod_filterEvent($event)'
+        (onButtonMsg)='buttonMsg($event)'
+        (onContieneMsg)='contieneMsg($event)'
+      ></app-articulo-card-select-filter>
+      <app-articulo-card-select-order
+        [order]="articuloOrder"
+        [listaOrden]='listaOrden'
+        (onOrderChangeEvent)='Prod_filterEvent($event)'
+      ></app-articulo-card-select-order>
+      <app-articulo-pago-select
+        [fpago] = 'fpago'
+        (onPagoChange)='cambiaPrecio($event)'
+      ></app-articulo-pago-select>
+      <!--app-articulo-card-select-tools class="float-left"
+        (onNewRegEvent)='newReg($event)'
+      ></app-articulo-card-select-tools-->
+      <button (click)="imprimir()"><i class="fas fa-print"></i></button>
+    </form>
+  </div>
+  <div class="card-container">
+    <app-prod-card-view-dos
+      *ngFor="let articulo of articuloList | productoFilter: searchBrowseItem  | slice: (page-1) * pageSize : page * pageSize; index as i"
+      class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 no-gutters"
+      [articulo]='articulo'
+      [idx]='i'
+      cmpTipo='venta'
+      [showStock]='showStock'
+      (click)="selected(articulo)"
+    ></app-prod-card-view-dos>
+  </div>
+  <div class="fixed-bottom">
+    <div class="bg-dark">
+      <app-browse-ctrl
+        [page]="page"
+        [pageSize]="pageSize"
+        [collectionSize]="collectionSize"
+        [tools]="tools"
+        (onBrowseCtrlEvent)="browseEvent($event)"
+      ></app-browse-ctrl>
+    </div>
+  </div>
 </div>
