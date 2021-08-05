@@ -61,4 +61,7 @@ export class AuthService {
     this.router.navigate(['/auth/signin']);
   }
 
+  profile(): void {
+    this.router.navigate(['/private/profile']);
+  }
 }

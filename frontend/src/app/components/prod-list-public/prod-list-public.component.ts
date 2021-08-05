@@ -30,7 +30,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   }
   collectionSize = 0;
   page = 1;
-  pageSize = 18;
+  pageSize = 9;
   searchBrowseItem = "";
 
   listasToPrint:any[] = [];
@@ -270,6 +270,10 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   showArticulos = true;
   showStock = true;
 
+  dbList = [];
+  tmpList = [];
+  hoja = 1;
+
   constructor(
     private http: HttpClient,
     private list: ListasArtProdService,
@@ -374,8 +378,8 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
     this.calculaPrecio();
   }
   calculaPrecio() {
-    for (let i = 0; i < this.articuloList.length; i++) {
-      formapago(this.articuloList[i],this.fpagoCoef);
+    for (let i = 0; i < this.dbList.length; i++) {
+      formapago(this.dbList[i],this.fpagoCoef);
     }
   }
   async searchProductos() {
@@ -398,12 +402,14 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
         `${this.ApiUri}/productos/list`,
         {Articulo, Producto, Extra, searchItem, Sort }
       );
-      this.articuloList = data;
-      this.articuloFullList = data;
-      this.collectionSize = this.articuloList.length;
-
-      console.log(data);
+      console.log(data)
+      this.dbList = data;
+      this.tmpList = data;
+      this.hoja = 1;
+      this.collectionSize = this.tmpList.length;
       this.calculaPrecio();
+      this.articuloList = this.more(this.tmpList, [])
+
       this.wait = false;
       if( this.buffer_searchItem !== this.searchItem ){
         this.searchProductos();
@@ -412,6 +418,17 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
       console.log(error);
     }
   }
+
+  more(inList,outList): any {
+    console.log(this.hoja);
+      console.log((this.hoja-1) * this.pageSize);
+      console.log(this.hoja * this.pageSize);
+      this.collectionSize = inList.length;
+      outList = outList.concat(inList.slice((this.hoja-1) * this.pageSize , this.hoja * this.pageSize));
+      this.hoja=this.hoja+1;
+      return outList;
+  }
+
   browseEvent(evt){
     console.log("browseEvent",evt);
     if(evt.page) this.page = evt.page;

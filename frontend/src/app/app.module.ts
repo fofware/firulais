@@ -60,6 +60,8 @@ import { ProductoFilterPipe } from './pipes/producto-filter.pipe';
 import { ArticulosReventaComponent } from './components/articulos-reventa/articulos-reventa.component';
 import { ArticuloCardViewReventaComponent } from './components/articulo-card-view-reventa/articulo-card-view-reventa.component';
 import { ArticulosReventaPrintComponent } from './components/articulos-reventa-print/articulos-reventa-print.component';
+import { UsersComponent } from './components/users/users.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -116,6 +118,8 @@ import { ArticulosReventaPrintComponent } from './components/articulos-reventa-p
     ArticulosReventaComponent,
     ArticuloCardViewReventaComponent,
     ArticulosReventaPrintComponent,
+    UsersComponent,
+    ProfileComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,10 +1,10 @@
 # HTTP — redirect all traffic to HTTPS
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server ipv6only=on;
+    listen 80;
+    listen [::]:80;
 
     # Here put the domain name the server is to be known as.
-    server_name  desktop.firulais.net.ar;
+    server_name desktop.firulais.net.ar;
 
     access_log   /var/log/admin.firulais.net.ar.access.log  main;
     error_log   /var/log/admin.firulais.net.ar.error.log  debug;
@@ -22,9 +22,9 @@ server {
     # site supplied with the default Nginx container
 
     # Use this to proxy for another service
-    #location /assets/images/ {
-    #    root /webroots/images/;
-    #}
+#    location /assets/images/ {
+#        root /webroots/images/;
+#    }
 
     location /api/ {
         proxy_pass      http://apiapp:4400/api/;
@@ -33,8 +33,4 @@ server {
     location /auth/ {
         proxy_pass      http://apiapp:4400/;
     }
-
-    #location /mongo/ {
-    #    proxy_pass      http://mongo-express:8081/;
-    #}
 }

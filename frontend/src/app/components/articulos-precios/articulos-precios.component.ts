@@ -175,6 +175,11 @@ export class ArticulosPreciosComponent implements OnInit {
   closeModal: string;
   user:any;
   wait: boolean;
+  hoja = 1;
+  pageSize = 9;
+  collectionSize = 1;
+  dbList = [];
+  tmpList = [];
 
   constructor(  private http: HttpClient,
   //  private modalService: NgbModal,
@@ -225,7 +230,12 @@ export class ArticulosPreciosComponent implements OnInit {
         `${API_URI}/articulos/productos/listdata`,
         {Articulo, Producto, Extra, searchItem: this.searchItem, Sort }
       );
-      this.articuloList = data;
+      console.log(data);
+      this.dbList = data;
+      this.tmpList = data;
+      this.hoja = 1;
+      this.collectionSize = this.tmpList.length;
+      this.articuloList = this.more(this.tmpList, [])
       console.log(this.articuloList);
     } catch (error) {
       console.log(error);
@@ -275,5 +285,14 @@ export class ArticulosPreciosComponent implements OnInit {
 
     this.printService.printDocument('articulospreciosprint', [lsId] );
 
+  }
+  more(inList,outList): any {
+    console.log(this.hoja);
+      console.log((this.hoja-1) * this.pageSize);
+      console.log(this.hoja * this.pageSize);
+      this.collectionSize = inList.length;
+      outList = outList.concat(inList.slice((this.hoja-1) * this.pageSize , this.hoja * this.pageSize));
+      this.hoja=this.hoja+1;
+      return outList;
   }
 }

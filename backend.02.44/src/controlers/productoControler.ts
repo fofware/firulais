@@ -89,8 +89,14 @@ const full_project = {
 				]
 			}
 		}
-	}
+	},
+	'showPrecio': { 
+		$cond: [ { $eq:['$pesable', true] },
+						{ $ceil:  '$calc_precio'  },
+						{ $multiply: [ { $ceil:{ $divide:['$calc_precio',10]}},10]}
+					]},
 }
+
 const invalidData = {
 	"compra": 0,
 	"reposicion": 0,
@@ -105,11 +111,14 @@ const invalidData = {
 	'parte':0,
 }
 
-export const productoGetData = async function( qry: any ): Promise<IProducto[]> {
+export const productoGetData = async function( qry: any, outProject?: any, hiddenData?: any ): Promise<IProducto[]> {
+	if(!outProject) outProject = full_project;
+	if(!hiddenData) hiddenData = invalidData;
 	if( !qry.Producto ) qry.Producto = {};
 	if( !qry.Articulo ) qry.Articulo = {};
 	if( !qry.Extra ) qry.Extra = {};
-	if( !qry.Project) qry.Project = { 'noproject': 0}
+	if( !qry.showData) qry.showData = { 'noproject': 0}
+	if( !qry.hiddenData) qry.hiddenData = { 'noproject': 0}
 	if( !qry.Decimales) qry.Decimales = 2;
 //	if( !qry.Sort ) qry.Sort = {'fabricante': 1, 'marca': 1, 'especie': 1, 'rubro': 1, 'linea': 1, 'edad': 1, 'raza': 1	};
 	if( !qry.Sort ) qry.Sort = { 'rubro': 1, 'linea': 1, 'contiene': 1, 'precio': 1 };
@@ -557,12 +566,12 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				'private_web': 1
 			}
 		},
-		{ $project: full_project},
+		{ $project: qry.showData },
 		{
 			$match: qry.Extra
 		},
 		{
-			$project: invalidData
+			$project: qry.hiddenData
 		},
 		{
 			$sort: qry.Sort
@@ -608,6 +617,7 @@ class ProductoControler {
 		this.router.get('/productos/toprovlista', this.toprovlista);
 		this.router.get('/productos/search/:search', this.search);
 		this.router.get('/productos/test', this.test);
+		this.router.get('/productos/fb', this.fb);
 	}
 
 	public index(req: Request, res: Response) {
@@ -648,6 +658,8 @@ class ProductoControler {
 			qry.Extra = Object.assign(qry.Extra, ret.Extra);
 		}
 		console.log(qry)
+		qry.showData = full_project;
+		qry.hiddenData = invalidData;
 		/*
 		console.log(qry.Extra['$or'])
 		for (let i = 0; i < qry.Extra['$or'].length; i++) {
@@ -902,6 +914,8 @@ class ProductoControler {
 					}
 				}
 			}
+			qry.showData = full_project;
+			qry.hiddenData = invalidData;
 			console.log(qry)
 //			const rpta: any = await readProductos(qry);
 			const rpta: any = await productoGetData(qry);
@@ -911,6 +925,7 @@ class ProductoControler {
 		}
 	}
 
+/*
 	getFullName (item:any, descr?: string): string {
 		if (!descr) descr = "";
 		if (item._id) {
@@ -924,6 +939,271 @@ class ProductoControler {
 			}
 		}
 		return descr.trim();
+	}
+*/
+
+	async fb(req: Request, res: Response){
+		const fbShowData = {
+			id: '$_id',
+			'title': {
+				$trim: 
+				{ input: 
+					{ $concat: [
+						'$art_name', 
+						{ $cond: [{ $eq: ['$name', '']}, '', ' ']},
+						'$name',
+						{ $cond: [{ $eq: ['$strContiene', '']}, '', ' ']},
+						'$strContiene',
+						{ $cond: [{ $eq: ['$unidad', '']}, '', ' ']},
+						'$unidad',
+						{ $cond: [{ $eq: ['$sname', '']}, '', ' ']},
+						'$sname',
+						{ $cond: [{ $eq: ['$sStrContiene', '']}, '', ' ']},
+						'$sStrContiene',
+						{ $cond: [{ $eq: ['$sunidad', '']}, '', ' ']},
+						'$sunidad'
+						]
+					}
+				}
+			},
+			'description': 'hay que armar la descripción',
+			'availability': {
+				$cond: [ {$gte: [ '$stock', 1] }, 'in stock', 'out of stock'] 
+			},
+			'condition': 'new',
+			'price':{
+				$concat: [{ 
+					$cond: [ { $eq:['$pesable', true] },
+									{$toString: { $ceil:  '$calc_precio'  }},
+									{$toString: { $multiply: [ { $ceil:{ $divide:['$calc_precio',10]}},10]}}
+								]}, ' ARS']
+			},
+			'link': {
+				$concat: ['http://firulais.net.ar/producto/',{$toString: '$_id'}]
+			},
+			'image_link': {
+				$cond: [{ $regexMatch: { input: "$image", regex: /^http/ }  }, 
+					'$image',
+					{ $concat: ['http://firulais.net.ar','$image']} ]
+			},
+//			'video': 0,
+			'brand': {
+				$concat: ['firulais_',{$toString: '$_id'}]
+			},
+			'fb_product_category':
+				{	$concat: [
+					{ $cond: [{ $eq:['$fabricante', '']}, '', 
+						{ $cond: [ { $or: [ 
+													{$ne: ['$marca','']}, 
+													{$ne: ['$rubro','']}, 
+													{$ne: ['$linea','']}, 
+													{$ne: ['$especie','']}, 
+													{$ne: ['$edad','']}, 
+													{$ne: ['$raza','']} 
+												]}, 
+												{ $concat:['$fabricante',' > ']},
+												'$fabricante'
+											]}
+					]},
+					{ $cond: [{ $eq:['$marca', '']}, '', 
+						{ $cond: [ { $or: [ 
+													{$ne: ['$rubro','']}, 
+													{$ne: ['$linea','']}, 
+													{$ne: ['$especie','']}, 
+													{$ne: ['$edad','']}, 
+													{$ne: ['$raza','']} 
+												]}, 
+												{ $concat:['$marca',' > ']},
+												'$marca'
+											]}
+					]},
+					{ $cond: [{ $eq:['$rubro', '']}, '', 
+						{ $cond: [ { $or: [ 
+													{$ne: ['$linea','']}, 
+													{$ne: ['$especie','']}, 
+													{$ne: ['$edad','']}, 
+													{$ne: ['$raza','']} 
+												]}, 
+												{ $concat:['$rubro',' > ']},
+												'$rubro'
+											]}
+					]},
+					{ $cond: [{ $eq:['$linea', '']}, '', 
+						{ $cond: [ { $or: [ 
+													{$ne: ['$especie','']}, 
+													{$ne: ['$edad','']}, 
+													{$ne: ['$raza','']} 
+												]}, 
+												{ $concat:['$linea',' > ']},
+												'$linea'
+											]}
+					]},
+					{ $cond: [{ $eq:['$especie', '']}, '', 
+						{ $cond: [ { $or: [ 
+													{$ne: ['$edad','']}, 
+													{$ne: ['$raza','']} 
+												]}, 
+												{ $concat:['$especie',' > ']},
+												'$especie'
+											]}
+					]},
+					{ $cond: [{ $eq:['$edad', '']}, '', 
+						{ $cond: [ { $or: [ 
+													{$ne: ['$raza','']} 
+												]}, 
+												{ $concat:['$edad',' > ']},
+												'$edad'
+											]}
+					]},
+					{ $cond: [{ $eq:['$raza', '']}, '', '$raza']}
+
+			]},
+			'google_product_category':
+			{	$concat: [
+				{ $cond: [{ $eq:['$fabricante', '']}, '', 
+					{ $cond: [ { $or: [ 
+												{$ne: ['$marca','']}, 
+												{$ne: ['$rubro','']}, 
+												{$ne: ['$linea','']}, 
+												{$ne: ['$especie','']}, 
+												{$ne: ['$edad','']}, 
+												{$ne: ['$raza','']} 
+											]}, 
+											{ $concat:['$fabricante',' > ']},
+											'$fabricante'
+										]}
+				]},
+				{ $cond: [{ $eq:['$marca', '']}, '', 
+					{ $cond: [ { $or: [ 
+												{$ne: ['$rubro','']}, 
+												{$ne: ['$linea','']}, 
+												{$ne: ['$especie','']}, 
+												{$ne: ['$edad','']}, 
+												{$ne: ['$raza','']} 
+											]}, 
+											{ $concat:['$marca',' > ']},
+											'$marca'
+										]}
+				]},
+				{ $cond: [{ $eq:['$rubro', '']}, '', 
+					{ $cond: [ { $or: [ 
+												{$ne: ['$linea','']}, 
+												{$ne: ['$especie','']}, 
+												{$ne: ['$edad','']}, 
+												{$ne: ['$raza','']} 
+											]}, 
+											{ $concat:['$rubro',' > ']},
+											'$rubro'
+										]}
+				]},
+				{ $cond: [{ $eq:['$linea', '']}, '', 
+					{ $cond: [ { $or: [ 
+												{$ne: ['$especie','']}, 
+												{$ne: ['$edad','']}, 
+												{$ne: ['$raza','']} 
+											]}, 
+											{ $concat:['$linea',' > ']},
+											'$linea'
+										]}
+				]},
+				{ $cond: [{ $eq:['$especie', '']}, '', 
+					{ $cond: [ { $or: [ 
+												{$ne: ['$edad','']}, 
+												{$ne: ['$raza','']} 
+											]}, 
+											{ $concat:['$especie',' > ']},
+											'$especie'
+										]}
+				]},
+				{ $cond: [{ $eq:['$edad', '']}, '', 
+					{ $cond: [ { $or: [ 
+												{$ne: ['$raza','']} 
+											]}, 
+											{ $concat:['$edad',' > ']},
+											'$edad'
+										]}
+				]},
+				{ $cond: [{ $eq:['$raza', '']}, '', '$raza']}
+
+			]},
+			'item_group_id': '$art_name',
+			'custom_label_0': '$marca',
+			'custom_label_1': '$rubro',
+			'custom_label_2': '$linea',
+			'custom_label_3': '$especie',
+			'custom_label_4': '$edad',
+			'visibility': 'published',
+/*
+			'fabricante': 1,
+			'marca': 1,
+			'rubro': 1,
+			'linea': 1,
+			'especie': 1,
+			'edad': 1,
+			'raza': 1,
+*/
+			'_id': 0
+		/*
+			'quantity_to_sell_on_facebook': '$stock',
+			'sale_price': 0,
+			'sale_price_effective_date': 0,
+			'additional_image_link': 0,
+			'color': 0,
+			'gender': 0,
+			'size': '$contiene',
+			'age_group': 0,
+			'material': 0,
+			'shipping': 0,
+			'shipping_weight': 0,
+*/		
+		}
+		const fbFields =[
+			'id',
+			'title',
+			'description',
+			'availability',
+			'condition',
+			'price',
+			'link',
+			'image_link',
+			'brand',
+			'fb_product_category',
+			'google_product_category',
+			'item_group_id',
+			'visibility',
+			'custom_label_0',
+			'custom_label_1',
+			'custom_label_2',
+			'custom_label_3',
+			'custom_label_4'
+		]
+		let qry = req.body;
+
+		qry.Producto = { pesable: {$ne: true }}
+		qry.showData = fbShowData;
+		const array: any = await productoGetData(qry);
+		let retData = ""
+		const line = []
+		for (let n = 0; n < fbFields.length; n++) {
+			const key = fbFields[n];
+			line.push(key);
+		}
+		retData += line.toString()+'\n';
+		for (let i = 0; i < array.length; i++) {
+			const e = array[i];
+			const line = [];
+			for (let n = 0; n < fbFields.length; n++) {
+				const key = fbFields[n];
+				line.push(e[key]);
+			}
+			retData += line.toString()+'\n';
+		}
+		var text={"hello.txt":"Hello World!","bye.txt":"Goodbye Cruel World!"};
+//		res.set({"Content-Disposition":"attachment; filename=\"fbproduct.csv\""});
+		res.set({'Content-Disposition': 'attachment; filename=\"fbproduct.csv\"','Content-type': 'text/csv'})
+		res.send(retData);
+//		res.status(200).write(retData)
+
 	}
 }
 

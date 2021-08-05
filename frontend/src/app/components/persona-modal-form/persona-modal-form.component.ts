@@ -31,8 +31,9 @@ export class PersonaModalFormComponent implements OnInit {
       } else {
         retData = await this.persona.save( this.selectedPersona );
       }
+      delete retData.rpta['[[Prototype]]'];
+      console.log("RetData",retData);
       this.selectedPersona = retData.rpta;
-      console.log(retData);
       this.activeModal.close('Save')
     } catch (error) {
       console.log(error);

@@ -20,7 +20,9 @@ class PersonaControler {
     this.router.post('/api/persona/add',passport.authenticate('jwt', {session:false}), this.add );
     this.router.post('/api/persona/find',passport.authenticate('jwt', {session:false}), this.find );
     this.router.post('/api/persona/import', passport.authenticate('jwt', {session:false}), 
-											this.import );
+										this.import );
+		this.router.post('/api/persona/save', passport.authenticate('jwt', {session:false}), 
+											this.save );
   }
 
 	public index(req: Request, res: Response) {
@@ -45,7 +47,8 @@ class PersonaControler {
 								{ $set: req.body }, 
 								{ upsert: true }    // Options
 							);
-			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
+			const rpta = await persona.findById( req.body._id );
+			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg, rpta });
 		} catch (error) {
 			res.status(500).json(error);
 		}
@@ -116,6 +119,21 @@ class PersonaControler {
 			res.status(200).json(rpta);
 		} catch ( error ) {
 			res.status(500).json( error );
+		}
+	}
+
+	async save(req: Request, res: Response): Promise<void> {
+		req.body._id = new ObjectID( req.body._id );
+		try {
+			const newReg = await persona.updateOne(
+								{ _id: req.body._id },   // Query parameter
+								{ $set: req.body }, 
+								{ upsert: true }    // Options
+							);
+			const rpta = await persona.findById( req.body._id );
+			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg, rpta });
+		} catch (error) {
+			res.status(500).json(error);
 		}
 	}
 

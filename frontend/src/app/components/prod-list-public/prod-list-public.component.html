@@ -30,7 +30,7 @@
     </form>
   </div>
   <div class="card-container">
-    <app-prod-card-view-dos
+    <!--app-prod-card-view-dos
       *ngFor="let articulo of articuloList | productoFilter: searchBrowseItem  | slice: (page-1) * pageSize : page * pageSize; index as i"
       class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 no-gutters"
       [articulo]='articulo'
@@ -38,9 +38,21 @@
       cmpTipo='venta'
       [showStock]='showStock'
       (click)="selected(articulo)"
+    ></app-prod-card-view-dos-->
+
+    <app-prod-card-view-dos
+      *ngFor="let articulo of articuloList; index as i"
+      class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4 no-gutters"
+      [articulo]='articulo'
+      [idx]='i'
+      cmpTipo='venta'
+      [showStock]='showStock'
+      (click)="selected(articulo)"
     ></app-prod-card-view-dos>
+    <button class="btn btn-block btn-secondary" [hidden]="((hoja-1)*pageSize) >= collectionSize" (click)="articuloList = more(tmpList, articuloList)">Mostrar más</button>
+
   </div>
-  <div class="fixed-bottom">
+  <!--div class="fixed-bottom">
     <div class="bg-dark">
       <app-browse-ctrl
         [page]="page"
@@ -50,5 +62,5 @@
         (onBrowseCtrlEvent)="browseEvent($event)"
       ></app-browse-ctrl>
     </div>
-  </div>
+  </div-->
 </div>

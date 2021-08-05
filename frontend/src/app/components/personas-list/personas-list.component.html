@@ -18,9 +18,10 @@
   <!--div class="container"-->
     <table class="table table-hover">
       <tbody>
-        <tr *ngFor="let item of personaList | personasFilter: searchItem | slice: (page-1) * pageSize : page * pageSize; index as i"
-          (click)="edit(i)">
-        <!--tr *ngFor="let item of personaList | slice: (page-1) * pageSize : page * pageSize; index as i" (click)="edit(i)"-->
+        <tr *ngFor="let item of tmpList | personasFilter: searchItem | slice: (page-1) * pageSize : page * pageSize; index as i"
+          (click)="edit(item)">
+        <!--tr *ngFor="let item of personaList; index as i"
+          (click)="edit(i)"-->
           <th scope="row">{{ (page -1) * pageSize + i + 1 }}</th>
           <td>{{item.apellido}} {{item.nombre}}</td>
           <td>{{item.direccion}} {{item.localidad}} {{item.provincia}}</td>
@@ -29,5 +30,6 @@
         </tr>
       </tbody>
     </table>
+    <!--button class="btn btn-block btn-secondary" [hidden]="((hoja-1)*pageSize) >= collectionSize" (click)="more(tmpList)">Mostrar más</button-->
   <!--/div-->
 </div>

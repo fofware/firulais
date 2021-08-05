@@ -1,31 +1,31 @@
-version: "3.1"
+version: "3.3"
 
 services: 
   mongo:
     image: mongo:4.4.4
-    restart: always
+    restart: unless-stopped
 #    environment:
 #      MONGO_INITDB_ROOT_USERNAME: root
 #      MONGO_INITDB_ROOT_PASSWORD: example
 
     volumes:
-      - /c/data/db:/data/db
+      - ${MONGO_DIR_DATA}:/data/db
 
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+#  mongo-express:
+#    image: mongo-express
+#    restart: always
+#    ports:
+#      - 8081:8081
+#    environment:
+#      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+#      ME_CONFIG_MONGODB_ADMINPASSWORD: example
 
   apiapp:
     container_name: apiapp
-    image: fofware/firulais_backend:v0
-    restart: always
-    ports: 
-      - 4000:4400
+    image: fofware/firulais_backend:v0.1
+    restart: unless-stopped
+#    ports: 
+#      - 4000:4400
     environment:
 #      MONGODB_USER: root
 #      MONGODB_PASSWORD: example
@@ -33,9 +33,15 @@ services:
 
   websrv:
     container_name: websrv
-    image: fofware/webserver:v0
-    restart: always
+    image: fofware/mydockersrvweb:0.0.11
+    restart: unless-stopped
     ports:
       - 80:80
+      - 443:443
     volumes:
-      - /C/Users/Fabian/Documents/negocio/firulais/frontend/src/assets/images:/webroots/admin.firulais.net.ar/assets/images
+      - ${NGINX_CONF_D}:/etc/nginx/conf.d
+      - ${NGINX_DEFAULT}:/usr/share/nginx/html
+      - ${NGINX_WEBROOTS}:/webroots
+      - ${LETSENCRYPT}:/etc/letsencrypt
+#      - ${SCRIPTS}:/scripts
+      - ${IMAGES_DIR_DATA}:/webroots/firulais.net.ar/assets/images

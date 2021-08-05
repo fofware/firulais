@@ -25,7 +25,7 @@ export class PersonasService {
 
   save(persona: any): Promise<object> {
     return this.http
-              .post(`${this.ApiUri}/persona/import/`, persona)
+              .post(`${this.ApiUri}/persona/save/`, persona)
               .toPromise();
   }
 }

@@ -12,7 +12,7 @@ export const menudata = [
           permiso: 'owner',
           target: '',
           rel: 'noopener',
-          route: '/user',
+          route: '/private/profile',
           param: ''
         },
         {
@@ -122,7 +122,7 @@ export const menudata = [
           permiso: 'owner',
           target: '',
           rel: 'noopener',
-          route: '/user',
+          route: '/users',
           param: ''
         },
         {

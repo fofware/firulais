@@ -45,6 +45,13 @@ export class BrowseCtrlComponent implements OnInit, OnChanges {
     }
   }
 
+  setPageSize(size: string){
+    console.log('setPageSiz', size)
+    this.pageSize = parseInt(size, 10) || 1000;
+    this.page = 1;
+    this.onPageChange(this.page)
+  }
+
   formatInput(input: HTMLInputElement) {
     input.value = input.value.replace(FILTER_PAG_REGEX, '');
     console.log("formatInput");
@@ -54,11 +61,10 @@ export class BrowseCtrlComponent implements OnInit, OnChanges {
   search(){
     console.log(this.searchItem)
     this.onBrowseCtrlEvent.emit({ev: 'search', searchItem: this.searchItem })
-
   }
+
   onPageChange(page){
     console.log(page)
-    this.onBrowseCtrlEvent.emit( { ev: 'pageChange', page } );
-
+    this.onBrowseCtrlEvent.emit( { ev: 'pageChange', page, 'pageSize': this.pageSize } );
   }
 }

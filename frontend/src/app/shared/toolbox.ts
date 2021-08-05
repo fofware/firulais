@@ -49,6 +49,7 @@ export function productosToShow(e){
     e.showStock = Math.floor(e.stock);
   }
   const recargo = (e.margen+100)*.01;
+/*
   if(e.pesable === true){
     e.showPrecio = Math.ceil( e.calc_precio );
 //    e.showPrecio = Math.ceil( ((e.compra || e.showCompra)*recargo));
@@ -57,7 +58,7 @@ export function productosToShow(e){
     e.showPrecio = Math.ceil( (e.calc_precio )/10)*10;
 //    e.calc_precio = Math.ceil( ((e.compra || e.showCompra)*recargo));
   }
-
+*/
   e.lista = Math.ceil(Math.ceil(e.calc_precio*1.120220997));
   e.reventa = Math.ceil(((e.compra || e.showCompra)*((reventa/3*2)+100)/100));
   e.reventa1 = Math.ceil(((e.compra || e.showCompra)*((reventa/3*1.5)+100)/100));

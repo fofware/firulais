@@ -1248,6 +1248,36 @@ export const dataProduct =
 						}]
 					}
 				},
+				'showPrecio': { 
+					$cond: [ { $eq:['$pesable', true] },
+									{ $ceil: {
+										$ceil:
+										{
+											$cond: [{ $eq: ['$count_parte', 0] },
+											{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+											{	$cond:
+													[ { $eq: ['$count_cerrado', 0] },
+													{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
+													{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
+													]
+											}]
+										}
+									}   },
+									{ $multiply: [ { $ceil:{ $divide:[{
+										$ceil:
+										{
+											$cond: [{ $eq: ['$count_parte', 0] },
+											{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+											{	$cond:
+													[ { $eq: ['$count_cerrado', 0] },
+													{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
+													{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
+													]
+											}]
+										}
+									},10]}},10]}
+								]},
+			
 				/*
 				"precioref": {
 					$round: [
@@ -1322,42 +1352,6 @@ export const dataProduct =
 				"plu": 1,
 				"image": 1,
 				"stock": 1,
-				/*
-				{
-					$floor:
-					{
-						$cond: [{ $eq: ['$count_parte', 0] },
-						{ $multiply: ['$parte.stock', '$parte.contiene'] },
-						{
-							$cond: [{ $eq: ['$count_cerrado', 0] },
-							{ $multiply: ['$cerrado.stock', '$cerrado.contiene'] },
-							{
-								$cond: [{ $eq: ['$ins_count', 0] },
-								{ $cond: [{ $gte: ['$stock', 1] }, '$stock', 0] },
-								{ $cond: [{ $gte: ['$stock', 1] }, '$stock', 0] }
-								]
-							}
-							]
-						}
-						]
-					}
-				},
-				"divisor": {
-					$cond: [{ $eq: ['$count_parte', 0] },
-						'$parte.contiene',
-					{
-						$cond: [{ $eq: ['$count_cerrado', 0] },
-							'$cerrado.contiene',
-						{
-							$cond: [{ $eq: ['$ins_count', 0] },
-								'$ins.contiene',
-								1]
-						}
-						]
-					}
-					]
-				},
-				*/
 				"scontiene": {
 					$cond: [{ $eq: ['$count_parte', 0] },
 						'',

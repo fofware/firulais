@@ -35,6 +35,18 @@
           </li>
       </ng-template>
     </ngb-pagination>
+    <input
+    #j
+    type="text"
+    inputmode="numeric"
+    pattern="[0-9]"
+    class="form-control custom-pages-input ml-2"
+    [value]="pageSize"
+    (keyup.enter)="setPageSize(j.value)"
+    (blur)="setPageSize(j.value)"
+    (input)="formatInput($any($event).target)"
+    style="width: 3.5rem"
+  />
   <div class="col-sm-2 col-lg-4">
     <button *ngIf="tools.new.display" class="btn btn-outline-primary ml-1 float-right" (click)="event('newReg')">
       <i class="fas fa-plus-square"></i>
