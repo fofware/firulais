@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  API_URI: `http://localhost:4400/api`,
-  AUTH_URI: `http://localhost:4400`
+  API_URI: `http://desktop.firulais.net.ar:4400/api`,
+  AUTH_URI: `http://desktop.firulais.net.ar:4400`
 };
 
 /*

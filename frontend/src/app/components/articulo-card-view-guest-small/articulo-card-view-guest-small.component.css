@@ -1,0 +1,109 @@
+:host {
+/*
+  height: 17rem;
+*/
+}
+
+:host .card-header {
+  font-weight: 700;
+  font-size: 1.1rem;
+  height: 3.3rem;
+}
+
+:host .card-body {
+/*
+  height: 11.3rem;
+*/
+  padding: 0;
+  position: relative;
+}
+:host .card-footer {
+  box-shadow: inset 1px 1px 1px 1px #b6b6b6;
+  -webkit-box-shadow: inset 1px 1px 1px 1px #b6b6b6;
+}
+
+:host .card-footer > div{
+  border: 0px solid gray;
+  padding-left: 6px;
+  padding-right: 6px;
+  box-shadow: inset 1px 1px 2px 1px #b6b6b6;
+  -webkit-box-shadow: inset 1px 1px 2px 1px #b6b6b6;
+
+}
+
+.imagen {
+  width: 120px;
+  min-width: 120px;
+  max-width: 120px;
+/*
+  border: 1px solid blueviolet;
+*/
+}
+.imagen .imgBox {
+  height: 100%;
+  max-height: 120px;
+}
+.imagen .imgBox > img {
+  width: auto;
+  height: 98%;
+  max-width: 120px;
+/*
+  height: calc(50% - 33.5px);
+  width:  calc(100vh * 1.3);
+*/
+}
+.pesable {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  z-index: 10;
+  text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
+}
+.stock {
+  position: absolute;
+  top: 0px;
+  left: 16px;
+  z-index: 10;
+  text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
+}
+.preciounidad {
+  position: absolute;
+  bottom: 0;
+  text-align: center;
+  z-index: 10;
+  font-weight: 500;
+  font-size: larger;
+  text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
+}
+.precio {
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+  text-align: center;
+  z-index: 10;
+  font-weight: 500;
+  font-size: xx-large;
+  text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
+}
+.detalles {
+  padding: 0;
+}
+
+.detalles > ul {
+  max-height: 140px;
+  margin-left: -20px;
+  overflow-y: hidden;
+}
+
+.saltodepagina {
+  display: none;
+}
+
+/*
+@media print {
+  .card {
+    width: 48%;
+    display: block;
+  }
+}
+*/

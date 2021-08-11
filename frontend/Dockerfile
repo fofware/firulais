@@ -6,7 +6,7 @@ FROM nginx:1.20.1
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    cron bash curl certbot plus
+    cron bash curl certbot
 
 # /webroots/DOMAIN.TLD/.well-known/... files go here
 VOLUME /webroots

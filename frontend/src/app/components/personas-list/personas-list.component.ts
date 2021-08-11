@@ -121,7 +121,12 @@ export class PersonasListComponent implements OnInit {
         console.log("Resultado",reg);
 //        console.log(modalRef.componentInstance.selectedPersona['[["Prototype"]]']);
         this.fullList[this.editedPersona] = reg;
+        console.log(this.fullList);
+        console.log(this.tmpList);
+        console.log('item', item)
+        console.log('reg', reg)
         item = reg;
+
 
         for (let i = 0; i < this.tmpList.length; i++) {
           if( this.tmpList[i]['_id'] === reg['_id'] ){
@@ -131,6 +136,7 @@ export class PersonasListComponent implements OnInit {
           }
         }
       }
+      this.filter(this.searchItem);
 
     });
   }

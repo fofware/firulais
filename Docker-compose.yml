@@ -22,7 +22,7 @@ services:
 
   apiapp:
     container_name: apiapp
-    image: fofware/firulais_backend:v0.1
+    image: fofware/firulais_backend:v0.4
     restart: unless-stopped
 #    ports: 
 #      - 4000:4400
@@ -33,7 +33,7 @@ services:
 
   websrv:
     container_name: websrv
-    image: fofware/mydockersrvweb:0.0.11
+    image: fofware/mydockersrvweb:0.0.15
     restart: unless-stopped
     ports:
       - 80:80

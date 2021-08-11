@@ -1,0 +1,80 @@
+<div class="card p-0 m-0">
+  <div class="card-header px-1 py-0 d-flex justify-content-center">
+    <span class="d-flex align-items-center">{{articulo.fullName}} </span>
+  </div>
+  <div class="card-body d-flex bd-highlight">
+    <!--i class="pesable fa fa-balance-scale fa-fw fa-2x" aria-hidden="true" [hidden]="!articulo.pesable"></i>
+    <i class="pesable fas fa-box fa-2x" aria-hidden="true" [hidden]="!(articulo.count_ins === 0)"></i-->
+    <div class="imagen d-flex justify-content-center" *ngIf="articulo.image">
+      <div class="imgBox align-self-center">
+        <img src="{{articulo.image}}" alt="">
+      </div>
+      <!--div *ngIf="articulo.contiene > 0 && !articulo.pesable" class="preciounidad d-flex justify-content-center">
+        ${{articulo.precioref}}/{{articulo.unidad}}
+      </div-->
+      <!--div *ngIf="articulo.contiene === 1" class="preciounidad d-flex justify-content-center">
+        ${{articulo.precio}}/{{articulo.unidad}}
+      </div-->
+    </div>
+    <div class="p-0 w-100 bd-highlight">
+      <div class="detalles">
+        <ul>
+          <li *ngFor="let detail of articulo.formula;" [hidden]='!detail.show && !detail.showname'>
+            <span [hidden]='!detail.showname'>{{detail.name}}:</span><span [hidden]='!detail.showvalue'> {{detail.value}}</span>
+          </li>
+          <!--li *ngFor="let detail of articulo.beneficios;" [hidden]='!detail.showvalue && !detail.showname'>
+            <span [hidden]='!detail.showname'>{{detail.name}}</span><span [hidden]='!(detail.showvalue && detail.showname)'>:</span> <span [hidden]='!detail.showvalue'> {{detail.value}}</span>
+          </li-->
+        </ul>
+      </div>
+      <table class="table-bordered w-100">
+        <thead>
+          <td *ngIf="!articulo.image"><strong>Picture</strong></td>
+          <!--td  align="center"><strong>Código</strong></td-->
+          <td  align="center"><strong>Presentación</strong></td>
+          <!--td width='35px' align="right"><strong>Stock</strong></td-->
+          <!--td width='80px' align="right"><strong>Compra</strong></td-->
+          <!--td width='80px' align="right"><strong>Reposición</strong></td>
+          <td width='80px' align="right"><strong>Pre/Un</strong></td>
+          <td width='80px' align="right"><strong>% Mgen</strong></td-->
+          <td width='60px' align="right"><strong>Lista</strong></td>
+          <td width='60px' align="right"><strong>Efectivo</strong></td>
+          <!--td width='80px' align="right"><strong>Reventa</strong></td>
+          <td width='80px' align="right"><strong>Reventa1</strong></td-->
+        </thead>
+        <tbody>
+          <tr *ngFor="let producto of productos; index as i;" [hidden]="!producto.pVenta">
+            <td *ngIf="!articulo.image" align='center'><img src="{{producto.image}}" alt="" style="height: 60px; width: auto;"> </td>
+            <!--td width='35px' align="right">{{producto.codigo}}</td-->
+            <td style="max-width: 200px;">{{producto.name}} {{producto.strContiene}}
+              {{producto.unidad}} {{producto.sname}}
+              {{producto.sStrContiene}} {{producto.sunidad}}</td>
+            <!--td width='35px' align="right">{{ producto.showStock }}</td-->
+            <!--td width='80px' align="right">{{producto.compra || producto.showCompra }}</td-->
+            <!--td width='80px' align="right">{{producto.reposicion}}</td>
+            <td width='80px' align="right">{{producto.precioxunidad}}/{{producto.unidad}}</td>
+            <td width='80px' align="right">{{producto.margen}}%</td-->
+            <td width='60px' align="right">{{producto.lista}}</td>
+            <td width='60px' align="right">{{producto.showPrecio}}</td>
+            <!--td width='80px' align="right">{{producto.reventa}}</td>
+            <td width='80px' align="right">{{producto.reventa1}}</td-->
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+    <!--div class="precio">
+      $ {{articulo.showPrecio}}
+    </div-->
+  </div>
+  <!--div class="card-footer px-0 py-0 d-flex justify-content-between">
+    <div>
+      <i class="fa fa-balance-scale fa-fw fa-1x" aria-hidden="true" [hidden]="!articulo.pesable"></i>
+      <i class="fas fa-box fa-1x" aria-hidden="true" [hidden]="!(articulo.count_ins === 0)"></i>
+      &nbsp;Stock: {{articulo.stock}}
+    </div>
+    <div *ngIf="articulo.costo">{{articulo.costo}}</div>
+    <div>${{articulo.precioref}}/{{articulo.unidad || articulo.sname}}</div>
+  </div-->
+</div>

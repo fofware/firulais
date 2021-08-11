@@ -131,15 +131,15 @@
         </div>
       </ng-template>
     </li>
-    <!--li [ngbNavItem]="2">
-      <a ngbNavLink><b>Características</b></a>
+    <li [ngbNavItem]="2">
+      <a ngbNavLink><b>Descripción</b></a>
       <ng-template ngbNavContent>
-        <ul>
-          <li *ngFor="let item of detalles"></li>
-
-        </ul>
+        <div class="form-group">
+          <label for="exampleFormControlTextarea1">Example textarea</label>
+          <textarea class="form-control" id="exampleFormControlTextarea1" rows="7" [(ngModel)]="selectedArticulo.detalles"></textarea>
+        </div>
       </ng-template>
-    </li-->
+    </li>
     <li [ngbNavItem]="3">
       <a ngbNavLink><b>Beneficios</b></a>
       <ng-template ngbNavContent>

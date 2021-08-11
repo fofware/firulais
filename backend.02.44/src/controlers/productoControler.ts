@@ -3,7 +3,7 @@ import producto, { IProducto } from '../models/producto';
 import { ObjectID } from 'bson'
 import passport from "passport";
 import articulos from '../models/articulos'
-import { articuloCtrl, articuloSanitize, articuloSanitizeString, readArticulos, readProductos } from './articuloControler';
+import { articuloCtrl, articuloSanitize, articuloSanitizeString, readArticulos, readProductos, saleProduct } from './articuloControler';
 import { qryProductosProcess, readParent } from '../common/productosCommon';
 import { decimales, round } from '../common/utils';
 import {Strategy, ExtractJwt, StrategyOptions} from 'passport-jwt';
@@ -26,8 +26,8 @@ const full_project = {
 	"servicio": 1,
 	"pVenta": 1,
 	"pCompra": 1,
-	"codigo": 1,
-	"plu": 1,
+	'codigo': { $ifNull: [ '$codigo', '' ] },
+	'plu': { $ifNull: [ '$plu', '' ] },
 	"image": 1,
 	"stock":1,
 	"divisor": 1,
@@ -154,8 +154,8 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 				"servicio": 1,
 				"pVenta": 1,
 				"pCompra": 1,
-				"codigo": 1,
-				"plu": 1,
+				'codigo': { $ifNull: [ '$codigo', '' ] },
+				'plu': { $ifNull: [ '$plu', '' ] },
 				"image": {$cond: [ '$image', '$image', '$art.image']},
 				"stock": 1,
 				"stockMin": 1,
@@ -464,8 +464,8 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 				"servicio": 1,
 				"pVenta": 1,
 				"pCompra": 1,
-				"codigo": 1,
-				"plu": 1,
+				'codigo': { $ifNull: [ '$codigo', '' ] },
+				'plu': { $ifNull: [ '$plu', '' ] },
 				"image": {$cond:[{$eq:[{ $strLenBytes: "$image" },0]},'$art_image','$image']},
 				"stock":{ $floor: 
 					{ $cond: [ {$eq: ['$count_parte', 0]}, 
@@ -751,7 +751,15 @@ class ProductoControler {
 			const { id } = req.params
 
 //			const rpta = await producto.findById(id).populate();
-			const rpta = await productoGetData({Producto: {_id: new ObjectID(id)}, Project: {fullName: 1}});
+			const rpta:any = await productoGetData({Producto: {_id: new ObjectID(id)}});
+			const articulo:any = await readProductos({Articulo:{_id: new ObjectID(rpta[0]['articuloId']) }},saleProduct);
+//			rpta[0]['presentaciones'] = articulo[0].productos;				
+
+			rpta[0]['presentaciones'] = [];
+			for (let i = 0; i < articulo[0].productos.length; i++) {
+				if(`${articulo[0].productos[i]['_id']}` !== `${rpta[0]['_id']}` && articulo[0].productos[i]['stock'] > 0)
+					rpta[0]['presentaciones'].push( articulo[0].productos[i] );				
+			}
 			res.status(200).json(rpta);
 		} catch (error) {
 			res.status(404).json(error);
@@ -944,7 +952,7 @@ class ProductoControler {
 
 	async fb(req: Request, res: Response){
 		const fbShowData = {
-			id: '$_id',
+			id: { $cond: [{ $eq:['$codigo', '']},'$_id','$codigo']},
 			'title': {
 				$trim: 
 				{ input: 
@@ -966,10 +974,14 @@ class ProductoControler {
 					}
 				}
 			},
+//			'description': '$detalles',
 			'description': 'hay que armar la descripción',
+			'availability': 'in stock',
+/*
 			'availability': {
 				$cond: [ {$gte: [ '$stock', 1] }, 'in stock', 'out of stock'] 
 			},
+*/
 			'condition': 'new',
 			'price':{
 				$concat: [{ 
@@ -987,77 +999,34 @@ class ProductoControler {
 					{ $concat: ['http://firulais.net.ar','$image']} ]
 			},
 //			'video': 0,
-			'brand': {
-				$concat: ['firulais_',{$toString: '$_id'}]
+			'brand': { 
+				$cond: [{$ne: ['$marca','']},'$marca','firulais']
 			},
-			'fb_product_category':
-				{	$concat: [
-					{ $cond: [{ $eq:['$fabricante', '']}, '', 
-						{ $cond: [ { $or: [ 
-													{$ne: ['$marca','']}, 
-													{$ne: ['$rubro','']}, 
-													{$ne: ['$linea','']}, 
-													{$ne: ['$especie','']}, 
-													{$ne: ['$edad','']}, 
-													{$ne: ['$raza','']} 
-												]}, 
-												{ $concat:['$fabricante',' > ']},
-												'$fabricante'
-											]}
-					]},
-					{ $cond: [{ $eq:['$marca', '']}, '', 
-						{ $cond: [ { $or: [ 
-													{$ne: ['$rubro','']}, 
-													{$ne: ['$linea','']}, 
-													{$ne: ['$especie','']}, 
-													{$ne: ['$edad','']}, 
-													{$ne: ['$raza','']} 
-												]}, 
-												{ $concat:['$marca',' > ']},
-												'$marca'
-											]}
-					]},
-					{ $cond: [{ $eq:['$rubro', '']}, '', 
-						{ $cond: [ { $or: [ 
-													{$ne: ['$linea','']}, 
-													{$ne: ['$especie','']}, 
-													{$ne: ['$edad','']}, 
-													{$ne: ['$raza','']} 
-												]}, 
-												{ $concat:['$rubro',' > ']},
-												'$rubro'
-											]}
-					]},
-					{ $cond: [{ $eq:['$linea', '']}, '', 
-						{ $cond: [ { $or: [ 
-													{$ne: ['$especie','']}, 
-													{$ne: ['$edad','']}, 
-													{$ne: ['$raza','']} 
-												]}, 
-												{ $concat:['$linea',' > ']},
-												'$linea'
-											]}
-					]},
-					{ $cond: [{ $eq:['$especie', '']}, '', 
-						{ $cond: [ { $or: [ 
-													{$ne: ['$edad','']}, 
-													{$ne: ['$raza','']} 
-												]}, 
-												{ $concat:['$especie',' > ']},
-												'$especie'
-											]}
-					]},
-					{ $cond: [{ $eq:['$edad', '']}, '', 
-						{ $cond: [ { $or: [ 
-													{$ne: ['$raza','']} 
-												]}, 
-												{ $concat:['$edad',' > ']},
-												'$edad'
-											]}
-					]},
-					{ $cond: [{ $eq:['$raza', '']}, '', '$raza']}
-
-			]},
+			'fb_product_category': { 
+				$cond: [ { $in:['$especie', ['Perro','perro', 'Perros', 'perros']] },
+					105,
+					{	$cond: [ { $in:['$especie',['Gato','gato', 'Gatos', 'gatos']]},
+						104,
+						{ $cond: [ { $in:['$especie', ['Ave', 'ave', 'Aves', 'aves']]}, 
+							100,
+							106
+						]}
+					]}
+				]
+			},
+			'google_product_category': { 
+				$cond: [ { $in:['$especie', ['Perro','perro', 'Perros', 'perros']] },
+					'Animals & Pet Supplies > Pet Supplies > Dog Supplies',
+					{	$cond: [ { $in:['$especie',['Gato','gato', 'Gatos', 'gatos']]},
+						'Animals & Pet Supplies > Pet Supplies > Cat Supplies',
+						{ $cond: [ { $in:['$especie', ['Ave', 'ave', 'Aves', 'aves']]}, 
+							'Animals & Pet Supplies > Pet Supplies > Bird Supplies',
+							'Animals & Pet Supplies > Pet Supplies'
+						]}
+					]}
+				]
+			},
+/*
 			'google_product_category':
 			{	$concat: [
 				{ $cond: [{ $eq:['$fabricante', '']}, '', 
@@ -1126,6 +1095,7 @@ class ProductoControler {
 				{ $cond: [{ $eq:['$raza', '']}, '', '$raza']}
 
 			]},
+*/
 			'item_group_id': '$art_name',
 			'custom_label_0': '$marca',
 			'custom_label_1': '$rubro',
@@ -1171,17 +1141,33 @@ class ProductoControler {
 			'google_product_category',
 			'item_group_id',
 			'visibility',
+/*
 			'custom_label_0',
 			'custom_label_1',
 			'custom_label_2',
 			'custom_label_3',
 			'custom_label_4'
+		*/
 		]
-		let qry = req.body;
+		let qry:any = {}; //req.body;
+		qry.Producto = { pesable: {$ne: true }, pVenta: true, compra: { $gt: 0 } }
 
-		qry.Producto = { pesable: {$ne: true }}
+		const artList:any = await articulos.find({'private_web': { $ne: true }});
+		for (let index = 0; index < artList.length; index++) {
+			artList[index] = new ObjectID(artList[index]._id);
+		}
+
+		if (artList.length){
+			qry.Producto['articulo'] = { '$in': artList };
+		}
+
+		qry.Sort = {title: 1}
+		qry.Extra = { private_web: { $not: { $eq: true } } }
 		qry.showData = fbShowData;
+		qry.hiddenData = { 'private_web': 0 };
+
 		const array: any = await productoGetData(qry);
+
 		let retData = ""
 		const line = []
 		for (let n = 0; n < fbFields.length; n++) {
@@ -1189,16 +1175,30 @@ class ProductoControler {
 			line.push(key);
 		}
 		retData += line.toString()+'\n';
+		const patt = /\n/g
+		const pat1 = /,/g
 		for (let i = 0; i < array.length; i++) {
 			const e = array[i];
 			const line = [];
 			for (let n = 0; n < fbFields.length; n++) {
 				const key = fbFields[n];
+				/*
+				if(key === 'description') {
+					if (typeof e[key] === 'string'){
+						const str = e[key].replace(patt,"");
+						e[key] = str.replace(pat1,'&#44;');
+//						e[key] = str.replace(pat1,'\,');
+						line.push(`'${e[key]}'`);
+					} else {
+						line.push("")
+					}
+				} else 
+				*/
 				line.push(e[key]);
 			}
 			retData += line.toString()+'\n';
 		}
-		var text={"hello.txt":"Hello World!","bye.txt":"Goodbye Cruel World!"};
+//		var text={"hello.txt":"Hello World!","bye.txt":"Goodbye Cruel World!"};
 //		res.set({"Content-Disposition":"attachment; filename=\"fbproduct.csv\""});
 		res.set({'Content-Disposition': 'attachment; filename=\"fbproduct.csv\"','Content-type': 'text/csv'})
 		res.send(retData);

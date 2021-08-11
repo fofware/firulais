@@ -16,6 +16,7 @@ import { PrintLayoutComponent } from './components/print-layout/print-layout.com
 import { ProdListPublicComponent } from './components/prod-list-public/prod-list-public.component';
 import { ProductListPrintComponent } from './components/product-list-print/product-list-print.component';
 import { ProductoLinkComponent } from './components/producto-link/producto-link.component';
+import { ProductoComponent } from './components/producto/producto.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { SigninComponent } from './components/signin/signin.component';
 import { SignupComponent } from './components/signup/signup.component';
@@ -70,6 +71,11 @@ const routes: Routes = [
   //    , canActivate: [AuthGuard]
       }
     ]
+  },
+  {
+    path: 'producto/:id'
+    , component: ProductoComponent
+//    , canActivate: [AuthGuard]
   },
   {
     path: 'productlist'

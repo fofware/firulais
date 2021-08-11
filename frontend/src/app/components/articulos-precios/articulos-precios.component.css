@@ -1,3 +1,9 @@
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 16px;
+}
 @media print {
   .isPrinting > * { display: none; }
   .isPrinting app-print-layout { display: block; }

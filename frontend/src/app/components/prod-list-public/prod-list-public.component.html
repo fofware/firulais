@@ -2,11 +2,6 @@
   <div class="productos-header sticky-top">
     <app-top-menu></app-top-menu>
     <form class="form-inline bg-dark p-1">
-      <span style="width: 140px;">
-        <app-producto-card-select-peso
-          (onContieneMsg)="contieneMsg($event)">
-        </app-producto-card-select-peso>
-      </span>
       <app-articulo-card-select-filter
         [searchItem]='searchItem'
         [filterButtons]='filterButtons'
@@ -14,6 +9,11 @@
         (onButtonMsg)='buttonMsg($event)'
         (onContieneMsg)='contieneMsg($event)'
       ></app-articulo-card-select-filter>
+      <span style="width: 150px;">
+        <app-producto-card-select-peso
+          (onContieneMsg)="contieneMsg($event)">
+        </app-producto-card-select-peso>
+      </span>
       <app-articulo-card-select-order
         [order]="articuloOrder"
         [listaOrden]='listaOrden'

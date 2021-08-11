@@ -62,6 +62,9 @@ import { ArticuloCardViewReventaComponent } from './components/articulo-card-vie
 import { ArticulosReventaPrintComponent } from './components/articulos-reventa-print/articulos-reventa-print.component';
 import { UsersComponent } from './components/users/users.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { ArticuloCardViewGuestSmallComponent } from './components/articulo-card-view-guest-small/articulo-card-view-guest-small.component';
+import { ProductoComponent } from './components/producto/producto.component';
+import { ArticuloCardViewGuestFullComponent } from './components/articulo-card-view-guest-full/articulo-card-view-guest-full.component';
 
 @NgModule({
   declarations: [
@@ -120,6 +123,9 @@ import { ProfileComponent } from './components/profile/profile.component';
     ArticulosReventaPrintComponent,
     UsersComponent,
     ProfileComponent,
+    ArticuloCardViewGuestSmallComponent,
+    ProductoComponent,
+    ArticuloCardViewGuestFullComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,80 @@
+<div class="productos-header sticky-top">
+  <app-top-menu></app-top-menu>
+</div>
+<div class="container">
+  <div class="card mb-3" >
+    <div class="card-header">
+      <h3>{{producto.art_name}}</h3>
+    </div>
+    <div class="row no-gutters">
+      <div class="col-md-5 col-lg-6">
+        <img src="{{producto.image}}" class="card-img" alt="image of {{producto.art_name}}">
+      </div>
+      <div class="col-md-7 col-lg-6">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-8">
+              <h4 class="card-title">{{producto.name}} {{producto.contiene}} {{producto.unidad}}</h4>
+            </div>
+            <div class="col-4">
+              <h4 class="card-title d-block" style="text-align: right;">$ {{producto.calc_precio}}</h4>
+            </div>
+          </div>
+          <ul ngbNav #nav="ngbNav" [activeId]="1" class="nav-tabs">
+            <li [ngbNavItem]="1" [hidden]="!producto.detalles || producto.detalles.length===0 ">
+              <a ngbNavLink><b>Presentaciones</b></a>
+              <ng-template ngbNavContent>
+                <div class="row" *ngFor="let presentacion of producto.presentaciones">
+                  <div class="col-8">
+                    <h6 class="card-title">{{presentacion.name}} {{presentacion.contiene}} {{presentacion.unidad}}</h6>
+                  </div>
+                  <div class="col-4">
+                    <h6 class="d-block" style="text-align: right;">$ {{presentacion.calc_precio}}</h6>
+                  </div>
+                </div>
+              </ng-template>
+            </li>
+            <li [ngbNavItem]="2" [hidden]="!producto.detalles">
+              <a ngbNavLink><b>Detalles</b></a>
+              <ng-template ngbNavContent>
+                <div [innerHTML]="producto.detalles"></div>
+              </ng-template>
+            </li>
+            <li [ngbNavItem]="3" [hidden]="!producto.beneficios || producto.beneficios.length===0">
+              <a ngbNavLink><b>Beneficios</b></a>
+              <ng-template ngbNavContent>
+                <div class="row col-8 offset-2">
+                  <table>
+                    <tbody>
+                      <tr *ngFor="let item of producto.beneficios; index as i;" class="">
+                        <td>{{item.name}}</td>
+                        <td>{{item.value}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </ng-template>
+            </li>
+            <li [ngbNavItem]="4" [hidden]="!producto.formula || producto.formula.length===0">
+              <a ngbNavLink><b>Fórmula</b></a>
+              <ng-template ngbNavContent>
+                <div class="row col-10 offset-1">
+                  <table width="100%">
+                    <tbody>
+                      <tr *ngFor="let item of producto.formula; index as i;" class="">
+                        <td>{{item.name}}</td>
+                        <td>{{item.value}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </ng-template>
+            </li>
+          </ul>
+          <div [ngbNavOutlet]="nav" class="mt-2"></div>
+          <p class="card-text"><small class="text-muted"> Los precios tienen el descuento por pago de contado en efectivo y pueden variar sin previo aviso. </small></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

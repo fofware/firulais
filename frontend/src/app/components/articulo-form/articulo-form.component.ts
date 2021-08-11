@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import {ModalDismissReasons, NgbModal, NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import { ModalDismissReasons, NgbModal, NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from 'src/app/services/auth.service';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
 import { API_URI } from 'src/app/shared/uris';

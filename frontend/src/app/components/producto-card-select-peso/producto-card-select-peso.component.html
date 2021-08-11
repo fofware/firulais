@@ -1,4 +1,7 @@
-<select name="compareOp" class="form-control"
+<div class="form-inline">
+  <select name="compareOp"
+  class="form-control mr-1"
+  style="max-width: 60px;"
   [(ngModel)]="cmp.op"
   (change)='cambioCmp()'>
   <option value='$gte'>&gt;=</option>
@@ -9,3 +12,5 @@
   name="compareValue"
   [(ngModel)]="cmp.value"
   (change)='cambioCmp()'>
+
+</div>

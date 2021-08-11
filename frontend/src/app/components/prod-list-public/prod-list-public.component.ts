@@ -135,7 +135,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
         ,qryName: 'Extra'
         ,qryValue: [{ $eq: 0 }, { $not: { $eq: 0 } }]
         ,qryKey: 'count_ins'
-        ,display: true
+        ,display: false
         ,text: ''
        }
        , {

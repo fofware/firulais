@@ -53,7 +53,7 @@ const articuloSchema = new Schema({
   margen: { type: Number, default: 35},
   tags: { type: String, trim: true, default: '' },
   formula: [],
-  detalles: [],
+  detalles: { type: String, trim: true, default: '' },
   beneficios: []
 });
 

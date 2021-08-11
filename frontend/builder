@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#ng build --prod
+ng build --prod
 
 #rm -r ./dist/frontend/assets/images/
 
-TAGNAME=0.0.14
+TAGNAME=0.0.15
 
 docker build -t fofware/mydockersrvweb:$TAGNAME . && docker push fofware/mydockersrvweb:$TAGNAME

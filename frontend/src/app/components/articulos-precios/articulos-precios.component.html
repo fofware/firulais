@@ -17,19 +17,15 @@
       <button (click)="imprimir()"><i class="fas fa-print"></i></button>
     </form>
   </div>
-  <div class="container">
-    <table>
-      <tr *ngFor="let articulo of articuloList; index as i;">
-        <td  class="card">
-          <app-articulo-card-view-guest
-            [articulo]='articulo'
-            [idx]=i
+  <div class="card-container">
+          <app-articulo-card-view-guest-full
+          *ngFor="let articulo of articuloList; index as i"
+          class="col-12 col-sm-12 col-md-11 col-lg-10 col-xl-6 no-gutters"
+          [articulo]='articulo'
+          [idx]=i
             [publico]='publico'
             (onSelectArticulo)='SelectEvent($event)'
-          ></app-articulo-card-view-guest>
-        </td>
-      </tr>
-    </table>
+          ></app-articulo-card-view-guest-full>
     <button class="btn btn-block btn-secondary" [hidden]="((hoja-1)*pageSize) >= collectionSize" (click)="articuloList = more(tmpList, articuloList)">Mostrar más</button>
   </div>
 </div>
