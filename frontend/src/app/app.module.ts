@@ -65,6 +65,8 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { ArticuloCardViewGuestSmallComponent } from './components/articulo-card-view-guest-small/articulo-card-view-guest-small.component';
 import { ProductoComponent } from './components/producto/producto.component';
 import { ArticuloCardViewGuestFullComponent } from './components/articulo-card-view-guest-full/articulo-card-view-guest-full.component';
+import { UsersFilterPipe } from './pipes/users-filter.pipe';
+import { UserModalFormComponent } from './components/user-modal-form/user-modal-form.component';
 
 @NgModule({
   declarations: [
@@ -126,6 +128,8 @@ import { ArticuloCardViewGuestFullComponent } from './components/articulo-card-v
     ArticuloCardViewGuestSmallComponent,
     ProductoComponent,
     ArticuloCardViewGuestFullComponent,
+    UsersFilterPipe,
+    UserModalFormComponent,
   ],
   imports: [
     BrowserModule,

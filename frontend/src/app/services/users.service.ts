@@ -16,4 +16,15 @@ export class UsersService {
               .post(`${this.ApiUri}/user/import`, user)
               .toPromise();
   }
+  fulllist(): Promise<object> {
+    return this.http
+              .get(`${this.ApiUri}/users/list`)
+              .toPromise();
+  }
+  save(user:any): Promise<object> {
+    return this.http
+              .post(`${this.ApiUri}/user/save/`, user)
+              .toPromise();
+  }
+
 }

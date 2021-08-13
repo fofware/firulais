@@ -7,7 +7,7 @@ export const menudata = [
       icon: 'fas fa-home fa-4x',
       menu: [
         {
-          title: 'Perfil',
+          title: 'Usuarios',
           icon: 'far fa-user fa-3x',
           permiso: 'owner',
           target: '',
@@ -122,7 +122,7 @@ export const menudata = [
           permiso: 'owner',
           target: '',
           rel: 'noopener',
-          route: '/users',
+          route: '/private/users',
           param: ''
         },
         {

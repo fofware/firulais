@@ -22,6 +22,7 @@ import { SigninComponent } from './components/signin/signin.component';
 import { SignupComponent } from './components/signup/signup.component';
 import { UsersComponent } from './components/users/users.component';
 import { AuthGuard } from './guard/auth.guard';
+import { Roles } from './shared/user-roles';
 
 const routes: Routes = [
   {
@@ -41,9 +42,12 @@ const routes: Routes = [
     , component: SigninComponent
   },
   {
-    path: "users"
+    path: "private/users"
     , component: UsersComponent
     , canActivate: [AuthGuard]
+    , data: {
+      //userRoles: [] // Multiple Allowed User
+    }
   },
   {
     path: "private/profile"

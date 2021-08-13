@@ -13,22 +13,22 @@
             <a ngbNavLink><b>Presentaciones</b></a>
             <ng-template ngbNavContent>
               <div class="row" *ngFor="let presentacion of articulo.productos">
-                <div class="col-8">
+                <div [class.isStock]="!presentacion.stock && !presentacion.sub.stock" [hidden]="!presentacion.pVenta || !presentacion.showPrecio" class="col-8">
                   <h6 class="card-title">{{presentacion.name}} {{presentacion.contiene}} {{presentacion.unidad}} {{presentacion.sname}}</h6>
                 </div>
-                <div class="col-4">
-                  <h6 class="d-block" style="text-align: right;">$ {{presentacion.calc_precio}}</h6>
+                <div [class.isStock]="!presentacion.stock && !presentacion.sub.stock" [hidden]="!presentacion.pVenta || !presentacion.showPrecio" class="col-4">
+                  <h6 class="d-block" style="text-align: right;">$ {{presentacion.showPrecio}}</h6>
                 </div>
               </div>
             </ng-template>
           </li>
-          <li [ngbNavItem]="2" [hidden]="!articulo.detalles">
+          <li [ngbNavItem]="2" [hidden]="!articulo.detalles || articulo.detalles.length===0">
             <a ngbNavLink><b>Detalles</b></a>
             <ng-template ngbNavContent>
               <div [innerHTML]="articulo.detalles"></div>
             </ng-template>
           </li>
-          <li [ngbNavItem]="3" [hidden]="!articulo.beneficios || articulo.beneficios.length===0">
+          <!--li [ngbNavItem]="3" [hidden]="!articulo.beneficios || articulo.beneficios.length===0">
             <a ngbNavLink><b>Beneficios</b></a>
             <ng-template ngbNavContent>
               <div class="row col-8 offset-2">
@@ -42,7 +42,7 @@
                 </table>
               </div>
             </ng-template>
-          </li>
+          </li-->
           <li [ngbNavItem]="4" [hidden]="!articulo.formula || articulo.formula.length===0">
             <a ngbNavLink><b>Fórmula</b></a>
             <ng-template ngbNavContent>

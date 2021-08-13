@@ -50,7 +50,6 @@ export class AuthService {
       // set a timeout to refresh the token a minute before it expires
       const expires = new Date(jwtToken.exp * 1000);
       const timeout = expires.getTime() - Date.now() - (60 * 1000);
-      console.log(timeout);
       if ( timeout > 10000 ) { return true; }
     }
     return false;
@@ -61,6 +60,29 @@ export class AuthService {
     this.router.navigate(['/auth/signin']);
   }
 
+  getUser(): any {
+    const token = localStorage.getItem('token');
+    if (token && token !== null ) {
+      const jwtToken = JSON.parse(atob(token.split('.')[1]));
+      return jwtToken
+    }
+    return false;
+  }
+/*
+  public getUserRoless(): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      this.http.get(`${this.baseUrl}getUserRoles`)
+      .pipe(catchError((error: any, caught: any) => {
+          reject(error);
+          return caught;
+        }),
+        map((res: any) => res.data))
+      .subscribe((role: string[]) => {
+        resolve(role);
+      });
+    });
+   }
+*/
   profile(): void {
     this.router.navigate(['/private/profile']);
   }
