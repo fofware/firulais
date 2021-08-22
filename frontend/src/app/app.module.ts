@@ -9,7 +9,7 @@ import { ArticuloCardSelectHeaderComponent } from './components/articulo-card-se
 import { ImageFallBackDirective } from './directives/image-fall-back.directive';
 import { HomeComponent } from './components/home/home.component';
 import { TopMenuComponent } from './components/top-menu/top-menu.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SigninComponent } from './components/signin/signin.component';
 import { SignupComponent } from './components/signup/signup.component';
 import { ProdListPublicComponent } from './components/prod-list-public/prod-list-public.component';
@@ -67,6 +67,7 @@ import { ProductoComponent } from './components/producto/producto.component';
 import { ArticuloCardViewGuestFullComponent } from './components/articulo-card-view-guest-full/articulo-card-view-guest-full.component';
 import { UsersFilterPipe } from './pipes/users-filter.pipe';
 import { UserModalFormComponent } from './components/user-modal-form/user-modal-form.component';
+import { AlertComponent } from './_components/alert/alert.component';
 
 @NgModule({
   declarations: [
@@ -130,12 +131,14 @@ import { UserModalFormComponent } from './components/user-modal-form/user-modal-
     ArticuloCardViewGuestFullComponent,
     UsersFilterPipe,
     UserModalFormComponent,
+    AlertComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     NgbPaginationModule,
     NgbAlertModule,
     NgbModule

@@ -5,6 +5,29 @@ import { sanitize } from '../common/utils'
 import producto, { IProducto } from '../models/producto';
 import passport from "passport";
 
+export const art_name_template = { $trim: 
+	{ input: 
+		{	$concat: [
+			{ $cond: ['$art.d_fabricante', '$art.fabricante', '']},
+			{ $cond: ['$art.d_marca', ' ', '']},
+			{ $cond: ['$art.d_marca', '$art.marca', '']},
+			{ $cond: ['$art.d_especie', ' ', '']},
+			{ $cond: ['$art.d_especie', '$art.especie', '']},
+			{ $cond: ['$art.d_edad', ' ', '']},
+			{ $cond: ['$art.d_edad', '$art.edad', '']},
+			{ $cond: ['$art.d_raza', ' ', '']},
+			{ $cond: ['$art.d_raza', '$art.raza', '']},
+			{ $cond: [ { $or: ['$art.d_marca','$art.d_fabricante','$art.d_especie','$art.d_edad','$art.d_raza'] }, ' ', '']},
+			'$art.name',
+			{ $cond: ['$art.d_rubro', ' ', '']},
+			{ $cond: ['$art.d_rubro', '$art.rubro', '']},
+			{ $cond: ['$art.d_linea', ' ', '']},
+			{ $cond: ['$art.d_linea', '$art.linea', '']},
+			]
+		}
+	}
+}
+
 export const productoGetData = async function( qry: any ): Promise<IProducto[]> {
 	if( !qry.Producto ) qry.Producto = {};
 	if( !qry.Articulo ) qry.Articulo = {};
@@ -51,28 +74,7 @@ export const productoGetData = async function( qry: any ): Promise<IProducto[]> 
 				"iva": 1,
 				"margen": 1,
 				"articuloId": "$articulo",
-				'art_name':{ $trim: 
-					{ input: 
-						{	$concat: [
-							{ $cond: ['$art.d_fabricante', '$art.fabricante', '']},
-							{ $cond: ['$art.d_marca', ' ', '']},
-							{ $cond: ['$art.d_marca', '$art.marca', '']},
-							{ $cond: ['$art.d_rubro', ' ', '']},
-							{ $cond: ['$art.d_rubro', '$art.rubro', '']},
-							{ $cond: ['$art.d_linea', ' ', '']},
-							{ $cond: ['$art.d_linea', '$art.linea', '']},
-							{ $cond: ['$art.d_especie', ' ', '']},
-							{ $cond: ['$art.d_especie', '$art.especie', '']},
-							{ $cond: ['$art.d_edad', ' ', '']},
-							{ $cond: ['$art.d_edad', '$art.edad', '']},
-							{ $cond: ['$art.d_raza', ' ', '']},
-							{ $cond: ['$art.d_raza', '$art.raza', '']},
-							' ',
-							'$art.name'
-							]
-						}
-					}
-				},
+				'art_name': art_name_template,
 				'url': '$art.url',
 				'art_image': '$art.image',
 				'art_iva': '$art.iva',
@@ -599,10 +601,10 @@ export const artProject = {
 				{ $cond: ['$d_especie', '$especie', '']},
 				{ $cond: ['$d_edad', ' ', '']},
 				{ $cond: ['$d_edad', '$edad', '']},
-				{ $cond: [ { $or: ['$d_marca','$d_fabricante','$d_especie','$d_edad'] }, ' ', '']},
-				'$name',
 				{ $cond: ['$d_raza', ' ', '']},
 				{ $cond: ['$d_raza', '$raza', '']},
+				{ $cond: [ { $or: ['$d_marca','$d_fabricante','$d_especie','$d_edad','$d_raza'] }, ' ', '']},
+				'$name',
 				{ $cond: ['$d_rubro', ' ', '']},
 				{ $cond: ['$d_rubro', '$rubro', '']},
 				{ $cond: ['$d_linea', ' ', '']},
@@ -2103,6 +2105,7 @@ class ArticuloControler {
 		this.router.post( '/articulos/productos/list', this.findProductos );
 		this.router.post( '/articulos/productos/listdata', this.findProductosData );
 		this.router.post( '/articulos/productos/updatefullData', passport.authenticate('jwt', { session: false }), this.updateFullData );
+//		this.router.post( '/articulos/productos/updatefullData', this.updateFullData );
 	}
 
 	public index(req: Request, res: Response) {
@@ -2325,6 +2328,7 @@ class ArticuloControler {
 
 	async updateFullData( req: Request, res: Response ){
 		try {
+			if(typeof(req.body.detalles) !== "string" && req.body.detalles.length === 0) req.body.detalles = ""
 			const artReg = {
 				_id: new ObjectID( req.body._id ),
 				fabricante: req.body.fabricante,
@@ -2352,10 +2356,10 @@ class ArticuloControler {
 				detalles: req.body.detalles,
 				beneficios: req.body.beneficios
 			}
-	
 			const prod_ids = [];
 			const prod_regs = [];
 			const prod_saved = [];
+
 			for (let i = 0; i < req.body.productos.length; i++) {
 				const e = req.body.productos[i];
 				e._id = new ObjectID(e._id);
@@ -2387,7 +2391,9 @@ class ArticuloControler {
 				})
 			}
 			const art_rpta = await articulo.updateOne( {_id: artReg._id}, { $set :  artReg  }, { upsert: true });
+			console.log(artReg);
 			console.log(art_rpta);
+
 			const del_regs = await producto.deleteMany({articulo: artReg._id, _id: { $nin: prod_ids } })
 			console.log(del_regs);
 			for (let i = 0; i < prod_regs.length; i++) {
@@ -2400,6 +2406,7 @@ class ArticuloControler {
 			res.status(200).json({ rpta: rpta[0], del_regs, artReg, prod_regs, prod_saved });
 
 		} catch (error) {
+			console.log(error);
 			res.status(403).json({ error });
 		}
 	}

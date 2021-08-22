@@ -14,9 +14,9 @@ export interface IUser extends Document {
   zipcode: string;
   pais: string;
   roles: [];
-
   comparePassword: ( password: string ) => Promise<boolean>;
-}
+  encriptPassword: ( password: string ) => string;
+};
 const userSchema = new Schema({
   email:{ type: String, unique: true, required: true, lowercase: true, trim: true }
   , password:{ type: String, required: true }
@@ -34,7 +34,7 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     default: []
   }]
-  
+
 },{
   timestamps: true,
   versionKey: false
@@ -42,11 +42,19 @@ const userSchema = new Schema({
 userSchema.pre<IUser>('save', async function(next) {
   const user = this;
   if(!user.isModified('password')) return next();
+
+  /*
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(user.password, salt);
-  user.password = hash;
+  */
+  user.password = this.encriptPassword(user.password);
   next();
 });
+
+userSchema.statics.encriptPassword = async (password: string) => {
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(password, salt);
+}
 
 userSchema.methods.comparePassword = async function( password: string ): Promise<boolean>  {
   const user:any = this;

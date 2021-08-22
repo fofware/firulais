@@ -6,66 +6,6 @@ import config from '../config/config';
 import passport from "passport";
 import { ObjectID } from 'bson'
 
-function createToken(user: IUser | any ) {
-  return jwt.sign({ _id: user._id, 
-    email: user.email,
-    appellido: user.apellido,
-    nombre: user.nombre,
-    roles: user.roles,
-    nickname: user.nickname || `${user.nombre} ${user.apellido}`,
-    image: '/assets/images/defuser.png',
-  }, config.jwtSecret, {
-    expiresIn: 43200
-  });
-};
-
-export const signUp = async (req: Request, res: Response): Promise<Response> => {
-  if (!req.body.email || !req.body.password)
-    return res.status(400).json({ msg: 'Por favor. Envíe su e-Mail y contraseña' });
-  const user = await User.findOne({ email: req.body.email });
-  if (user)
-    return res.status(400).json({ msg: 'eMail ya existe' });
-  if (req.body.password !== req.body.password2)
-    return res.status(400).json({msg: 'Las contraseñas no coinciden'})
-  delete req.body.password2;
-  const newUser = new User(req.body);
-
-  await newUser.save();
-  delete newUser.password;
-  const token = createToken(newUser);
-  console.log(newUser);
-  delete newUser.__v;
-  delete newUser.password;
-  newUser.__v = null;
-  newUser.password = null;
-  return res.status(200).json({ token, newUser });
-};
-
-export const signIn = async (req: Request, res: Response): Promise<Response> => {
-  if (!req.body.email || !req.body.password)
-    return res.status(401).json({ msg: 'Por favor. Envíe su e-Mail y contraseña' });
-  let user = await User.findOne({ email: req.body.email });
-  if (!user)
-    return res.status(401).json({ msg: 'Usuario y/o contraseña ivalidos' });
-  const isMatch = await user.comparePassword(req.body.password);
-  if (!isMatch)
-    return res.status(401).json({ msg: 'Contraseña y/o Usuario ivalidos' });
-  const token = createToken(user);
-  console.log(user);
-  delete user.__v ;
-  delete user.password;
-  user.password = null;
-  user.__v = null
-  return res.status(200).json( token);
-};
-
-export const renew = async (req: Request, res: Response): Promise<Response> => {
-	const user = req.user;
-  console.log("Renovó token");
-  console.log(user);
-  const newToken = createToken(user);
-  return res.status(200).json({ newToken });
-};
 
 /*
 export const list = async ( req: Request, res: Response ) =>{
@@ -146,9 +86,6 @@ class UserControler {
 	}
 
 	config () {
-    this.router.post('/signup', signUp);
-    this.router.post('/signin', signIn);
-    this.router.post('/renew',passport.authenticate('jwt', {session:false}), renew);
     this.router.get('/api/users/list',passport.authenticate('jwt', {session:false}), this.list );
     this.router.get('/api/users/search/:search',passport.authenticate('jwt', {session:false}), this.buscar );
     this.router.delete('/api/user/:id',passport.authenticate('jwt', {session:false}), this.delete );
@@ -190,7 +127,7 @@ class UserControler {
 			return res.status(404).json( err );
 		})
 	}
-	
+
 	async delete( req: Request, res: Response ){
 		const { id } = req.params;
 		User.findByIdAndDelete(id).then( (rpta: any) => {

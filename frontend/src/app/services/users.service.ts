@@ -26,5 +26,9 @@ export class UsersService {
               .post(`${this.ApiUri}/user/save/`, user)
               .toPromise();
   }
-
+  findUserByEmail(email): Promise<object> {
+    return this.http
+              .get(`${this.ApiUri}/user/email/:id`,email)
+              .toPromise()
+  }
 }

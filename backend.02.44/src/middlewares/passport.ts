@@ -9,12 +9,13 @@ const opts: StrategyOptions = {
 }
 
 export default new Strategy( opts, async (payload, done) =>{
- /*
+ 
   const now = new Date().valueOf();
   console.log(payload);
   console.log( Math.round( now / 1000 ));
- */
- const user = await User.findById(payload._id);
+ 
+  const user = await User.findById(payload._id);
+  console.log(user)
   try {
     if (user) return done(null, user)
     return done(null, false);

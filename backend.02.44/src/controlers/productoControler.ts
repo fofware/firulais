@@ -3,10 +3,13 @@ import producto, { IProducto } from '../models/producto';
 import { ObjectID } from 'bson'
 import passport from "passport";
 import articulos from '../models/articulos'
-import { articuloCtrl, articuloSanitize, articuloSanitizeString, readArticulos, readProductos, saleProduct } from './articuloControler';
+import { articuloCtrl, articuloSanitize, articuloSanitizeString, art_name_template, readArticulos, readProductos, saleProduct } from './articuloControler';
 import { qryProductosProcess, readParent } from '../common/productosCommon';
 import { decimales, round } from '../common/utils';
 import {Strategy, ExtractJwt, StrategyOptions} from 'passport-jwt';
+
+
+// TODO: hay que limpiar todo lo comentado de este archivo y crear las plantillas comunes para artículos y productos. 
 
 const full_project = {
 	"_id": 1,
@@ -110,7 +113,6 @@ const invalidData = {
 	'cerrado':0,
 	'parte':0,
 }
-
 export const productoGetData = async function( qry: any, outProject?: any, hiddenData?: any ): Promise<IProducto[]> {
 	if(!outProject) outProject = full_project;
 	if(!hiddenData) hiddenData = invalidData;
@@ -162,28 +164,7 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 				"iva": 1,
 				"margen": 1,
 				"articuloId": "$articulo",
-				'art_name':{ $trim: 
-					{ input: 
-						{	$concat: [
-							{ $cond: ['$art.d_fabricante', '$art.fabricante', '']},
-							{ $cond: ['$art.d_marca', ' ', '']},
-							{ $cond: ['$art.d_marca', '$art.marca', '']},
-							{ $cond: ['$art.d_especie', ' ', '']},
-							{ $cond: ['$art.d_especie', '$art.especie', '']},
-							{ $cond: ['$art.d_edad', ' ', '']},
-							{ $cond: ['$art.d_edad', '$art.edad', '']},
-							{ $cond: [ { $or: ['$art.d_marca','$art.d_fabricante','$art.d_especie','$art.d_edad'] }, ' ', '']},
-							'$art.name',
-							{ $cond: ['$art.d_raza', ' ', '']},
-							{ $cond: ['$art.d_raza', '$art.raza', '']},
-							{ $cond: ['$art.d_rubro', ' ', '']},
-							{ $cond: ['$art.d_rubro', '$art.rubro', '']},
-							{ $cond: ['$art.d_linea', ' ', '']},
-							{ $cond: ['$art.d_linea', '$art.linea', '']},
-							]
-						}
-					}
-				},
+				'art_name': art_name_template,
 				'url': '$art.url',
 				'art_image': '$art.image',
 				'art_iva': '$art.iva',

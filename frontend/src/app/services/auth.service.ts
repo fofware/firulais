@@ -30,6 +30,7 @@ export class AuthService {
       exp: 0
     };
   }
+
   signIn( user: any ): Observable<object> {
     return this.httpClient.post(this.URL + '/signin', user);
   }
@@ -41,6 +42,20 @@ export class AuthService {
   getToken(): string {
     const token = localStorage.getItem('token');
     return token;
+  }
+
+  async emailExists(email): Promise<boolean> {
+    console.log(email);
+    const rpta:any = await this.httpClient.get(`${this.URL}/emailcheck/${email}`).toPromise();
+    console.log(rpta);
+    return rpta.exists
+  }
+
+  async emailFind(email): Promise<[string]> {
+    console.log(email);
+    const rpta:any = await this.httpClient.get(`${this.URL}/emailcheck/${email}`).toPromise();
+    console.log(rpta);
+    return rpta
   }
 
   loggedIn(): boolean {
@@ -57,7 +72,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('token');
-    this.router.navigate(['/auth/signin']);
+    this.router.navigate([`/${AUTH_URI}/signin`]);
   }
 
   getUser(): any {
