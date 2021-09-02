@@ -29,6 +29,8 @@ export const art_name_template = { $trim:
 }
 
 export const productoGetData = async function( qry: any ): Promise<IProducto[]> {
+	// TODO: algo
+	
 	if( !qry.Producto ) qry.Producto = {};
 	if( !qry.Articulo ) qry.Articulo = {};
 	if( !qry.Extra ) qry.Extra = {};
