@@ -16,10 +16,11 @@ export class ArticuloCardViewReventaComponent implements OnInit {
     //this.productos = JSON.parse(JSON.stringify(this.articulo.productos));
 
     this.productos = this.articulo.productos;
-
+/*
     for (let i = 0; i < this.productos.length; i++) {
       const e = productosToShow(this.productos[i]);
     }
+*/
   }
 
 

@@ -3,13 +3,491 @@ import producto, { IProducto } from '../models/producto';
 import { ObjectID } from 'bson'
 import passport from "passport";
 import articulos from '../models/articulos'
-import { articuloCtrl, articuloSanitize, articuloSanitizeString, art_name_template, readArticulos, readProductos, saleProduct } from './articuloControler';
+import { articuloCtrl, articuloSanitize, articuloSanitizeString, art_name_template, dataProduct, readArticulos, readProductos, saleProduct } from './articuloControler';
 import { qryProductosProcess, readParent } from '../common/productosCommon';
 import { decimales, round } from '../common/utils';
 import {Strategy, ExtractJwt, StrategyOptions} from 'passport-jwt';
+export const producto_ins_template = () => {
+	return 				{
+		from: "productos",
+		let: { productoId: "$parent", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
+		pipeline: [
+			{
+				$match:
+				{
+					$expr:
+					{
+						$and:
+							[
+								{ $eq: ["$_id", "$$productoId"] },
+								// Este es un producto que se compra por caja 
+								// que contiene producto que se pueden vender o no
+								// de forma separada
+								// 
+								//{ $eq: ["$$pVenta", true] },
+								{ $eq: ["$$pCompra", true] },
+								//{ $eq: [ "$$pServicio", false ] },
+								{ $eq: ["$$pesable", false] },
+								//{ $eq: [ "$pVenta", true ] },
+								//{ $eq: [ "$pCompra", true ] },
+								//{ $eq: [ "$pesable", false ] }
+							]
+					}
+				}
+			},
 
+			{
+				$project: {
+					_id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, margen:1, stock: 1, image: 1, strContiene: { $toString: '$contiene' }
+				}
+				//$project: { name: 1, contiene: 1, unidad: 1, _id: 0 } 
+			}
 
-// TODO: hay que limpiar todo lo comentado de este archivo y crear las plantillas comunes para artículos y productos. 
+		],
+		as: "ins"
+	}
+
+}
+export const producto_parte_template = () => {
+	return 				{
+		from: "productos",
+		let: { productoId: "$parent", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
+		pipeline: [
+			{
+				$match:
+				{
+					$expr:
+					{
+						$and:
+							[
+								{ $eq: ["$_id", "$$productoId"] },
+								// Esto nos asegura que es un producto que se vende
+								// fraccionando
+								{ $eq: ["$$pVenta", true] },
+								{ $eq: ["$$pCompra", false] },
+								//{ $eq: [ "$$pServicio", false ] },
+								{ $eq: ["$$pesable", true] },
+
+								//{ $eq: [ "$pVenta", true ] },
+								//{ $eq: [ "$pCompra", true ] },
+								//{ $eq: [ "$pesable", false ] }
+							]
+					}
+				}
+			},
+			{
+				$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, margen:1, stock: 1, image: 1, strContiene: { $toString: '$contiene' } }
+			}
+		],
+		as: "parte"
+	}
+
+}
+export const producto_cerrado_template = () => {
+	return 				{
+		from: "productos",
+		let: { productoId: "$_id", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
+		pipeline: [
+			{
+				$match:
+				{
+					$expr:
+					{
+						$and:
+							[
+								{ $eq: ["$parent", "$$productoId"] },
+								// esto asegura que es un producto de venta que no se compra 
+								// y se incluye dentro de este pack no se fracciona
+								{ $eq: ["$$pVenta", true] },
+								{ $eq: ["$$pCompra", false] },
+								//{ $eq: [ "$$pServicio", false ] },
+								{ $eq: ["$$pesable", false] },
+								// no es necesario
+								//{ $eq: [ "$pVenta", true ] },
+								//{ $eq: [ "$pCompra", true ] },
+								//{ $eq: [ "$pesable", false ] }
+							]
+					}
+				}
+			},
+
+			{
+				$project: { _id: 1, parent: 1, name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, margen:1, stock: 1, image: 1, strContiene: { $toString: '$contiene' } }
+			}
+		],
+		as: "cerrado"
+	}
+
+}
+export const precioLista = (indice) => {
+	return {
+		$ceil:
+		{
+			$multiply: [{
+				$ceil: {
+					$divide: [{
+						$ceil:
+						{
+							$cond: [{ $eq: ['$count_parte', 0] },
+							{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }, indice] },
+							{
+								$cond:
+									[{ $eq: ['$count_cerrado', 0] },
+									{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }, indice] },
+									{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra', indice] }
+									]
+							}]
+						}
+					}, 10]
+				}
+			}, 10]
+		}
+	}
+}
+export const compra = () => {
+	return {
+		$cond:[	{ $eq: ['$count_parte', 0] },
+						{ $divide: ['$parte.compra', '$parte.contiene'] },
+						{	$cond:[	{ $eq: ['$count_cerrado', 0] },
+											{ $divide: ['$cerrado.compra', '$cerrado.contiene']},
+											'$compra'
+										]
+						}
+					]
+		}
+}
+
+export const calculaPrecio = (coeficienteDescuento,margenMinimo,pesable) => {
+	const incrementoMinimo = (margenMinimo+100)/100;
+	if(pesable)
+		return {
+			$cond: [
+				{ $eq: ['$pesable', true] },
+				{
+					$ceil: {
+						$ceil:
+						{
+							$cond: [{ $eq: ['$count_parte', 0] },
+							{
+								$cond: [{ $gt: [{ $multiply: ['$margen', coeficienteDescuento] }, '$parte.margen'] },
+								{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+								{ $multiply: [{ $add: ['$parte.margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] }
+								]
+							},
+							{
+								$cond:
+									[{ $eq: ['$count_cerrado', 0] },
+									{
+										$cond: [{ $gt: [{ $multiply: ['$margen', coeficienteDescuento] }, '$cerrado.margen'] },
+										{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
+										{ $multiply: [{ $add: ['$cerrado.margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] }
+										]
+									},
+									{
+										$cond: [{ $gt: [{ $multiply: ['$margen', coeficienteDescuento] }, '$margen'] },
+										{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, '$compra'] },
+										{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
+										]
+									}
+									]
+							}]
+						}
+					}
+				}
+				, {
+					$multiply: [{
+						$ceil: {
+							$divide: [{
+								$ceil:
+								{
+									$cond: [{ $eq: ['$count_parte', 0] },
+									{
+										$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$parte.margen'] },
+										{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+										{ $multiply: [{ $add: ['$parte.margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] }
+										]
+									},
+									{
+										$cond: [{ $eq: ['$count_cerrado', 0] },
+											{
+												$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$cerrado.margen'] },
+												{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
+												{ $multiply: [{ $add: ['$cerrado.margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] }
+												]
+											},
+											{
+/*												$cond: [{ $eq: ['$count_ins', 0] },
+													{
+														$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$margen'] },
+														{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, '$compra' ] },
+														{ $multiply: [incrementoMinimo, '$compra'] }
+														]
+													},
+													{
+*/														$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, margenMinimo] },
+														{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, '$compra'] },
+														{ $multiply: [incrementoMinimo, '$compra'] }
+														]
+													}]
+//											}]
+									}]
+								}
+							}, 10]
+						}
+					}, 10]
+				}
+			]
+		}
+	else
+		return {
+			$cond: [{ $eq: ['$pesable', true] },
+			{
+				$ceil: {
+					$ceil:
+					{
+						$cond: [{ $eq: ['$count_parte', 0] },
+						{ $multiply: [{ $add: ['$parte.margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+						{ $cond:[{ $eq: ['$count_cerrado', 0] },
+								{ $multiply: [{ $add: ['$cerrado.margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
+//								{
+//									$cond:[{ $eq: ['$count_ins', 0] },
+//										{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$compra', '$contiene'] }] },
+										{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
+//									]
+//								}
+								
+								]
+						}]
+					}
+				}
+			},
+			{
+				$multiply: [{
+					$ceil: {
+						$divide: [{
+							$ceil:
+							{
+								$cond: [{ $eq: ['$count_parte', 0] },
+								{
+									$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$parte.margen'] },
+									{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+									{ $multiply: [{ $add: ['$parte.margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] }
+									]
+								},
+								{
+									$cond: [{ $eq: ['$count_cerrado', 0] },
+										{
+											$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$cerrado.margen'] },
+											{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
+											{ $multiply: [{ $add: ['$cerrado.margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] }
+											]
+										},
+										{
+											$cond: [{ $eq: ['$count_ins', 0] },
+												{
+													$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$margen'] },
+													{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: ['$compra', '$contiene'] }] },
+													{ $multiply: [incrementoMinimo, '$compra'] }
+													]
+												},
+												{
+													$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, margenMinimo] },
+													{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, '$compra'] },
+													{ $multiply: [incrementoMinimo, '$compra'] }
+													]
+												}]
+										}]
+								}]
+							}
+						}, 10]
+					}
+				}, 10]
+			}
+		]
+	}
+
+}
+export const referencia = (Decimales) => {
+	return {
+		$round: [
+			{
+				$cond: [{ $eq: ['$count_parte', 0] },
+//				{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+				calculaPrecio(1,23,true),
+				{
+					$cond: [{ $eq: ['$count_cerrado', 0] },
+						{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$cerrado.compra'] }, { $cond: [{ $eq: ['$cerrado.contiene', 0] }, 1, { $multiply: ['$cerrado.contiene', '$contiene'] }] }] },
+						{ $divide: [calculaPrecio(1,23,true),{ $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }]}
+//					{
+//						$cond: [{ $eq: ['$count_ins', 0] },
+//						{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, '$contiene', { $multiply: ['$contiene', '$ins.contiene'] }] }] },
+//						{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }] }
+//						]
+//					}
+					]
+				}
+				]
+			},
+			{
+				$cond: [
+					{
+						$lt: [
+							{
+								$cond: [{ $eq: ['$count_parte', 0] },
+								{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+								{
+									$cond: [{ $eq: ['$count_cerrado', 0] },
+									{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$cerrado.compra'] }, { $cond: [{ $eq: ['$cerrado.contiene', 0] }, 1, { $multiply: ['$cerrado.contiene', '$contiene'] }] }] },
+									{
+										$cond: [{ $eq: ['$count_ins', 0] },
+										{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$ins.contiene', 0] }, '$contiene', { $multiply: ['$contiene', '$ins.contiene'] }] }] },
+										{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }] }
+										]
+									}
+									]
+								}
+								]
+							},
+							1
+						]
+					},
+					2,
+					Decimales
+
+				]
+			}
+		]
+	}
+
+}
+
+// TODO: #1 hay que limpiar el codigo en desuuso comentado de este archivo y crear las plantillas comunes para artículos y productos. 
+// buscar todo lo que se pueda unificar con articulos
+export const productoFullTemplate = 				
+{
+	"_id": 1,
+	"name": 1,
+	"contiene": 1,
+	"strContiene": { $cond: [{ $eq: ['$count_ins', 0] }, { $concat: ['con ', '$strContiene'] }, '$strContiene'] },
+	"unidad": 1,
+	"compra": 1,
+	"showCompra" : compra(),
+	"reposicion": 1,
+	precio: 1,
+	"calc_precio": {
+		$ceil:
+		{
+			$cond: [{ $eq: ['$count_parte', 0] },
+			{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+			{	$cond:
+					[ { $eq: ['$count_cerrado', 0] },
+					{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
+					{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
+					]
+			}]
+		}
+	},
+	'lista': precioLista(1.14),
+	'showPrecio': calculaPrecio(1,23,true),
+	'reventa': calculaPrecio(.8,18.5,true),
+	'reventa1': calculaPrecio(.43,14.5,true),
+	'reventa2': calculaPrecio(.1556,11.5,true),
+	'sub': {
+		$cond: [{ $eq: ['$count_ins', 0] },
+			'$ins',
+		{
+			$cond: [{ $eq: ['$count_parte', 0] },
+				'$parte',
+			{
+				$cond: [{ $eq: ['$count_cerrado', 0] },
+					'$cerrado',
+				{ 'name': '', 'strContiene': '', 'unidad': '' }
+				]
+			}
+			]
+		}
+		]
+	},
+	"pesable": 1,
+	"servicio": 1,
+	"pVenta": 1,
+	"pCompra": 1,
+	"codigo": 1,
+	"plu": 1,
+	"image": 1,
+	"stock": 1,
+	"scontiene": {
+		$cond: [{ $eq: ['$count_parte', 0] },
+			'',
+		{
+			$cond: [{ $eq: ['$count_cerrado', 0] },
+				'',
+			{
+				$cond: [{ $eq: ['$count_ins', 0] },
+					'$ins.contiene',
+					'']
+			}
+			]
+		}
+		]
+	},
+	"sStrContiene": {
+		$cond: [{ $eq: ['$count_parte', 0] },
+			'',
+		{
+			$cond: [{ $eq: ['$count_cerrado', 0] },
+				'',
+			{
+				$cond: [{ $eq: ['$count_ins', 0] },
+					'$ins.strContiene',
+					'']
+			}
+			]
+		}
+		]
+	},
+	"sname": {
+		$cond: [{ $eq: ['$count_parte', 0] },
+			'',
+		{
+			$cond: [{ $eq: ['$count_cerrado', 0] },
+				'',
+			{
+				$cond: [{ $eq: ['$count_ins', 0] },
+					'$ins.name',
+					'']
+			}
+			]
+		}
+		]
+	},
+	"sunidad": {
+		$cond: [{ $eq: ['$count_parte', 0] },
+			'',
+		{
+			$cond: [{ $eq: ['$count_cerrado', 0] },
+				'',
+			{
+				$cond: [{ $eq: ['$count_ins', 0] },
+					'$ins.unidad',
+					'']
+			}
+			]
+		}
+		]
+	},
+	"stockMin": 1,
+	"iva": 1,
+	"margen": 1,
+	"tipo": 1,
+	//'ins': 1,
+	'count_ins': 1,
+	//'cerrado':1,
+	'count_cerrado': 1,
+	//'parte':1,
+	'count_parte': 1,
+	'parent': 1
+};
 
 const full_project = {
 	"_id": 1,
@@ -100,7 +578,7 @@ const full_project = {
 					]},
 }
 
-const invalidData = {
+export const invalidData = {
 	"compra": 0,
 	"reposicion": 0,
 	"promedio": 0,
@@ -109,12 +587,13 @@ const invalidData = {
 	"margen": 0,
 	"art_margen": 0,
 	"tipo": 0,
-	'ins': 0,
-	'cerrado':0,
-	'parte':0,
+//	'ins': 0,
+//	'cerrado':0,
+//	'parte':0,
 }
+
 export const productoGetData = async function( qry: any, outProject?: any, hiddenData?: any ): Promise<IProducto[]> {
-	if(!outProject) outProject = full_project;
+	if(!outProject) outProject = productoFullTemplate;
 	if(!hiddenData) hiddenData = invalidData;
 	if( !qry.Producto ) qry.Producto = {};
 	if( !qry.Articulo ) qry.Articulo = {};
@@ -128,6 +607,7 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 //	console.log('Producto',qry.Producto);
 //	console.log('Extra',qry.Extra);
 //	console.log('Extra.$and',qry.Extra['$and']);
+	const calculatedPrecioLista = precioLista(1.14);
 	const array = await producto.aggregate([
 		{ $match: qry.Producto },
 		{
@@ -198,105 +678,13 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 			}
 		},
 		{
-      $lookup:
-         {
-           from: "productos",
-           let: { productoId: "$parent", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
-           pipeline: [
-							{ $match:
-                 { $expr:
-                    { $and:
-                       [
-												 { $eq: [ "$_id",  "$$productoId" ] },
-												 // Esto nos asegura que es un producto que se vende
-												 // fraccionando
-                         { $eq: [ "$$pVenta", true ] },
-                         { $eq: [ "$$pCompra", true ] },
- //                        { $eq: [ "$$pServicio", false ] },
-                         { $eq: [ "$$pesable", false ] },
-
-//												 { $eq: [ "$pVenta", true ] },
-//                         { $eq: [ "$pCompra", true ] },
-//                         { $eq: [ "$pesable", false ] }
-                       ]
-                    }
-                 }
-							},
-
-							{
-								$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0, image: 1, strContiene: {$toString: '$contiene'},
-							} 
-//								$project: { name: 1, contiene: 1, unidad: 1, _id: 0 } 
-							}
-
-           ],
-           as: "ins"
-         }
+			$lookup: producto_ins_template()
 		},
 		{
-      $lookup:
-         {
-           from: "productos",
-           let: { productoId: "$parent", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
-           pipeline: [
-							{ $match:
-                 { $expr:
-                    { $and:
-                       [
-												 { $eq: [ "$_id",  "$$productoId" ] },
-												 // Esto nos asegura que es un producto que se vende
-												 // fraccionando
-                         { $eq: [ "$$pVenta", true ] },
-                         { $eq: [ "$$pCompra", false ] },
- //                        { $eq: [ "$$pServicio", false ] },
-                         { $eq: [ "$$pesable", true ] },
-
-//												 { $eq: [ "$pVenta", true ] },
-//                         { $eq: [ "$pCompra", true ] },
-//                         { $eq: [ "$pesable", false ] }
-                       ]
-                    }
-                 }
-							},
-							{
-								$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0, image: 1, strContiene: {$toString: '$contiene'} } 
-							}
-           ],
-           as: "parte"
-         }
+			$lookup: producto_parte_template()
 		},
 		{
-      $lookup:
-         {
-           from: "productos",
-           let: { productoId: "$_id", pesable: "$pesable", pVenta: "$pVenta", pCompra: "$pCompra", pServicio: "$pServicio" },
-           pipeline: [
-							{ $match:
-                 { $expr:
-                    { $and:
-                       [
-												 { $eq: [ "$parent",  "$$productoId" ] },
-												 // esto asegura que es un producto de venta que no se compra 
-												 // y se incluye dentro de este pack no se fracciona
-                         { $eq: [ "$$pVenta", true ] },
-                         { $eq: [ "$$pCompra", false ] },
-//                         { $eq: [ "$$pServicio", false ] },
-                         { $eq: [ "$$pesable", false ] },
-												 // no es necesario
-//                         { $eq: [ "$pVenta", true ] },
-//                         { $eq: [ "$pCompra", true ] },
-//                         { $eq: [ "$pesable", false ] }
-                       ]
-                    }
-                 }
-							},
-
-							{
-								$project: { name: 1, contiene: 1, unidad: 1, precio: 1, compra: 1, reposicion: 1, stock: 1, _id: 0, image: 1, strContiene: {$toString: '$contiene'} } 
-							}
-           ],
-           as: "cerrado"
-         }
+			$lookup: producto_cerrado_template()
 		},
 		{
 			$unwind: {
@@ -320,13 +708,64 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 			}				
 		},
 		{
-			$project: 
+			$project:
+
 			{
 				"_id": 1,
 				"name": 1,
 				"contiene": 1,
 				"strContiene": {$cond: [{$eq:['$count_ins',0]}, {$concat: ['con ','$strContiene']}, '$strContiene']},
 				"unidad": 1,
+				"compra": 1,
+				"reposicion": 1,
+				precio: 1,
+				"calc_precio": {
+					$cond: [{ $eq: ['$pesable', true] },
+					{
+						$ceil: {
+							$ceil:
+							{
+								$cond: [{ $eq: ['$count_parte', 0] },
+								{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+								{
+									$cond:
+										[{ $eq: ['$count_cerrado', 0] },
+										{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
+										{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
+										]
+								}]
+							}
+						}
+					},
+					{
+						$multiply: [{
+							$ceil: {
+								$divide: [{
+									$ceil:
+									{
+										$cond: [{ $eq: ['$count_parte', 0] },
+										{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
+										{
+											$cond:
+												[{ $eq: ['$count_cerrado', 0] },
+												{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
+												{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
+												]
+										}]
+									}
+								}, 10]
+							}
+						}, 10]
+					}
+					]
+				},
+				
+				'lista': precioLista(1.14),
+				'showPrecio': calculaPrecio(1,23,true),
+				'reventa': calculaPrecio(.8,18.5,true),
+				'reventa1': calculaPrecio(.466,14.5,true),
+				'reventa2': calculaPrecio(.1556,11.5,true),
+/*
 				"compra": {
 					$round:[ 
 						{ $cond: [ {$eq: ['$count_parte', 0]}, 
@@ -381,54 +820,8 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 							}]
 					}
 				},
-				"precioref": {
-					$round: [
-						{
-							$cond: [{ $eq: ['$count_parte', 0] },
-							{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
-							{
-								$cond: [{ $eq: ['$count_cerrado', 0] },
-								{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$cerrado.compra'] }, { $cond: [{ $eq: ['$cerrado.contiene', 0] }, 1, { $multiply: ['$cerrado.contiene', '$contiene'] }] }] },
-								{
-									$cond: [{ $eq: ['$count_ins', 0] },
-									{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$ins.contiene', 0] }, '$contiene', { $multiply: ['$contiene', '$ins.contiene'] }] }] },
-									{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }] }
-									]
-								}
-								]
-							}
-							]
-						},
-						{
-							$cond: [
-								{
-									$lt: [
-										{
-											$cond: [{ $eq: ['$count_parte', 0] },
-											{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
-											{
-												$cond: [{ $eq: ['$count_cerrado', 0] },
-												{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$cerrado.compra'] }, { $cond: [{ $eq: ['$cerrado.contiene', 0] }, 1, { $multiply: ['$cerrado.contiene', '$contiene'] }] }] },
-												{
-													$cond: [{ $eq: ['$count_ins', 0] },
-													{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$ins.contiene', 0] }, '$contiene', { $multiply: ['$contiene', '$ins.contiene'] }] }] },
-													{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }] }
-													]
-												}
-												]
-											}
-											]
-										},
-										1
-									]
-								},
-								2,
-								qry.Decimales
-
-							]
-						}
-					]
-				},
+*/
+				"precioref": referencia(qry.Decimales),
 				'sub': {
 					$cond: [ {$eq: ['$count_ins',0]},
 						'$ins',
@@ -546,6 +939,7 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 				'count_parte': 1,
 				'private_web': 1
 			}
+			
 		},
 		{ $project: qry.showData },
 		{
@@ -732,8 +1126,20 @@ class ProductoControler {
 			const { id } = req.params
 
 //			const rpta = await producto.findById(id).populate();
-			const rpta:any = await productoGetData({Producto: {_id: new ObjectID(id)}});
-			const articulo:any = await readProductos({Articulo:{_id: new ObjectID(rpta[0]['articuloId']) }},saleProduct);
+			const qry = {
+				Producto: {_id: new ObjectID(id)},
+				hiddenData: {
+					'art_margen':0,
+					'compra': 0,
+					'promeedio': 0,
+					'sub.compra': 0,
+//					'sub.margen': 0,
+					'sub.reposicion': 0,
+					'reposicion': 0,
+				}
+			}
+			const rpta:any = await productoGetData(qry);
+			const articulo:any = await readProductos({Articulo:{_id: new ObjectID(rpta[0]['articuloId']) }}, dataProduct({hidden: qry.hiddenData}));
 //			rpta[0]['presentaciones'] = articulo[0].productos;				
 
 			rpta[0]['presentaciones'] = [];
@@ -743,7 +1149,7 @@ class ProductoControler {
 			}
 			res.status(200).json(rpta);
 		} catch (error) {
-			res.status(404).json(error);
+			res.json(error);
 		}
 	}
 
@@ -956,7 +1362,7 @@ class ProductoControler {
 				}
 			},
 //			'description': '$detalles',
-			'description': 'hay que armar la descripción',
+			'description': 'probando la descripción otra linea',
 			'availability': 'in stock',
 /*
 			'availability': {
@@ -967,8 +1373,8 @@ class ProductoControler {
 			'price':{
 				$concat: [{ 
 					$cond: [ { $eq:['$pesable', true] },
-									{$toString: { $ceil:  '$calc_precio'  }},
-									{$toString: { $multiply: [ { $ceil:{ $divide:['$calc_precio',10]}},10]}}
+									{$toString: { $ceil:  '$showPrecio'  }},
+									{$toString: { $multiply: [ { $ceil:{ $divide:['$showPrecio',10]}},10]}}
 								]}, ' ARS']
 			},
 			'link': {

@@ -31,6 +31,8 @@ export const tpPagos: any = [
   { name: 'Trj. Crédito 3 Pagos', value: 1.195802, coef: [] },
   { name: 'Trj. Crédito 6 Pagos', value: 1.364909, coef: [] }
 ];
+// TODO: #3 Esto se debe sacar
+/*
 export const tpLista: any = [
   { name: 'Publico', basePrecio: 'precio', value: 1, margen: false },
   { name: 'Test-Publico', basePrecio: 'compra', value: 1, margen: true },
@@ -40,7 +42,7 @@ export const tpLista: any = [
   { name: 'Revendedor2', basePrecio: 'promedio', value: 1.10, margen: false },
   { name: 'Revendedor3', basePrecio: 'compra', value: 1.10, margen: false },
 ];
-
+*/
 //export const API_URI = `${location.protocol}//firulais.net.ar:${(location.protocol == 'https:' ? 3443 : 3000)}/api`
 //export const AUTH_URI = `${location.protocol}//firulais.net.ar:${(location.protocol == 'https:' ? 3443 : 3000)}`
 

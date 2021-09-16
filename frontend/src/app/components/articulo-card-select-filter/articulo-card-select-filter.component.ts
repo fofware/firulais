@@ -8,14 +8,17 @@ import { API_URI } from 'src/app/shared/uris';
   templateUrl: './articulo-card-select-filter.component.html',
   styleUrls: ['./articulo-card-select-filter.component.css']
 })
-export class ArticuloCardSelectFilterComponent implements OnInit {
+export class ArticuloCardSelectFilterComponent implements OnInit, OnChanges{
 
   @Input() setting: any;
   @Input() filterButtons: any;
-  @Input() searchItem: string;
+//  @Input() searchItem: string;
+  @Input() wait: boolean;
   @Output() onSearchArticulos = new EventEmitter<object>();
   @Output() onButtonMsg = new EventEmitter<object>();
 
+  prevSearchItem = "";
+  searchItem = "";
 
   constructor(private http: HttpClient) { }
 
@@ -24,14 +27,25 @@ export class ArticuloCardSelectFilterComponent implements OnInit {
 
   // tslint:disable-next-line:use-lifecycle-interface
   ngOnChanges(changes: SimpleChanges): void {
-//    console.log('FILTER ONCHANGES');
-//    console.log(changes);
+    console.log('FILTER ONCHANGES');
+    if(changes.wait)
+      if(changes.wait.previousValue === true && changes.wait.currentValue === false) this.searchArticulos();
+      console.log(changes.wait);
+
   }
   searchArticulos(): void {
-    const searchItem = this.searchItem || '';
+    if(this.searchItem.length < 3 && this.prevSearchItem.length === 0) return
+    if(this.searchItem === this.prevSearchItem) return;
+    if(this.wait) return
+//    if(this.searchItem.length === 0 && this.prevSearchItem.length > 0)
+    this.prevSearchItem = this.searchItem;
+    const searchItem = this.prevSearchItem || '';
     //    console.log('FILTER-EMIT-EVENT');
     //this.onSearchArticulos.emit({ setting: this.setting, searchItem });
+    //
+
     this.onSearchArticulos.emit({ searchItem });
+
   }
   emitMsg(button){
     console.log(button);

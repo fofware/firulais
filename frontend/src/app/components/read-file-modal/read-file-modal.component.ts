@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -8,17 +8,20 @@ import { Observable } from 'rxjs';
   styleUrls: ['./read-file-modal.component.css']
 })
 export class ReadFileModalComponent implements OnInit {
-  @Input() encode: string;
+//  @Input() encode: string;
 
+  encode: string = "utf8";
   chosenFiles: FileList;
   existingFile: File;
-
+  data: string;
   progress = 0;
   msg = '';
   FileDetail: Observable<any>;
 
 
-  constructor(public activeModal: NgbActiveModal) { }
+  constructor(private modalService: NgbModal,
+              public activeModal: NgbActiveModal,
+            ) { }
 
   ngOnInit(): void {
     this.encode = ( this.encode == null ? 'utf8' : this.encode );
@@ -31,6 +34,8 @@ export class ReadFileModalComponent implements OnInit {
   gotData(data: any ): void {
     console.log("Got Data")
     console.log({ data, file: this.existingFile, chosenFile: this.chosenFiles })
+    this.data = data;
+    this.activeModal.close('load')
   }
 
 /*

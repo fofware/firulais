@@ -17,6 +17,7 @@ export function round( num: any, dec: number ): number {
   return Number(num);
 }
 export const decimales = 2;
+/*
 export const tpLista: any = [
   { name: 'Publico', basePrecio: 'precio', value: 1, margen: false },
   { name: 'Test-Publico', basePrecio: 'reposicion', value: 1, margen: true },
@@ -26,8 +27,11 @@ export const tpLista: any = [
   { name: 'Revendedor2', basePrecio: 'promedio', value: 1.10, margen: false },
   { name: 'Revendedor3', basePrecio: 'compra', value: 1.10, margen: false },
 ];
+*/
 export function productosToShow(e){
+  // TODO: #4 todos los precios se deben calcular en el servidor esto hay que sacarlo de acá
   let reventa = (e.margen ? e.margen : 30);
+
 
   if(e.count_cerrado === 0){
     e.precioxunidad = Math.round(e.sub.compra/e.sub.contiene/e.contiene);
@@ -59,9 +63,17 @@ export function productosToShow(e){
 //    e.calc_precio = Math.ceil( ((e.compra || e.showCompra)*recargo));
   }
 */
+  // TODO: #5 Aquí se etán calculando los precios para revendedores se debe hacer en el server y además hay que armar un sistema de promosiones y ofertas
   e.lista = Math.ceil(Math.ceil(e.calc_precio*1.120220997));
-  e.reventa = Math.ceil(((e.compra || e.showCompra)*((reventa/3*2)+100)/100));
-  e.reventa1 = Math.ceil(((e.compra || e.showCompra)*((reventa/3*1.5)+100)/100));
+  if (e.pesable) {
+    e.reventa = e.calc_precio;
+    e.reventa1 = e.calc_precio;
+    e.reventa2 = e.calc_precio;
+  } else {
+    e.reventa = Math.ceil(((e.compra || e.showCompra)*( (((reventa/3*2.4)+100) < 118.5 ? 118.5 : (reventa/3*2.4)+100))/100));
+    e.reventa1 = Math.ceil(((e.compra || e.showCompra)*( (((reventa/3*1.4)+100) < 114.5 ? 114.5 : (reventa/3*1.4)+100))/100));
+    e.reventa2 = Math.ceil(((e.compra || e.showCompra)*( (((reventa/3*.467)+100) < 111.5 ? 111.5 : (reventa/3*.467)+100))/100));
+  }
 
   return e;
 }

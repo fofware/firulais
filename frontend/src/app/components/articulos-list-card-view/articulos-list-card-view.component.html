@@ -12,8 +12,8 @@
     </h4>
     <div class="d-flex flex-row print-oculta">
       <div class="block" style="width: max-content;">
-        <button class="btn btn-outline-primary" (click)="editdata()"><i class="fas fa-edit"></i></button>
-        <button class="btn btn-outline-danger" (click)="editdata()"><i class="fas fa-trash-alt"></i></button>
+        <button class="btn btn-outline-primary print-oculta" (click)="editdata()"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-outline-danger print-oculta" (click)="editdata()"><i class="fas fa-trash-alt"></i></button>
       </div>
     </div>
   </div>
@@ -39,14 +39,15 @@
       <td  align="center"><strong>Presentación</strong></td>
       <td width='35px' align="right"><strong>Stock</strong></td>
       <td width='80px' align="right"><strong>Compra</strong></td>
-      <!--td width='80px' align="right"><strong>Reposición</strong></td>
-      <td width='80px' align="right"><strong>Pre/Un</strong></td>
-      <td width='80px' align="right"><strong>% Mgen</strong></td-->
+      <!--td width='80px' align="right"><strong>Reposición</strong></td-->
+      <td width='80px' align="right"><strong>Costo/Un</strong></td>
+      <td width='80px' align="right"><strong>%Mgn</strong></td>
       <td width='80px' align="right"><strong>Lista</strong></td>
-      <td width='80px' align="right"><strong>Pcio.Pub</strong></td>
-      <td width='80px' align="right"><strong>+ de 1</strong></td>
-      <td width='80px' align="right"><strong>+ de 4</strong></td>
-      <td width='80px' align="right"><strong>+ de 9</strong></td>
+      <td width='80px' align="right"><strong>Eft</strong></td>
+      <td width='80px' align="right"><strong>Pre/Un</strong></td>
+      <td width='80px' align="right"><strong>3 a 5</strong></td>
+      <td width='80px' align="right"><strong>6 a 9</strong></td>
+      <td width='80px' align="right"><strong>10 o+</strong></td>
     </thead>
     <tbody>
       <tr *ngFor="let producto of productos; index as i;">
@@ -56,12 +57,13 @@
           {{producto.unidad}} {{producto.sname}}
           {{producto.sStrContiene}} {{producto.sunidad}}</td>
         <td width='35px' align="right">{{producto.stock || producto.showStock }}</td>
-        <td width='80px' align="right">{{producto.compra || producto.showCompra }}</td>
-        <!--td width='80px' align="right">{{producto.reposicion}}</td>
-        <td width='80px' align="right">{{producto.precioxunidad}}/{{producto.unidad}}</td>
-        <td width='80px' align="right">{{producto.margen}}%</td-->
+        <td width='80px' align="right">{{round(producto.compra || producto.showCompra) }}</td>
+        <!--td width='80px' align="right">{{producto.reposicion}}</td-->
+        <td width='80px' align="right">{{round((producto.compra || producto.showCompra)/producto.contiene)}}/{{sub(producto.unidad,2)}}</td>
+        <td width='80px' align="right">{{producto.margen}}%</td>
         <td width='80px' align="right">{{producto.lista}}</td>
         <td width='80px' align="right">{{producto.showPrecio}}</td>
+        <td width='80px' align="right">{{round(producto.showPrecio/producto.contiene)}}/{{sub(producto.unidad,2)}}</td>
         <td width='80px' align="right">{{producto.reventa}}</td>
         <td width='80px' align="right">{{producto.reventa1}}</td>
         <td width='80px' align="right">{{producto.reventa2}}</td>
@@ -74,7 +76,7 @@
   <div class="imgbox">
     <img class="caja-img" src="{{articulo.image}}" alt="">
   </div>
-  <a class="cajaUrl btn btn-link" href="{{articulo.url}}" target='_blanck'
+  <a class="cajaUrl btn btn-link print-oculta" href="{{articulo.url}}" target='_blanck'
     [hidden]="!articulo.url || articulo.url == ''">
     <i class="fas fa-info-circle" (click)="opLink(articulo.url)"></i>
   </a>

@@ -1,0 +1,12 @@
+<table>
+  <tr *ngFor="let articulo of articuloList; index as i;">
+    <td>
+      <app-articulos-list-card-view
+      [articulo]='articulo'
+      [idx]=i
+      [publico]='publico'
+      (onSelectArticulo)='SelectEvent($event)'
+    ></app-articulos-list-card-view>
+    </td>
+  </tr>
+</table>

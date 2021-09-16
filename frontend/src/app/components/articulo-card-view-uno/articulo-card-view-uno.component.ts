@@ -21,9 +21,11 @@ export class ArticuloCardViewUnoComponent implements OnInit, OnChanges {
 
     this.productos = this.articulo.productos;
 
+/*
     for (let i = 0; i < this.productos.length; i++) {
       const e = productosToShow(this.productos[i]);
     }
+*/
 /*
     for (let i = 0; i < this.productos.length; i++) {
       const e = this.productos[i];

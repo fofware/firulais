@@ -8,10 +8,12 @@ import { promise } from 'selenium-webdriver';
 import { IPersonas } from 'src/app/models/i-personas';
 import { CsvfileService } from 'src/app/services/csvfile.service';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
+import { ListasProveedoresService, proveedoresSettings } from 'src/app/services/listas-proveedores.service';
 import { PersonasService } from 'src/app/services/personas.service';
-import { round, tpLista } from 'src/app/shared/toolbox';
+import { round } from 'src/app/shared/toolbox';
 import { API_URI } from 'src/app/shared/uris';
 import { ReadCsvFileModalComponent } from '../read-csv-file-modal/read-csv-file-modal.component';
+import { ReadFileModalComponent } from '../read-file-modal/read-file-modal.component';
 import { ReadXlsxFileModalComponent } from '../read-xlsx-file-modal/read-xlsx-file-modal.component';
 
 @Component({
@@ -20,11 +22,11 @@ import { ReadXlsxFileModalComponent } from '../read-xlsx-file-modal/read-xlsx-fi
   styleUrls: ['./cargalistas.component.css']
 })
 export class CargalistasComponent implements OnInit, OnChanges {
-
+  provSettings = proveedoresSettings;
   ApiUri = API_URI;
   wait = false;
   searchItem = '';
-  lista = tpLista;
+//  lista = tpLista;
   cmpSetting = {
     tipo: 'Compra',
     public: false
@@ -310,14 +312,21 @@ export class CargalistasComponent implements OnInit, OnChanges {
   }
   modalsNumber = 0;
   dbPersonas: IPersonas[];
-  proveedor: string = "";
+  proveedor = 0;
+  newData:any = [];
+  errorData:any = [];
+
+  page = 1;
+  pageSize = 15;
+  collectionSize = 0;
 
   constructor(
     private csv: CsvfileService,
     private http: HttpClient,
     private list: ListasArtProdService,
     private personas: PersonasService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private procesaLista: ListasProveedoresService
   ) {
     this.modalService.activeInstances.subscribe((list) => {
       this.modalsNumber = list.length;
@@ -342,7 +351,214 @@ export class CargalistasComponent implements OnInit, OnChanges {
     */
 
   }
-  readFile() {
+
+//  readFileSciarriello(){
+//    console.log("Read File")
+//    const modalRef = this.modalService.open(ReadFileModalComponent, {
+//      ariaLabelledBy: 'modal-basic-title'
+//      , size: 'xl'
+//      /*
+//            , beforeDismiss: () => {
+//              console.log("BeforeDisMiss");
+//              const ret: boolean = modalRef.componentInstance.checkData();
+//              return ret;
+//            }
+//      */
+//      //, windowClass: 'xlModal'
+//      , scrollable: true
+//      , centered: false
+//      , backdrop: true
+//    });
+//    modalRef.componentInstance.encode = this.encode;
+//    modalRef.result.then((result) => {
+//      if (result) {
+//        console.log(result);
+//        const validata = []
+//        if (result === 'load') {
+//          const data: any = modalRef.componentInstance.data.split('\n');
+//          data.map((line: string) => {
+//            if (line.search('[$]') > -1) {
+//              line = line.replace(/,/g, '');
+//              const capturingRegexText = /(?<Name>[A-Za-z0-9+-_ñÑáéíóúÁÉÍÓÚÜü ]*)(?<contiene>[0-9]*)(?:\s)(?<unidad>:[A-Za-Z]*)[ ][$](?<lista>[0-9.]*)[$ ]*(?<medio>[0-9.]*)[$ ]*(?<full>[0-9.]*)/;
+//              // SABROSITOS GATO MIX 4 UNI X 3 KGS $1631 $1694
+//              // SABROSITOS GATO MIX 10 KGS $1308 $1341
+//              const reg = line.match(capturingRegexText);
+//              if (reg) validata.push(reg);
+//              else this.errorData.push(line);
+//            }
+//          })
+//          for (let index = 0; index < validata.length; index++) {
+//            const reg = validata[index];
+//            const obj = reg.groups;
+//            if (obj.lista === "") obj.lista = 0;
+//            else obj.lista = parseFloat(obj.lista);
+//            if (obj.medio === "") obj.medio = obj.lista;
+//            else obj.medio = parseFloat(obj.medio);
+//            if (obj.full === "") {
+//              obj.full = obj.medio;
+//              obj.medio = obj.lista;
+//            } else obj.full = parseFloat(obj.full);
+////            let bulto = obj.Name.match(/([A-Za-z0-9+-_ñÑáéíóúÁÉÍÓÚÜü ]*)([0-9]*)\s[xX]$|([A-Za-z0-9+-_ñÑáéíóúÁÉÍÓÚÜü ]*)[xX]$/);
+//            const coso = obj.Name.match(/([A-Za-z0-9+-_ñÑáéíóúÁÉÍÓÚÜü ]*)([0-9]*)\s[xX]$|([A-Za-z0-9+-_ñÑáéíóúÁÉÍÓÚÜü ]*)[xX]$/);;
+//            if(coso){
+//              obj.Name = coso[1] || coso[3]
+//              const cosito = coso[1].match(/([0-9]*)([ ]*)([a-zA-ZñÑáéíóúÁÉÍÓÚÜü]*)$/)
+////              obj.coso = coso;
+////              obj.cosito = cosito;
+//              if(cosito[1] === ""){
+//                obj.bulto = 1;
+//              } else {
+//                obj.bulto = parseFloat(cosito[1] || "1")
+//                obj.Name = obj.Name.replace(cosito[1],'').trim()
+//              }
+//            } else obj.bulto = 1
+//            obj.proveedor = this.proveedor;
+//            obj.contiene = parseFloat(obj.contiene);
+//            if (!obj.codigo) obj.codigo = `${obj.Name} ${obj.contiene} ${obj.unidad}`
+//            obj.reposocion = Math.ceil((obj.full / 1.21 * 1.245)*100)/100;
+//          }
+//          this.newData = validata;
+//          this.collectionSize = this.newData.length;
+//          console.log(this.newData);
+//          console.log(this.errorData);
+//        }
+//      }
+//    });
+//  }
+  readTxt(proveedor:string) {
+    console.log("Read File")
+    const modalRef = this.modalService.open(ReadFileModalComponent, {
+      ariaLabelledBy: 'modal-basic-title'
+      , size: 'xl'
+      /*
+            , beforeDismiss: () => {
+              console.log("BeforeDisMiss");
+              const ret: boolean = modalRef.componentInstance.checkData();
+              return ret;
+            }
+      */
+      //, windowClass: 'xlModal'
+      , scrollable: true
+      , centered: false
+      , backdrop: true
+    });
+    modalRef.componentInstance.encode = this.encode;
+    modalRef.result.then( async (result) => {
+      if (result) {
+        console.log(result);
+        const validata = []
+        if (result === 'load') {
+          //const retData = this.procesaLista[proveedor](modalRef.componentInstance.data)
+          this.newData = await this.procesaLista[proveedor](modalRef.componentInstance.data)
+          this.collectionSize = this.newData.length;
+          console.log(this.newData);
+        }
+      }
+    });
+  }
+
+  readFileButter() {
+    console.log("Read File")
+    const modalRef = this.modalService.open(ReadFileModalComponent, {
+      ariaLabelledBy: 'modal-basic-title'
+      , size: 'xl'
+      /*
+            , beforeDismiss: () => {
+              console.log("BeforeDisMiss");
+              const ret: boolean = modalRef.componentInstance.checkData();
+              return ret;
+            }
+      */
+      //, windowClass: 'xlModal'
+      , scrollable: true
+      , centered: false
+      , backdrop: true
+    });
+    modalRef.componentInstance.encode = this.encode;
+    modalRef.result.then((result) => {
+      if (result) {
+        console.log(result);
+        const validata = []
+        if (result === 'load') {
+          const data: any = modalRef.componentInstance.data.split('\n');
+          data.map((line: string) => {
+            if (line.search('[$]') > -1) {
+              line = line.replace(/,/g, '');
+              const capturingRegexText = /(?<Name>[A-Za-z0-9+-_ñÑáéíóúÁÉÍÓÚÜü ]*)(?<bulto>[0-9]*)(?:\s)(?:[xX]?)(?:\s*)(?<contiene>[0-9.]*)[ ](?<unidad>[A-Za-z]*)[ ][$][ ](?<lista>[0-9.]*)[$ ]*(?<medio>[0-9.]*)[$ ]*(?<full>[0-9.]*)/;
+              const reg = line.match(capturingRegexText);
+              if (reg) validata.push(reg.groups);
+              else this.errorData.push(line);
+            }
+          })
+          for (let index = 0; index < validata.length; index++) {
+            const reg = validata[index];
+            const obj = reg;
+            if (obj.lista === "") obj.lista = 0;
+            else obj.lista = parseFloat(obj.lista);
+            if (obj.medio === "") obj.medio = obj.lista;
+            else obj.medio = parseFloat(obj.medio);
+            if (obj.full === "") {
+              obj.full = obj.medio;
+              obj.medio = obj.lista;
+            } else obj.full = parseFloat(obj.full);
+            const coso = obj.Name.match(/([A-Za-z0-9+-_ñÑáéíóúÁÉÍÓÚÜü ]*)([0-9]*)\s[xX]$|([A-Za-z0-9+-_ñÑáéíóúÁÉÍÓÚÜü ]*)[xX]$/);;
+            if(coso){
+              obj.Name = coso[1] || coso[3]
+              const cosito = coso[1].match(/([0-9]*)([ ]*)([a-zA-ZñÑáéíóúÁÉÍÓÚÜü]*)$/)
+//              obj.coso = coso;
+//              obj.cosito = cosito;
+              if(cosito[1] === ""){
+                obj.bulto = 1;
+              } else {
+                obj.bulto = parseFloat(cosito[1] || "1")
+                obj.Name = obj.Name.replace(cosito[1],'').trim()
+              }
+            } else obj.bulto = 1
+            obj.proveedor = this.proveedor;
+            obj.contiene = parseFloat(obj.contiene);
+            if (!obj.codigo) obj.codigo = `${obj.Name} ${obj.contiene} ${obj.unidad}`
+            obj.reposicion = Math.ceil((obj.full / 1.21 * 1.245)*100)/100;
+          }
+          this.newData = validata;
+          this.collectionSize = this.newData.length;
+          console.log(this.newData);
+          console.log(this.errorData);
+        }
+      }
+    });
+  }
+/*
+  inewReg(ev){
+    console.log("Add New Articulo")
+    this.selectedArticulo = this.newArticulo;
+    this.selectedArticulo._id = new ObjectID();
+
+    //const newArticulo = this.modalService.open(ArticuloFormAddModalComponent);
+    const modalRef = this.modalService.open(ArticuloFormComponent, {
+      ariaLabelledBy: 'modal-basic-title'
+      , size: 'xl'
+      , beforeDismiss: () => {
+        console.log("BeforeDisMiss");
+        const ret: boolean = modalRef.componentInstance.checkData();
+        return ret;
+      }
+      //, windowClass: 'xlModal'
+      , scrollable: true
+      , centered: false
+      , backdrop: false
+    });
+    modalRef.componentInstance.selectedArticulo = this.selectedArticulo;
+    modalRef.result.then((result) => {
+      if (result) {
+        console.log(result);
+        if (result === 'Save'){
+          this.articuloList.push(modalRef.componentInstance.selectedArticulo);
+        }
+      }
+    });
+  }
+*/
+  readFileCSV() {
     console.log("Read File")
     const modalRef = this.modalService.open(ReadCsvFileModalComponent, {
       ariaLabelledBy: 'modal-basic-title'
@@ -367,7 +583,50 @@ export class CargalistasComponent implements OnInit, OnChanges {
     });
 
   }
-  readXlsxFile() {
+  readLista(){
+    console.log("selccionado",this.proveedor)
+    console.log(this.provSettings[this.proveedor])
+    const prove = this.provSettings[this.proveedor];
+    if(prove.type === "XLSX"){
+      console.log("Read File")
+      const modalRef = this.modalService.open(ReadXlsxFileModalComponent, {
+        ariaLabelledBy: 'modal-basic-title'
+        , size: 'xl'
+        /*
+              , beforeDismiss: () => {
+                console.log("BeforeDisMiss");
+                const ret: boolean = modalRef.componentInstance.checkData();
+                return ret;
+              }
+        */
+        //, windowClass: 'xlModal'
+        , scrollable: true
+        , centered: false
+        , backdrop: true
+      });
+      modalRef.componentInstance.named = prove.named;
+      modalRef.componentInstance.encode = prove.encode;
+      modalRef.result.then(async (result) => {
+        if (result) {
+          console.log(this.newData);
+          console.log(result.wb)
+          this.data = await this.procesaLista[prove.type](prove,result.wbData)
+          this.newData = this.data;
+          this.collectionSize = this.newData.length;
+        }
+      });
+
+    }
+  }
+
+  async importArticulos(){
+    for (const reg of this.newData) {
+      const rpta:any = await this.procesaLista.addProducto(reg);
+      console.log(rpta);
+    }
+  }
+
+  readXlsxFile(proveedor) {
     console.log("Read File")
     const modalRef = this.modalService.open(ReadXlsxFileModalComponent, {
       ariaLabelledBy: 'modal-basic-title'
@@ -384,15 +643,18 @@ export class CargalistasComponent implements OnInit, OnChanges {
       , centered: false
       , backdrop: true
     });
+    modalRef.componentInstance.named = false;
     modalRef.componentInstance.encode = this.encode;
     modalRef.result.then((result) => {
       if (result) {
-        this.xlsxToTable(result.wbData)
+        console.log(result.wb)
+        this.xlsxToTable(proveedor,result.wbData)
       }
     });
   }
-  xlsxToTable(src) {
+  xlsxToTable(proveedor,src) {
 //    console.log('xlsx', src);
+/*
     this.data = [];
     for (const key in src) {
       if (Object.prototype.hasOwnProperty.call(src, key)) {
@@ -404,6 +666,11 @@ export class CargalistasComponent implements OnInit, OnChanges {
         }
       }
     }
+*/
+    this.data = this.procesaLista[proveedor](src)
+    this.newData = this.data;
+    this.collectionSize = this.newData.length;
+
 /*
     let fd: string[] = [];
     this.fields = [];
@@ -928,11 +1195,16 @@ export class CargalistasComponent implements OnInit, OnChanges {
     );
     */
   }
+
   async checkIdLista() {
+
+/*
     if (this.proveedor === '') {
       alert('Debe Seleccionar Proveedor');
       return;
     }
+*/
+/*
     for (let i = 0; i < this.data.length; i++) {
 //      const e = this.setReg(i);
       const e = this.data[i];
@@ -959,7 +1231,9 @@ export class CargalistasComponent implements OnInit, OnChanges {
 //    this.typeValues.push('_id');
 //    this.typeValues.push('status');
     console.log(this.data);
+  */
   }
+
   async checkId(e){
     e['codigo_proveedor'] = e['codigo_proveedor'] + '';
     if (e['codigo_proveedor'] === '') {
@@ -1035,10 +1309,12 @@ export class CargalistasComponent implements OnInit, OnChanges {
   }
   async importarFile() {
     console.log('Proveedor', this.proveedor);
+/*
     if (this.proveedor === '') {
       alert('Debe Seleccionar Proveedor');
       return;
     }
+*/
     for (let i = 0; i < this.data.length; i++) {
       const e = this.data[i];
       this.checkId(e);
@@ -1111,5 +1387,8 @@ export class CargalistasComponent implements OnInit, OnChanges {
       }
     }
 */
+  }
+  margen(sug,rep): number {
+    return round((((sug || rep) / rep)-1)*100,2)
   }
 }

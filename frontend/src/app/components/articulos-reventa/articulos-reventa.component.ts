@@ -146,6 +146,11 @@ export class ArticulosReventaComponent implements OnInit {
 
   articuloOrder = [
     {
+      name: 'Lista',
+      vista: 1,
+      sort: { fabricante: 1, marca: 1, especie: 1, rubro: 1, linea: 1, edad: -1, fullName: 1  }
+    },
+    {
       name: 'Descripción',
       vista: 1,
       sort: { fullName: 1, name: 1, contiene: 1  }

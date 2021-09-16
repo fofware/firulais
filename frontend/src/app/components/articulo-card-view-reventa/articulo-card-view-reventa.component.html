@@ -30,37 +30,38 @@
     <thead>
       <tr>
         <td *ngIf="!articulo.image"></td>
-        <td colspan="3"></td>
+        <td colspan="2"></td>
         <!--td width='80px' align="right"><strong>Compra</strong></td-->
         <!--td width='80px' align="right"><strong>Reposición</strong></td>
         <td width='80px' align="right"><strong>Pre/Un</strong></td>
         <td width='80px' align="right"><strong>% Mgen</strong></td-->
-        <td colspan="2" align="center" bgcolor="#cecece"><strong>Público</strong></td>
-        <td colspan="2" align="center" bgcolor="#eeeeee"><strong>Reventa</strong></td>
+        <td colspan="2" align="center" bgcolor="#cecece"><strong>Minorista</strong></td>
+        <td colspan="3" align="center" bgcolor="#eeeeee"><strong>Mayorista</strong></td>
       </tr>
       <tr>
         <td *ngIf="!articulo.image"><strong>Picture</strong></td>
         <td  align="center"><strong>Código</strong></td>
         <td  align="center"><strong>Presentación</strong></td>
-        <td width='35px' align="right"><strong>Stk</strong></td>
+        <!--td width='35px' align="right"><strong>Stk</strong></td-->
         <!--td width='80px' align="right"><strong>Compra</strong></td-->
         <!--td width='80px' align="right"><strong>Reposición</strong></td>
         <td width='80px' align="right"><strong>Pre/Un</strong></td>
         <td width='80px' align="right"><strong>% Mgen</strong></td-->
         <td width='80px' align="right" bgcolor="#cecece" style="padding: 5px;"><strong>Lista</strong></td>
         <td width='80px' align="right" bgcolor="#cecece" style="padding: 5px;"><strong>Efectivo</strong></td>
-        <td width='80px' align="right" bgcolor="#eeeeee" style="padding: 5px;"><strong>2 a 4</strong></td>
-        <td width='80px' align="right" bgcolor="#eeeeee" style="padding: 5px;"><strong>+ de 4</strong></td>
+        <td width='80px' align="right" bgcolor="#eeeeee" style="padding: 5px;"><strong>3/5</strong></td>
+        <td width='80px' align="right" bgcolor="#eeeeee" style="padding: 5px;"><strong>6/9</strong></td>
+        <td width='80px' align="right" bgcolor="#eeeeee" style="padding: 5px;"><strong>10/+</strong></td>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let producto of productos; index as i;">
+      <tr *ngFor="let producto of productos; index as i;" [hidden]="producto.pesable">
         <td *ngIf="!articulo.image" align='center'><img src="{{producto.image}}" alt="" style="height: 60px; width: auto;"> </td>
         <td width='35px' align="right">{{producto.codigo}}</td>
         <td >{{producto.name}} {{producto.strContiene}}
           {{producto.unidad}} {{producto.sname}}
           {{producto.sStrContiene}} {{producto.sunidad}}</td>
-        <td width='35px' align="right" style="padding: 5px;">{{ producto.showStock || producto.stock }}</td>
+        <!--td width='35px' align="right" style="padding: 5px;">{{ producto.showStock || producto.stock }}</td-->
         <!--td width='80px' align="right">{{producto.compra || producto.showCompra }}</td-->
         <!--td width='80px' align="right">{{producto.reposicion}}</td>
         <td width='80px' align="right">{{producto.precioxunidad}}/{{producto.unidad}}</td>
@@ -69,6 +70,7 @@
         <td width='80px' align="right" style="padding: 5px;">{{producto.showPrecio}}</td>
         <td width='80px' align="right" style="padding: 5px;">{{producto.reventa}}</td>
         <td width='80px' align="right" style="padding: 5px;">{{producto.reventa1}}</td>
+        <td width='80px' align="right" style="padding: 5px;">{{producto.reventa2}}</td>
       </tr>
     </tbody>
   </table>

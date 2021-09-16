@@ -68,6 +68,8 @@ import { ArticuloCardViewGuestFullComponent } from './components/articulo-card-v
 import { UsersFilterPipe } from './pipes/users-filter.pipe';
 import { UserModalFormComponent } from './components/user-modal-form/user-modal-form.component';
 import { AlertComponent } from './_components/alert/alert.component';
+import { ArticulosListPrintComponent } from './components/articulos-list-print/articulos-list-print.component';
+import { ArticulosListCardViewComponent } from './components/articulos-list-card-view/articulos-list-card-view.component';
 
 @NgModule({
   declarations: [
@@ -132,6 +134,8 @@ import { AlertComponent } from './_components/alert/alert.component';
     UsersFilterPipe,
     UserModalFormComponent,
     AlertComponent,
+    ArticulosListPrintComponent,
+    ArticulosListCardViewComponent,
   ],
   imports: [
     BrowserModule,

@@ -4,14 +4,48 @@
 <header>
   <select name="proveedor"  [(ngModel)]="proveedor">
     <option value=""></option>
-    <option *ngFor="let val of dbPersonas"  value="{{val._id}}" >{{val.apellido}}{{val.nombre}}</option>
+    <option *ngFor="let val of provSettings; index as i"  value="{{i}}" >{{val.nombre}}</option>
   </select>
+  <ngb-pagination
+  [collectionSize]="collectionSize"
+  [pageSize] = 'pageSize'
+  [(page)]="page"
+  [boundaryLinks]="true"
+>
+<ng-template ngbPaginationPages let-page let-pages="pages" class="mb-0">
+    <li class="ngb-custom-pages-item" *ngIf="pages.length > 0">
+        <div class="form-group d-flex flex-nowrap px-2">
+          <label
+              id="paginationInputLabel"
+              for="paginationInput"
+              class="col-form-label mr-2 ml-1 bg-white"
+          >Pág.</label>
+          <input #i
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              class="form-control custom-pages-input"
+              id="paginationInput"
+              [value]="page"
+              (keyup.enter)="selectPage(i.value)"
+              (blur)="selectPage(i.value)"
+              (input)="formatInput($any($event).target)"
+              aria-labelledby="paginationInputLabel paginationDescription"
+              style="width: 3.5rem"
+          />
+          <span id="paginationDescription" class="col-form-label text-nowrap px-2 bg-white">
+              de {{pages.length}}</span>
+        </div>
+    </li>
+</ng-template>
+</ngb-pagination>
+
 <app-producto-autocomplete
 ></app-producto-autocomplete>
 </header>
 <div id='main' (window:resize)="onResize($event)">
   <article>
-    <table class="table">
+    <table class="table" [hidden]="true">
       <thead>
         <tr>
           <th scope="col">
@@ -82,16 +116,93 @@
         </tr-->
       </tbody>
     </table>
+    <div class="card-container">
+      <div class="card  pt-2 pl-2 pr-2 mb-2 mycolor1 col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 no-gutters"
+      *ngFor="let item of newData | slice: (page-1) * pageSize : page * pageSize; index as i">
+      <div class="form-row align-items-center">
+        <div class="col">
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">Código</div>
+            </div>
+            <input type="text" class="form-control" id="codigo_{{i}}" placeholder="Código" [(ngModel)]="item.codigo">
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">EAN</div>
+            </div>
+            <input type="text" class="form-control" id="ean_{{i}}" placeholder="EAN" [(ngModel)]="item.ean">
+          </div>
+        </div>
+      </div>
+      <div class="form-row align-items-center">
+        <div class="col-12">
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">Nombre</div>
+            </div>
+            <input type="text" class="form-control" id="nombre_{{i}}" placeholder="Nombre" [(ngModel)]="item.nombre">
+          </div>
+        </div>
+      </div>
+      <div class="form-row align-items-center justify-content-end">
+        <div class="col-sm-3 col-md-2 col-lg-2 col-xl-3">
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">Bulto</div>
+            </div>
+            <input type="text" class="form-control text-right" id="bulto_{{i}}" placeholder="Bulto" [(ngModel)]="item.bulto">
+          </div>
+        </div>
+        <div class="col-sm-4 col-md-3 col-lg-2 col-xl-3">
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">Contiene</div>
+            </div>
+            <input type="text" class="form-control text-right" id="contiene_{{i}}" placeholder="Contiene" [(ngModel)]="item.contiene">
+          </div>
+        </div>
+        <div class="col-sm-4 col-md-2 col-lg-2 col-xl-3">
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">Unid</div>
+            </div>
+            <input type="text" class="form-control" id="unidad_{{i}}" placeholder="Unidad" [(ngModel)]="item.unidad">
+          </div>
+        </div>
+        <div class="col-sm-4 col-md-3 col-lg-3 col-xl-4">
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">Reposición</div>
+            </div>
+            <input type="text" class="form-control text-right" id="reposicion_{{i}}" placeholder="Reposición"
+              [(ngModel)]="item.reposicion">
+          </div>
+        </div>
+        <div class="col-sm-5 col-md-4 col-lg-3 col-xl-5">
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <div class="input-group-text">Sugerido ({{item.margen || margen(item.sugerido,item.reposicion)}}%) </div>
+            </div>
+            <input type="text" class="form-control text-right" id="sugerido_{{i}}" placeholder="Sugerido" [(ngModel)]="item.sugerido">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div>
   </article>
   <!--nav>
     <div *ngFor="let fldn of fields; index as i;">
       <label>{{fldn}}</label> {{typeValues[i]}}
     </div>
   </nav-->
-  <aside class="p-0">
+  <aside class="p-0" [hidden]="true">
     <div class="productos-header sticky-top">
       <app-articulo-card-select-filter
-      [searchItem]='searchItem'
+      [wait]='wait'
       [filterButtons]='filterButtons'
       (onSearchArticulos)='Prod_filterEvent($event)'
       (onButtonMsg)='buttonMsg($event)'
@@ -111,11 +222,20 @@
   </aside>
 </div>
 <footer>
-  <button (click)="findSimilares()">Buscar</button>
-  <button (click)="readFile()">Cargar Archivo</button>
-  <button (click)="readXlsxFile()">Cargar XLSX</button>
-  <button (click)="checkIdLista()">Check Lista</button>
-  <button (click)="importarFile()">Importar</button>
+  <!--button (click)="findSimilares()">Buscar</button>
+  <button (click)="readFileButter()">Cargar Butter</button>
+  <button (click)="readTxt('rapTXT')">Cargar RAP</button>
+  <button (click)="readTxt('rapRaza')">Cargar Raza</button>
+  <button (click)="readTxt('rapOptimum')">Cargar Optimum</button>
+  <button (click)="readXlsxFile('cancatXLSX')">Cargar CanCatXLSX</button>
+  <button (click)="readXlsxFile('sciarrielloXLSX')">Cargar sciarrielloXLSX</button>
+  <button (click)="readXlsxFile('dumasXLSX')">Cargar DumasXLSX</button-->
+  <button (click)="readLista()">Leer Lista</button>
+  <!--button (click)="readFileSciarriello()">Cargar Sciarriello</button-->
+  <!--button (click)="readFileCSV()">Cargar CSV Archivo</button-->
+  <!--button (click)="readXlsxFile()">Cargar XLSX</button-->
+  <button (click)="importArticulos()">Check Lista</button>
+  <!--button (click)="importarFile()">Importar</button-->
 
 </footer>
 

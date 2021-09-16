@@ -3,7 +3,7 @@ import { Component, OnChanges, OnInit } from '@angular/core';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
 import { ListasToPrintService } from 'src/app/services/listas-to-print.service';
 import { PrintService } from 'src/app/services/print.service';
-import { formapago, productosToShow, tpLista } from 'src/app/shared/toolbox';
+import { formapago, productosToShow } from 'src/app/shared/toolbox';
 import { API_URI } from 'src/app/shared/uris';
 
 @Component({
@@ -18,7 +18,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   buffer_searchItem = '';
   fpago = 0;
   fpagoCoef = {name: "Efectivo",icon:'far fa-money-bill-alt',value: 1, coef: [{comiMP: 0, op: 1}, {RetImpIngBru: 0}] };
-  lista = tpLista;
+//  lista = tpLista;
   cmpSetting = {
     tipo: 'Venta',
     public: true
@@ -111,6 +111,20 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
         ]
       }
       , {
+        id: 'seco'
+        , tipo: 'button'
+        ,value: 0
+        ,show:[ 'fas fa-cloud-sun-rain fa-2x text-white-50',
+                'fas fa-sun fa-2x text-warning',
+                'fas fa-cloud-showers-heavy fa-2x text-info'
+              ]
+        ,qryName: 'Articulo'
+        ,qryValue: [{$regex: { patern:'seco', flags: 'i'}},{$regex: { patern:'húmedo', flags: 'i'}}]
+        ,qryKey: 'rubro'
+        ,display: true
+        ,text: ''
+       }
+      , {
         id: 'pesable'
         , tipo: 'button'
         ,value: 0
@@ -141,14 +155,14 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
        , {
         id: 'private_web'
         , tipo: 'button'
-        ,value: 1
+        ,value: 0
         ,show:[ 'fas fa-prescription fa-2x text-white',
                 'fas fa-prescription fa-2x text-white-50'
               ]
         ,qryName: 'Articulo'
         ,qryValue: [{ $not: { $eq: true } }]
         ,qryKey: 'private_web'
-        ,display: true
+        ,display: false
         ,text: ''
        }
        , {
@@ -168,8 +182,8 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
         id: 'stock'
         , tipo: 'button'
         ,value: 1
-        ,show:[ 'fa fa-shopping-cart fa-2x text-white-50',
-                'fa fa-shopping-cart fa-2x text-white'
+        ,show:[ 'fab fa-shopify fa-2x text-white-50',
+                'fab fa-shopify fa-2x text-white'
               ]
         ,qryName: 'Extra'
         ,qryValue: [{ $gte: 1 }]

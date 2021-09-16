@@ -38,11 +38,11 @@ export class ReadXlsxFileModalComponent implements OnInit {
         wbData[wsname] = (XLSX.utils.sheet_to_json( ws ));
       } else {
         const sheetData = (XLSX.utils.sheet_to_json( ws, { header: 1} ))
-        data[wsname] = sheetData;
+        wbData[wsname] = sheetData;
       }
     }
-    console.log({ wbData, file: this.existingFile, chosenFile: this.chosenFiles })
-    this.activeModal.close({ wbData, file: this.existingFile, chosenFile: this.chosenFiles });
+//    console.log({ wbData, file: this.existingFile, chosenFile: this.chosenFiles })
+    this.activeModal.close({ wbData, wb, file: this.existingFile, chosenFile: this.chosenFiles });
   }
 
   /*

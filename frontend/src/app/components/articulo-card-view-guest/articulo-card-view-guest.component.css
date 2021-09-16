@@ -1,6 +1,6 @@
 :host {
   position: relative;
-
+  font-size: 130%;
 /*
   border: 1px solid orange;
   text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
@@ -67,7 +67,10 @@ article .control {
           order: 3;
   overflow: auto;
 }
-
+img {
+  height: 250px;
+  width: auto;
+}
 .imgbox {
     display: flex;
     flex-direction: row;
@@ -84,8 +87,6 @@ article .control {
 /*
     height: 100%;
 */
-    max-height: 100%;
-    max-width: 200px;
   }
   .center {
     position: absolute;

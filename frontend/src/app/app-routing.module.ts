@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ApitoapiComponent } from './components/apitoapi/apitoapi.component';
+import { ArticulosListPrintComponent } from './components/articulos-list-print/articulos-list-print.component';
 import { ArticulosListComponent } from './components/articulos-list/articulos-list.component';
 import { ArticulosPreciosPrintComponent } from './components/articulos-precios-print/articulos-precios-print.component';
 import { ArticulosPreciosComponent } from './components/articulos-precios/articulos-precios.component';
@@ -65,18 +66,6 @@ const routes: Routes = [
     , canActivate: [AuthGuard]
   },
   {
-    path: 'print'
-    ,outlet: 'print'
-    ,component: PrintLayoutComponent
-    ,children: [
-      {
-        path: 'productlistprint/:ids'
-      , component: ProductListPrintComponent
-  //    , canActivate: [AuthGuard]
-      }
-    ]
-  },
-  {
     path: 'producto/:id'
     , component: ProductoComponent
 //    , canActivate: [AuthGuard]
@@ -91,18 +80,6 @@ const routes: Routes = [
     , component: ArticulosReventaComponent
     , canActivate: [AuthGuard]
   }
-  , {
-    path: 'print'
-    ,outlet: 'print'
-    ,component: PrintLayoutComponent
-    ,children: [
-      {
-        path: 'articulosreventaprint/:ids'
-      , component: ArticulosReventaPrintComponent
-      , canActivate: [AuthGuard]
-      }
-    ]
-  }
   ,{
     path: 'articuloslist'
     , component: ArticulosListComponent
@@ -114,10 +91,21 @@ const routes: Routes = [
     ,component: PrintLayoutComponent
     ,children: [
       {
-        path: 'articulospreciosprint/:ids'
-      , component: ArticulosPreciosPrintComponent
+        path: 'articuloslistprint/:ids'
+      , component: ArticulosListPrintComponent
+  //    , canActivate: [AuthGuard]
+      },
+      {
+        path: 'articulosreventaprint/:ids'
+      , component: ArticulosReventaPrintComponent
+      , canActivate: [AuthGuard]
+      },
+      {
+        path: 'productlistprint/:ids'
+      , component: ProductListPrintComponent
   //    , canActivate: [AuthGuard]
       }
+
     ]
   }
   ,{

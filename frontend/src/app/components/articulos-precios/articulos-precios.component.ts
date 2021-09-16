@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
@@ -87,6 +87,20 @@ export class ArticulosPreciosComponent implements OnInit {
       ]
     }
     , {
+      id: 'seco'
+      , tipo: 'button'
+      ,value: 0
+      ,show:[ 'fas fa-cloud-sun-rain fa-2x text-white-50',
+              'fas fa-sun fa-2x text-warning',
+              'fas fa-cloud-showers-heavy fa-2x text-info'
+            ]
+      ,qryName: 'Articulo'
+      ,qryValue: [{$regex: { patern:'seco', flags: 'i'}},{$regex: { patern:'húmedo', flags: 'i'}}]
+      ,qryKey: 'rubro'
+      ,display: true
+      ,text: ''
+     }
+    , {
       id: 'pesable'
       , tipo: 'button'
       ,value: 0
@@ -103,14 +117,14 @@ export class ArticulosPreciosComponent implements OnInit {
      , {
       id: 'private_web'
       , tipo: 'button'
-      ,value: 1
+      ,value: 0
       ,show:[ 'fas fa-prescription fa-2x text-white',
               'fas fa-prescription fa-2x text-white-50'
             ]
       ,qryName: 'Articulo'
       ,qryValue: [{ $not: { $eq: true } }]
       ,qryKey: 'private_web'
-      ,display: true
+      ,display: false
       ,text: ''
      }
   ]
@@ -201,6 +215,12 @@ export class ArticulosPreciosComponent implements OnInit {
     this.listArticulos()
   }
 
+/*
+  ngOnChanges(changes: SimpleChanges){
+    console.log('Articulos ONCHANGES');
+    console.log(changes);
+  }
+*/
   filterEvent(ev){
     for (const propName in ev) {
       console.log(propName, ev[propName]);
@@ -227,7 +247,7 @@ export class ArticulosPreciosComponent implements OnInit {
 
     try {
       const data:any = await this.list.readData(
-        `${API_URI}/articulos/productos/listdata`,
+        `${API_URI}/articulos/productos/listpublicdata`,
         {Articulo, Producto, Extra, searchItem: this.searchItem, Sort }
       );
       console.log(data);
@@ -283,7 +303,9 @@ export class ArticulosPreciosComponent implements OnInit {
     console.log(lsId);
     localStorage.setItem( lsId, JSON.stringify(this.articuloList));
 
-    this.printService.printDocument('articulospreciosprint', [lsId] );
+//    this.printService.printDocument('articulospreciosprint', [lsId] );
+
+    this.printService.printDocument('articulosreventaprint', [lsId] );
 
   }
   more(inList,outList): any {

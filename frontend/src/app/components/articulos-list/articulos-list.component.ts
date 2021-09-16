@@ -127,25 +127,30 @@ export class ArticulosListComponent implements OnInit {
       ,qryName: 'Extra'
       ,qryValue: [true, { $not: { $eq: true } }]
       ,qryKey: 'pesable'
-      ,display: true
+      ,display: false
       ,text: ''
      }
      , {
       id: 'private_web'
       , tipo: 'button'
-      ,value: 1
+      ,value: 0
       ,show:[ 'fas fa-prescription fa-2x text-white',
               'fas fa-prescription fa-2x text-white-50'
             ]
       ,qryName: 'Articulo'
       ,qryValue: [{ $not: { $eq: true } }]
       ,qryKey: 'private_web'
-      ,display: true
+      ,display: false
       ,text: ''
      }
   ]
 
   articuloOrder = [
+    {
+      name: 'Lista',
+      vista: 1,
+      sort: { fabricante: 1, marca: 1, especie: 1, rubro: 1, linea: 1, edad: -1  }
+    },
     {
       name: 'Descripción',
       vista: 1,
@@ -207,7 +212,7 @@ export class ArticulosListComponent implements OnInit {
   constructor(  private http: HttpClient,
                 private modalService: NgbModal,
                 private list: ListasArtProdService,
-                private printService: PrintService,
+                public printService: PrintService,
                 private authService: AuthService
               ) {
                 this.modalService.activeInstances.subscribe((list) => {
@@ -362,7 +367,7 @@ export class ArticulosListComponent implements OnInit {
     console.log(lsId);
     localStorage.setItem( lsId, JSON.stringify(this.articuloList));
 
-    this.printService.printDocument('articulospreciosprint', [lsId] );
+    this.printService.printDocument('articuloslistprint', [lsId] );
 
   }
 

@@ -1,12 +1,15 @@
 .isStock {
-  color: lightgray;
+  color:darkgrey;
   content: " sin stock ";
 }
 .card {
   border: unset;
 }
-.card-img{
 /*
+.card-img{
+
   max-height: 300px;
-*/
+  width: auto;
+
 }
+*/

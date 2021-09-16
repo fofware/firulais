@@ -13,6 +13,7 @@ export class ArticuloCardSelectHeaderComponent implements OnInit, OnChanges {
   @Input() order: any;
   @Input() searchItem: string;
   @Input() listaOrden: number;
+  @Input() wait: boolean;
 
   // tslint:disable-next-line:no-output-on-prefix
   @Output() onCardSelectHeaderEvent = new EventEmitter<any>();

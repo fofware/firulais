@@ -9,7 +9,15 @@
     <div class="row no-gutters">
       <div class="col-md-5 col-lg-6">
         <img src="{{producto.image}}" class="card-img" alt="image of {{producto.art_name}}">
-      </div>
+        <div class="row">
+          <div class="col-8">
+            <h4 class="card-title">{{producto.name}} {{producto.contiene}} {{producto.unidad}}</h4>
+          </div>
+          <div class="col-4">
+            <h4 class="card-title d-block" style="text-align: right;">$ {{producto.showPrecio}}</h4>
+          </div>
+        </div>
+    </div>
       <div class="col-md-7 col-lg-6">
         <div class="card-body">
           <div class="row">
@@ -17,11 +25,11 @@
               <h4 class="card-title">{{producto.name}} {{producto.contiene}} {{producto.unidad}}</h4>
             </div>
             <div class="col-4">
-              <h4 class="card-title d-block" style="text-align: right;">$ {{producto.calc_precio}}</h4>
+              <h4 class="card-title d-block" style="text-align: right;">$ {{producto.showPrecio}}</h4>
             </div>
           </div>
           <ul ngbNav #nav="ngbNav" [activeId]="1" class="nav-tabs">
-            <li [ngbNavItem]="1" [hidden]="!producto.detalles || producto.detalles.length===0 ">
+            <li [ngbNavItem]="1" [hidden]="!producto.presentaciones || producto.presentaciones.length===0 ">
               <a ngbNavLink><b>Presentaciones</b></a>
               <ng-template ngbNavContent>
                 <div class="row" *ngFor="let presentacion of producto.presentaciones">
@@ -29,7 +37,7 @@
                     <h6 class="card-title">{{presentacion.name}} {{presentacion.contiene}} {{presentacion.unidad}}</h6>
                   </div>
                   <div class="col-4">
-                    <h6 class="d-block" style="text-align: right;">$ {{presentacion.calc_precio}}</h6>
+                    <h6 class="d-block" style="text-align: right;">$ {{presentacion.showPrecio}}</h6>
                   </div>
                 </div>
               </ng-template>

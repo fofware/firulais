@@ -2,6 +2,12 @@ body {
   font: 24px Helvetica;
   background: #999999;
  }
+ .card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 16px;
+}
 
  #main {
   margin: 0px;

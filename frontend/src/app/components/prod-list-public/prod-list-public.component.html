@@ -3,7 +3,7 @@
     <app-top-menu></app-top-menu>
     <form class="form-inline bg-dark p-1">
       <app-articulo-card-select-filter
-        [searchItem]='searchItem'
+        [wait]='wait'
         [filterButtons]='filterButtons'
         (onSearchArticulos)='Prod_filterEvent($event)'
         (onButtonMsg)='buttonMsg($event)'
