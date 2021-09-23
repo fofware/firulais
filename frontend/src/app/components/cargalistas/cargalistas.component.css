@@ -68,7 +68,14 @@ body {
   border: 1px solid #eebb55;
   border-radius: 7pt;
   background: #ffeebb;
-  }
+  -webkit-border-radius: 7pt;
+  -moz-border-radius: 7pt;
+  -ms-border-radius: 7pt;
+  -o-border-radius: 7pt;
+}
+header {
+  height: 200px;
+}
   .mycolor1{
     background-color: beige;
   }

@@ -16,6 +16,7 @@ import { PersonasListComponent } from './components/personas-list/personas-list.
 import { PrintLayoutComponent } from './components/print-layout/print-layout.component';
 import { ProdListPublicComponent } from './components/prod-list-public/prod-list-public.component';
 import { ProductListPrintComponent } from './components/product-list-print/product-list-print.component';
+import { ProductoEditComponent } from './components/producto-edit/producto-edit.component';
 import { ProductoLinkComponent } from './components/producto-link/producto-link.component';
 import { ProductoComponent } from './components/producto/producto.component';
 import { ProfileComponent } from './components/profile/profile.component';
@@ -74,6 +75,11 @@ const routes: Routes = [
     path: 'productlist'
     , component: ProdListPublicComponent
 //    , canActivate: [AuthGuard]
+  },
+  {
+    path: 'productoedit'
+    , component: ProductoEditComponent
+    , canActivate: [AuthGuard]
   },
   {
     path: 'reventalist'

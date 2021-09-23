@@ -70,6 +70,8 @@ import { UserModalFormComponent } from './components/user-modal-form/user-modal-
 import { AlertComponent } from './_components/alert/alert.component';
 import { ArticulosListPrintComponent } from './components/articulos-list-print/articulos-list-print.component';
 import { ArticulosListCardViewComponent } from './components/articulos-list-card-view/articulos-list-card-view.component';
+import { ProductoEditComponent } from './components/producto-edit/producto-edit.component';
+import { ProductoProvListComponent } from './components/producto-prov-list/producto-prov-list.component';
 
 @NgModule({
   declarations: [
@@ -136,6 +138,8 @@ import { ArticulosListCardViewComponent } from './components/articulos-list-card
     AlertComponent,
     ArticulosListPrintComponent,
     ArticulosListCardViewComponent,
+    ProductoEditComponent,
+    ProductoProvListComponent,
   ],
   imports: [
     BrowserModule,

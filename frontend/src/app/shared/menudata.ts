@@ -153,6 +153,15 @@ export const menudata = [
           param: ''
         },
         {
+          title: 'Productos Edit',
+          icon: 'fas fa-barcode fa-3x',
+          permiso: 'moderator',
+          target: '',
+          rel: 'noopener',
+          route: '/productoedit',
+          param: ''
+        },
+        {
           title: 'Compras',
           icon: 'fas fa-file-invoice-dollar fa-3x',
           permiso: 'moderator',

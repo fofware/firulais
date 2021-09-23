@@ -1,0 +1,48 @@
+  <div class="productos-header sticky-top">
+    <app-top-menu></app-top-menu>
+    <form class="form-inline bg-dark p-1">
+      <app-articulo-card-select-filter
+        [wait]='wait'
+        [filterButtons]='filterButtons'
+        (onSearchArticulos)='Prod_filterEvent($event)'
+        (onButtonMsg)='buttonMsg($event)'
+        (onContieneMsg)='contieneMsg($event)'
+      ></app-articulo-card-select-filter>
+      <span style="width: 150px;">
+        <app-producto-card-select-peso
+          (onContieneMsg)="contieneMsg($event)">
+        </app-producto-card-select-peso>
+      </span>
+      <app-articulo-card-select-order
+        [order]="articuloOrder"
+        [listaOrden]='listaOrden'
+        (onOrderChangeEvent)='Prod_filterEvent($event)'
+      ></app-articulo-card-select-order>
+      <app-browse-ctrl
+        [page]="page"
+        [pageSize]="pageSize"
+        [collectionSize]="collectionSize"
+        [tools]="tools"
+        (onBrowseCtrlEvent)="browseEvent($event)"
+      ></app-browse-ctrl>
+
+      <!--button (click)="imprimir()"><i class="fas fa-print"></i></button-->
+    </form>
+  </div>
+  <div class="d-flex flex-row">
+    <div class="card-container col-6">
+      <app-producto-form-edit
+        *ngFor="let producto of fullList | productoFilter: searchItem | slice: (page-1) * pageSize : page * pageSize; index as i"
+        [producto]='producto'
+        [unidades]='unidades'
+        [articulo]='selectedArticulo'
+        [idx]='i'
+        (onBorrar)='borrarProducto($event)'
+      ></app-producto-form-edit>
+    </div>
+    <div class="card-container">
+      <app-producto-prov-list
+      ></app-producto-prov-list>
+    </div>
+
+  </div>

@@ -608,7 +608,8 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 //	console.log('Extra',qry.Extra);
 //	console.log('Extra.$and',qry.Extra['$and']);
 	const calculatedPrecioLista = precioLista(1.14);
-	const array = await producto.aggregate([
+
+	const aggr = [
 		{ $match: qry.Producto },
 		{
 			$lookup: {
@@ -952,7 +953,14 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 			$sort: qry.Sort
 		}
 
-	])
+	];
+	let array:any;
+	if (qry.limit){
+		array = { data: await producto.aggregate(aggr).skip(qry.skip).limit(qry.limit), count: await producto.find(qry.Producto).count()};
+	} else {
+		array = await producto.aggregate(aggr);
+	}
+	
 //	console.log(qry.Sort)
 	return array;
 } 

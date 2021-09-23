@@ -232,6 +232,7 @@ class ProveedoresArticulosControler {
 
 	config () {
     this.router.get('/api/proveedoresarticulos/list', this.list );
+    this.router.get('/api/proveedoresarticulos/nombre/:search', this.search );
 		this.router.post( '/api/proveedoresarticulos/', passport.authenticate('jwt', {session:false}), this.add );
 		this.router.post( '/api/proveedoresarticulos/insmany', passport.authenticate('jwt', {session:false}), this.insMany );
 		this.router.post( '/api/proveedoresarticulos/buscar', passport.authenticate('jwt', {session:false}), this.buscar );
@@ -241,8 +242,52 @@ class ProveedoresArticulosControler {
 	}
 
 	async list(req: Request, res: Response) {
-		const articulos = await provArt.find();
+		const articulos = await provArt.find().populate('proveedor')
 		res.json(articulos);
+	}
+
+	async search(req: Request, res: Response){
+		const { search } = req.params;
+		console.log(search)
+		const values = search.split(' ').map(val => 
+			{
+				const tiene = new RegExp(val,'i');
+				return {nombre: {$regex: tiene}}
+			});
+
+		//await provArt.createIndexes( { nombre: "text" } );
+		//const pattern = new RegExp(search,'i')
+		//console.log(pattern);
+		//console.log(values);
+		//const data = await provArt.find({ nombre: { $regex: pattern }}).limit(20);
+		//const data = await provArt.find({ $text: { $search: search, $caseSensitive: false, $diacriticSensitive: true, $language: 'es' } }, { idxKey: { $meta: "textScore" } }).limit(10);
+		//const data = await provArt.find({ $text: { $search: search, $caseSensitive: false, $diacriticSensitive: true, $language: 'es' } },{ score: { $meta: "textScore" } }).sort( { score: { $meta: "textScore" } } );
+		//const data = await provArt.find({ nombre: {$in: values}}).limit(10);
+		const data = await provArt.aggregate(
+			[
+				{ $match: { $text: { $search: search } } },
+				{ $match: { producto: null, '$and': values } },
+				{
+					$lookup: {
+						from: "personas",
+						localField: "proveedor",    // field in the orders collection
+						foreignField: "_id",  // field in the items collection
+						as: "proveedor"
+			 		}
+				},
+				{
+					$unwind: {
+						path: '$proveedor',
+						preserveNullAndEmptyArrays: true
+					}				
+				},
+				//{ $project: { nombre: 1, contiene: 1, unidad:1, proveedor: { $concat:['$proveedor.apellido', " ", '$proveedor.nombre']}, score: { $meta: "textScore" } } },
+				{ $sort: { score: -1, nombre: 1, contiene: 1 } },
+				//{ $match: { score: { $gt: 1.0 } } }
+			]
+		).limit(30);
+		const retData = data.map(item => `${item.nombre} ${item.contiene} ${item.unidad} ${item.proveedor} ${item.score}` )
+		res.status(200).json(data);
 	}
 
 	async buscar (req: Request, res: Response){

@@ -785,8 +785,17 @@ export const proveedoresSettings = [
         ,
         "filters":[
           `(line,idx,array) => {
+            if(line[0] && !line[1] && !line[2] && !line[3] && !line[4] && !line[5] && !line[6] && !line[7] && !line[8]){
+              console.log(line[0],array[idx])
+              array[idx][9] = line[0]
+            } else if(line[0] && line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && array[idx-1][9]) {
+              line[9] = array[idx-1][9];
+            }
+            return line;
+          }`,
+          `(line,idx,array) => {
             const ret = {};
-            ret['nombre'] = line[0];
+            ret['nombre'] = line[0]+ ' ' + line[9];
             ret.codigo = line[1];
             ret.bulto = line[2];
             ret.contiene = line[3];
@@ -811,14 +820,14 @@ export const proveedoresSettings = [
             line[11]= "Kg";
             if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
           }`
-          ,
-          `(line,idx,array) => {
-            if(!line[0]){
-              array[idx][0] = array[idx-1][0];
-              line[0] = array[idx-1][0];
-            }
-            return line;
-          }`
+          //,
+          //`(line,idx,array) => {
+          //  if(!line[0]){
+          //    array[idx][0] = array[idx-1][0];
+          //    line[0] = array[idx-1][0];
+          //  }
+          //  return line;
+          //}`
         ]
       },
       'SUPERCOAT':{
@@ -958,6 +967,10 @@ export const proveedoresSettings = [
             ret['nombre'] = line[1];
             ret.marca = line[2];
             ret.reposicion = isNaN(line[3]) ? null : line[3];
+
+            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
+              ret.codigo = ret.nombre.replace(/[ ]/g);
+            line[0] = ret.codigo;
             line[1] = ret.nombre;
             line[2] = ret.marca;
             line[3] = 1;
@@ -995,6 +1008,8 @@ export const proveedoresSettings = [
             ret.porcentage = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
             ret.descuento = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
             ret.reposicion = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
+              ret.codigo = ret.nombre.replace(/[ ]/g);
             line[1] = ret.nombre;
             line[2] = ret.marca;
             line[3] = ret.bulto;
@@ -1031,12 +1046,14 @@ export const proveedoresSettings = [
             ret.lista = isNaN(line[3]) ? null : Math.round(line[3]*100)/100;
             ret.porcentage = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
             ret.descuento = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.reposicion = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+            ret.reposicion = ret.lista; //isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
+              ret.codigo = ret.nombre.replace(/[ ]/g);
             line[1] = ret.nombre;
             line[2] = ret.marca;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.unidad;
+            line[3] = 1; //ret.bulto;
+            line[4] = 1; //ret.contiene;
+            line[5] = 'Un'; //ret.unidad;
             line[6] = ret.lista;
             line[7] = ret.porcentage;
             line[8] = ret.descuento;
@@ -1064,11 +1081,13 @@ export const proveedoresSettings = [
             const ret = {};
             ret.codigo = line[0];
             ret['nombre'] = line[1];
-            ret.marca = line[2];
-            ret.lista = isNaN(line[3]) ? null : Math.round(line[3]*100)/100;
-            ret.porcentage = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-            ret.descuento = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.reposicion = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+            ret.lista = isNaN(line[2]) ? null : Math.round(line[2]*100)/100;
+            ret.porcentage = isNaN(line[3]) ? null : Math.round(line[3]*100)/100;
+            ret.descuento = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+            ret.reposicion = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
+              ret.codigo = ret.nombre.replace(/[ ]/g);
+
             line[1] = ret.nombre;
             line[2] = ret.marca;
             line[3] = ret.bulto;
@@ -1105,12 +1124,15 @@ export const proveedoresSettings = [
             ret.lista = isNaN(line[3]) ? null : Math.round(line[3]*100)/100;
             ret.porcentage = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
             ret.descuento = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.reposicion = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+            ret.reposicion = ret.lista; //isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
+              ret.codigo = ret.nombre.replace(/[ ]/g);
+
             line[1] = ret.nombre;
             line[2] = ret.marca;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.unidad;
+            line[3] = 1; //ret.bulto;
+            line[4] = 1; //ret.contiene;
+            line[5] = 'Un'; //ret.unidad;
             line[6] = ret.lista;
             line[7] = ret.porcentage;
             line[8] = ret.descuento;
@@ -1142,12 +1164,15 @@ export const proveedoresSettings = [
             ret.lista = isNaN(line[3]) ? null : Math.round(line[3]*100)/100;
             ret.porcentage = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
             ret.descuento = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.reposicion = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+            ret.reposicion = ret.lista; //isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
+              ret.codigo = ret.nombre.replace(/[ ]/g);
+
             line[1] = ret.nombre;
             line[2] = ret.marca;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.unidad;
+            line[3] = 1; //ret.bulto;
+            line[4] = 1; //ret.contiene;
+            line[5] = 'Un'; //ret.unidad;
             line[6] = ret.lista;
             line[7] = ret.porcentage;
             line[8] = ret.descuento;
@@ -1177,9 +1202,12 @@ export const proveedoresSettings = [
             ret['nombre'] = line[1];
             ret.marca = line[2];
             ret.lista = isNaN(line[3]) ? null : Math.round(line[3]*100)/100;
-            ret.porcentage = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-            ret.descuento = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.reposicion = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+            ret.reposicion = ret.lista;
+            //ret.porcentage = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+            //ret.descuento = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+            //ret.reposicion = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
+              ret.codigo = ret.nombre.replace(/[ ]/g);
             line[1] = ret.nombre;
             line[2] = ret.marca;
             line[3] = ret.bulto;

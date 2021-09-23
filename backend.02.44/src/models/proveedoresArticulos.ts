@@ -15,7 +15,7 @@ export interface IProveedoresArticulos extends Document {
 const ProveedoresArticulosSchema = new Schema({
   proveedor: {
     type: Schema.Types.ObjectId
-    ,ref: "personas"
+    ,ref: "Persona"
     ,$id: '_id'
     ,required: true
   }
@@ -32,5 +32,6 @@ const ProveedoresArticulosSchema = new Schema({
   , bulto: { type: Number, default: null }
   , contiene: { type: Number, default: null }
   , unidad: { type: String, default: null }
-})
+});
+
 export default model<IProveedoresArticulos>('ProveedoresArticulos', ProveedoresArticulosSchema);
