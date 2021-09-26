@@ -19,6 +19,7 @@ import { comprobanteCtrl } from './controlers/comprobantesControler';
 import authRoutes from './routes/authRoutes';
 import { ProveedoresListasCtrl } from './controlers/proveedoresListasControlers';
 import { TmpListasCtrl } from './controlers/tmpListasControler';
+import { MercadoPagoCtrl } from './controlers/mercadopagoControler';
 
 export default class Server {
 
@@ -54,6 +55,7 @@ export default class Server {
 		this.app.use( mongoCtrl.router);
 		this.app.use( cajaCtrl.router);
 		this.app.use( comprobanteCtrl.router);
+		this.app.use( MercadoPagoCtrl.router);
 	}
 	start(): void {
 		this.app.listen(this.app.get('port'), () => {

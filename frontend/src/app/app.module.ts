@@ -72,6 +72,10 @@ import { ArticulosListPrintComponent } from './components/articulos-list-print/a
 import { ArticulosListCardViewComponent } from './components/articulos-list-card-view/articulos-list-card-view.component';
 import { ProductoEditComponent } from './components/producto-edit/producto-edit.component';
 import { ProductoProvListComponent } from './components/producto-prov-list/producto-prov-list.component';
+import { CheckoutComponent } from './components/checkout/checkout.component';
+import { MpSuccessComponent } from './components/mp-success/mp-success.component';
+import { MpFailureComponent } from './components/mp-failure/mp-failure.component';
+import { MpPendingComponent } from './components/mp-pending/mp-pending.component';
 
 @NgModule({
   declarations: [
@@ -140,6 +144,10 @@ import { ProductoProvListComponent } from './components/producto-prov-list/produ
     ArticulosListCardViewComponent,
     ProductoEditComponent,
     ProductoProvListComponent,
+    CheckoutComponent,
+    MpSuccessComponent,
+    MpFailureComponent,
+    MpPendingComponent,
   ],
   imports: [
     BrowserModule,

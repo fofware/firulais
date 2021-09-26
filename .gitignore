@@ -649,3 +649,15 @@ frontend/src/assets/images/proplan/PURINA PRO PLAN VETERINARY DIETS Canine NF Re
 frontend/src/assets/images/proplan/purina-pro-plan-sensitive-skin-and-stomach-adults-razas-medianas-y-grandes.png
 frontend/src/assets/images/proplan/purina-pro-plan-sensitive-skin-and-stomach-adults-razas-pequeñas.png
 frontend/src/assets/images/proplan/purina-pro-plan-sensitive-skin-and-stomach-gatos.png
+mpbackend_v1/build/app.js
+mpbackend_v1/build/databaseMongoose.js
+mpbackend_v1/build/index.js
+mpbackend_v1/build/config/config.js
+mpbackend_v1/build/controlers/authControler.js
+mpbackend_v1/build/controlers/documentos.js
+mpbackend_v1/build/controlers/mp_documentos.js
+mpbackend_v1/build/controlers/preferencias.js
+mpbackend_v1/build/controlers/userController.js
+mpbackend_v1/build/middlewares/passport.js
+mpbackend_v1/build/models/user.js
+mpbackend_v1/build/routes/authRoutes.js

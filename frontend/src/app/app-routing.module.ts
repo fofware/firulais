@@ -8,9 +8,13 @@ import { ArticulosPreciosComponent } from './components/articulos-precios/articu
 import { ArticulosReventaPrintComponent } from './components/articulos-reventa-print/articulos-reventa-print.component';
 import { ArticulosReventaComponent } from './components/articulos-reventa/articulos-reventa.component';
 import { CargalistasComponent } from './components/cargalistas/cargalistas.component';
+import { CheckoutComponent } from './components/checkout/checkout.component';
 import { HomeComponent } from './components/home/home.component';
 import { ImportDataComponent } from './components/import-data/import-data.component';
 import { MenuappComponent } from './components/menuapp/menuapp.component';
+import { MpFailureComponent } from './components/mp-failure/mp-failure.component';
+import { MpPendingComponent } from './components/mp-pending/mp-pending.component';
+import { MpSuccessComponent } from './components/mp-success/mp-success.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { PersonasListComponent } from './components/personas-list/personas-list.component';
 import { PrintLayoutComponent } from './components/print-layout/print-layout.component';
@@ -142,6 +146,26 @@ const routes: Routes = [
   , {
     path: 'importdata'
     , component: ImportDataComponent
+//    , canActivate: [AuthGuard]
+  }
+  , {
+    path: 'checkout'
+    , component: CheckoutComponent
+//    , canActivate: [AuthGuard]
+  }
+  , {
+    path: 'mpsuccess'
+    , component: MpSuccessComponent
+//    , canActivate: [AuthGuard]
+  }
+  , {
+    path: 'mpfailure'
+    , component: MpFailureComponent
+//    , canActivate: [AuthGuard]
+  }
+  , {
+    path: 'mppending'
+    , component: MpPendingComponent
 //    , canActivate: [AuthGuard]
   }
   , { path: '**',
