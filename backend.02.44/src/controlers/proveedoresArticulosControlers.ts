@@ -369,42 +369,30 @@ class ProveedoresArticulosControler {
 		req.body.codigo = req.body.codigo+'';
 		req.body.ean = req.body.ean ? req.body.ean+'' : null;
 		req.body.proveedor = new ObjectID(req.body.proveedor);
-		req.body.producto = req.body.producto ? new ObjectID(req.body.producto) : null; 
-		/*
-		try {
-			const newReg = await provArt.updateOne(
-				{ proveedor: req.body.proveedor, codigo: req.body.codigo },   // Query parameter
-				{ $set: req.body },
-				{ upsert: true }																							// Options
-			);
-			res.status(200).json( newReg );
-		} catch (error) {
-			console.log(error);
-			res.status(404).json(error);
-		}
-		*/
+		req.body.producto = req.body.producto ? new ObjectID(req.body.producto) : null;
 
 		try {
-			const reg = await provArt.findOne({ proveedor: req.body.proveedor, codigo: req.body.codigo });
-			if (reg) {
-				req.body._id = reg._id;
+			const ret = {
+				new: false
+			} 
+			let articulo_reg = await provArt.findOne({ proveedor: req.body.proveedor, codigo: req.body.codigo });
+			if(!articulo_reg){
+				articulo_reg = new provArt(req.body);
+				await articulo_reg.save();
+				ret.new = true;
 			}
-			const newReg = await provArt.updateOne(
-				{ proveedor: req.body.proveedor, codigo: req.body.codigo },   // Query parameter
-				{ $set: req.body },
-				{ upsert: true }																							// Options
-			);
-			if(newReg.upserted) req.body._id = newReg.upserted[0]['_id'];
-			res.status(200).json( { reg: req.body, newReg} );
+			Object.assign(ret, articulo_reg['_doc']);
+			return res.status(200).json(ret);
 		} catch (error) {
 			console.log(error);
 			res.status(500).json(error);
 		}
-
 	}
+
 	async insMany( req: Request, res: Response){
 		console.log(req.body)
 	}
+
 	async put( req: Request, res: Response) {
 		try {
 			const filter = { _id: req.params.id };
@@ -414,6 +402,7 @@ class ProveedoresArticulosControler {
 			return res.status(500).json( error );
 		}
 	}
+
 	async delete( req: Request, res: Response ){
 		try {
 			const { id } = req.params;

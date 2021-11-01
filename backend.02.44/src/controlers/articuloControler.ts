@@ -817,6 +817,8 @@ class ArticuloControler {
 
 
 
+		this.router.get( '/articulos/fulldata/list', this.fulldata );
+
 		this.router.get( '/articulos/productos/list', this.searchProductos );
 		this.router.get( '/articulos/productos/list/:search', this.searchProductos );
 		this.router.post( '/articulos/productos/list', this.findProductos );
@@ -998,6 +1000,21 @@ class ArticuloControler {
 				'sub.compra':0,
 				'sub.reposicion':0
 			}}));
+			res.status(200).json(rpta);
+		} catch (error) {
+			res.json(error);
+		}
+	}
+
+	async fulldata ( req: Request, res: Response ) {
+		try {
+
+			const qry = {
+				Articulo: {}
+				,Extra: {}
+			};
+			console.log('Entra qry', qry);
+			const rpta = await readProductos(qry,dataProduct({}));
 			res.status(200).json(rpta);
 		} catch (error) {
 			res.json(error);

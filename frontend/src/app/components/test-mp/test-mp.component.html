@@ -1,0 +1,63 @@
+<div [class.isPrinting]="printService.isPrinting">
+  <div id="top" class="sticky-top">
+    <app-top-menu></app-top-menu>
+    <form class="form-inline bg-dark p-1">
+      <app-articulo-card-select-filter
+        [wait]='wait'
+        [filterButtons]='filterButtons'
+        (onSearchArticulos)='filterEvent($event)'
+        (onButtonMsg)='buttonMsg($event)'
+      >
+      </app-articulo-card-select-filter>
+      <app-articulo-card-select-order
+        [order]="Order"
+        [listaOrden]='listaOrden'
+        (onOrderChangeEvent)='filterEvent($event)'
+      ></app-articulo-card-select-order>
+      <button (click)="imprimir()"><i class="fas fa-print"></i></button>
+    </form>
+  </div>
+  <div [class.isPrinting]="printService.isPrinting" id="main" (window:resize)="setHeight()">
+    <aside>     <!--aside [hidden]="selectedList.length === 0"-->
+      <div class="formater">
+        <div class="tablecontainer">
+          <table width="100%">
+            <tr *ngFor="let articulo of selectedList; index as i;">
+              <td>
+                <img src="{{articulo.picture_url}}" width="30px" alt="">
+              </td>
+              <td>{{articulo.quantity}}</td>
+              <td>{{articulo.title}} {{articulo.description}}</td>
+              <td>{{articulo.unit_price}}</td>
+              <td>{{articulo.unit_price*articulo.quantity}}</td>
+              <td><i class="far fa-trash-alt" (click)="deleteItem(i);sumaItems();"></i></td>
+            </tr>
+          </table>
+        </div>
+        <footer >
+          <button (click)="deleteAll()">Borrar Todo</button>
+           asdfasdfasdfasdfasdfadsf
+           <span class="float-right">$ {{sumaTotal}} </span>
+        </footer>
+      </div>
+    </aside>
+    <article class="d-flex justify-content-center" [class.isPrinting]="printService.isPrinting">
+      <div class="formater">
+        <div class="tablecontainer">
+          <table class="w-100">
+            <tr *ngFor="let articulo of articuloList; index as i;">
+              <td >
+                <app-prod-card-view-kart [producto]='articulo' (click)="addItem(articulo);sumaItems();">
+                </app-prod-card-view-kart>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <footer>
+          <button (click)="addAll()">Cargar Todo</button>
+          <button (click)="checkOut()">COMPRAR</button>
+        </footer>
+      </div>
+    </article>
+  </div>
+</div>

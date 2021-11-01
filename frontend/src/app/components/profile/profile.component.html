@@ -1,1 +1,227 @@
-<p>profile works!</p>
+<div class="sticky-top">
+  <app-top-menu></app-top-menu>
+</div>
+<div class="modal-header">
+  <div class='d-flex flex-column w-100 bd-highlight'>
+    <h4 class="modal-title" id="modal-basic-title">
+      <span >{{user.apellido }} </span>
+      <span >{{user.nombre }} </span>
+    </h4>
+  </div>
+</div>
+
+<div class="modal-body">
+  <ul ngbNav #nav="ngbNav" [activeId]="1" class="nav-tabs justify-content-center">
+    <li [ngbNavItem]="1">
+      <a ngbNavLink><b>Detalles</b></a>
+      <ng-template ngbNavContent>
+          <div>
+            <div class="row">
+              <div class="input-group col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                <div class="input-group-prepend">
+                  <div class="input-group-text setw">Apellidos</div>
+                </div>
+                <input type="text" class="form-control" name="apellido" placeholder="Apellidos"
+                  [(ngModel)]="user.apellido">
+              </div>
+              <div class="input-group col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                <div class="input-group-prepend">
+                  <div class="input-group-text setw">Nombres</div>
+                </div>
+                <input type="text" class="form-control" name="nombre" placeholder="Nombres"
+                  [(ngModel)]="user.nombre">
+              </div>
+            </div>
+              <div class="row">
+                <div class="input-group col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text setw">Dirección</div>
+                  </div>
+                  <input type="text" class="form-control" name="direccion" placeholder="Dirección"
+                    [(ngModel)]="user.direccion">
+                </div>
+                <div class="input-group col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text setw">Localidad</div>
+                  </div>
+                  <input type="text" class="form-control" name="localidad" placeholder="Localidad"
+                    [(ngModel)]="user.localidad">
+                </div>
+                <div class="input-group col-12 col-sm-12 col-md-12 col-lg-6 col-xl-4">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text setw">Provincia</div>
+                  </div>
+                  <input type="text" class="form-control" name="provincia" placeholder="Provincia"
+                    [(ngModel)]="user.provincia">
+                </div>
+                <div class="input-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-4">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text setw">Cod.Postal</div>
+                  </div>
+                  <input type="text" class="form-control" name="zipcode" placeholder="Cod-Pos"
+                    [(ngModel)]="user.zipcode">
+                </div>
+                <div class="input-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-4">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text setw">País</div>
+                  </div>
+                  <input type="text" class="form-control" name="pais" placeholder="País"
+                    [(ngModel)]="user.pais">
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-group col-sm-12 col-md-12 col-lg-8 col-xl-6">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      <i class="far fa-envelope"></i>
+                    </div>
+                  </div>
+                  <input type="text" class="form-control" name="email" placeholder="e-mail"
+                    [(ngModel)]="user.email">
+                </div>
+                <div class="input-group col-sm-12 col-md-6 col-lg-4 col-xl-3">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      <i class="fas fa-phone"></i>
+                    </div>
+                  </div>
+                  <input type="text" class="form-control" name="fijo" placeholder="Teléfono Fijo"
+                    [(ngModel)]="user.fijo">
+                </div>
+                <div class="input-group col-sm-12 col-md-6 col-lg-4 col-xl-3">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      <i class="fas fa-mobile-alt"></i>
+                    </div>
+                  </div>
+                  <input type="text" class="form-control" name="celular" placeholder="Celular"
+                    [(ngModel)]="user.celular">
+                </div>
+              </div>
+          </div>
+      </ng-template>
+    </li>
+    <li [ngbNavItem]="3">
+      <a ngbNavLink><b>Beneficios</b></a>
+      <ng-template ngbNavContent>
+        <div class="row col-6 offset-3">
+          <table>
+            <thead>
+              <th>#</th>
+              <th>Descripción</th>
+              <th>Valor</th>
+              <th>Mostrar</th>
+              <th>boton</th>
+            </thead>
+            <tbody>
+              <!--tr *ngFor="let item of user.beneficios; index as i;" class="">
+                <td>{{i}}</td>
+                <td>
+                  <input type="text" name="bname_{{i}}" [(ngModel)]="item.name">
+                </td>
+                <td>
+                  <input type='checkbox' name="bshowname_{{i}}" [(ngModel)]="item.showname">
+                </td>
+                <td>
+                  <input type="text" name="bvalue_{{i}}" [(ngModel)]="item.value">
+                </td>
+                <td>
+                  <input type='checkbox' name="bshow_{{i}}" [(ngModel)]="item.showvalue">
+                </td>
+                <td><button class='btn btn-outline-danger' (click)='borraBeneficio(i)'><i class="fas fa-trash-alt"></i></button></td>
+              </tr>
+              <tr class="">
+                <td></td>
+                <td>
+                  <input type="text" name="new_bname" [(ngModel)]="newBeneficios.name">
+                </td>
+                <td>
+                  <input type='checkbox' name="new_bshowname" [(ngModel)]="newBeneficios.showname">
+                </td>
+                <td>
+                  <input type="text" name="new_bvalue" [(ngModel)]="newBeneficios.value">
+                </td>
+                <td>
+                  <input type='checkbox' name="new_bshowvalue" [(ngModel)]="newBeneficios.showvalue">
+                </td>
+                <td><button class='btn btn-outline-primary' (click)='addBeneficios()'><i class="fas fa-plus"></i></button></td>
+              </tr-->
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </li>
+    <li [ngbNavItem]="4">
+      <a ngbNavLink><b>Fórmula</b></a>
+      <ng-template ngbNavContent>
+        <div class="row col-6 offset-3">
+          <table>
+            <thead>
+              <th>#</th>
+              <th>Descripción</th>
+              <th>Valor</th>
+              <th>Mostrar</th>
+              <th>boton</th>
+            </thead>
+            <tbody>
+              <!--tr *ngFor="let item of user.formula; index as i;" class="">
+                <td>{{i}}</td>
+                <td>
+                  <input type="text" name="name_{{i}}" [(ngModel)]="item.name">
+                </td>
+                <td>
+                  <input type='checkbox' name="shwowname_{{i}}" [(ngModel)]="item.showname">
+                </td>
+                <td>
+                  <input type="text" name="value_{{i}}" [(ngModel)]="item.value">
+                </td>
+                <td>
+                  <input type='checkbox' name="show_{{i}}" [(ngModel)]="item.showvalue">
+                </td>
+                <td><button class='btn btn-outline-danger' (click)='borraFormula(i)'><i class="fas fa-trash-alt"></i></button></td>
+              </tr>
+              <tr class="">
+                <td></td>
+                <td>
+                  <input type="text" name="new_name" [(ngModel)]="newFormula.name">
+                </td>
+                <td>
+                  <input type='checkbox' name="new_showname" [(ngModel)]="newFormula.showname">
+                </td>
+                <td>
+                  <input type="text" name="new_value" [(ngModel)]="newFormula.value">
+                </td>
+                <td>
+                  <input type='checkbox' name="new_showvalue" [(ngModel)]="newFormula.showvalue">
+                </td>
+                <td><button class='btn btn-outline-primary' (click)='addFormula()'><i class="fas fa-plus"></i></button></td>
+              </tr-->
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </li>
+    <li [ngbNavItem]="5" class="mr-auto">
+      <a ngbNavLink><b>Presentaciones</b></a>
+      <!--ng-template ngbNavContent>
+        <div class="d-flex">
+          <button class="btn btn-info ml-auto mb-2" (click)="add_producto()">add</button>
+        </div>
+        <app-producto-form-edit
+          *ngFor="let producto of user.productos;index as i;"
+          [producto]='producto'
+          [unidades]='unidades'
+          [articulo]='user'
+          [idx]='i'
+          (onBorrar)='borrarProducto($event)'
+        ></app-producto-form-edit>
+      </ng-template-->
+    </li>
+  </ul>
+  <div [ngbNavOutlet]="nav" class="mt-2"></div>
+</div>
+<div class="modal-footer">
+  <!--button type="button" class="btn btn-danger" (click)="checkData() ? activeModal.close('Cancel') : ''">Cancel</button-->
+  <button type="button" class="btn btn-danger" (click)="checkData()">Cancel</button>
+  <button type="button" class="btn btn-danger" (click)="saveData();">Save</button>
+</div>

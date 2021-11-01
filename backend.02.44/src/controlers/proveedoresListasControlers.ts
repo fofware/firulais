@@ -1,7 +1,8 @@
 import {Request, Response, Router} from 'express';
 import { ObjectID } from 'bson'
 import passport from "passport";
-import lista, {IProveedoresListas} from '../models/proveedoresListas'
+//import lista, {IProveedoresListas} from '../models/proveedoresListas'
+import lista from '../models/proveedoresListas';
 
 class ProveedoresListasControler {
 
@@ -15,6 +16,7 @@ class ProveedoresListasControler {
 		this.router.post( '/proveedoreslistas/import', this.import );
 		this.router.post( '/proveedoreslistas/getid', this.provlistaid );
 		this.router.post( '/proveedoreslistas/savelink', this.savelink );
+		this.router.post( '/proveedoreslistas/checklista', this.checkLista );
 	}
 
 	public index(req: Request, res: Response) {
@@ -23,7 +25,7 @@ class ProveedoresListasControler {
 
 	async list(req: Request, res: Response) {
 		try {
-      const retData = await lista.find().sort({marca: 1, edad: 1, descripcion: 1});
+      const retData = await lista.find(); //.sort({marca: 1, edad: 1, descripcion: 1});
       res.status(200).json(retData);
     } catch (error) {
 			return res.status(404).json( error );			
@@ -50,6 +52,27 @@ class ProveedoresListasControler {
 			res.status(500).json(error);
 		}
 	}
+
+  async checkLista(req: Request, res: Response ){
+    console.log(req.body);
+    const listaReg = {
+			file_name: req.body.filename,
+			last_modified: req.body.lastModified,
+			size: req.body.size,
+			proveedor_id: new ObjectID(req.body.proveedor_id)
+		}
+		let lista_reg = await lista.findOne({ 
+                        file_name: listaReg.file_name,
+												last_modified: listaReg.last_modified,
+												proveedor_id: listaReg.proveedor_id
+											});
+		if(!lista_reg){
+			lista_reg = new lista(listaReg);
+			const rslt = await lista_reg.save();
+		}
+    return res.status(200).json(lista_reg);
+  }
+
   async savelink(req: Request, res: Response){
     try {
       if(req.body._id) req.body._id = new ObjectID(req.body._id);

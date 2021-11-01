@@ -7,5 +7,4 @@ export const AUTH_OLD = `${location.protocol}//firulais.net.ar:${(location.proto
 // export const AUTH_URI = `${location.protocol}//firulais.net.ar:${(location.protocol == 'https:' ? 3443 : 3000)}`
 export const API_URI = environment.API_URI;
 export const AUTH_URI = environment.AUTH_URI;
-console.log(API_URI);
-console.log(AUTH_URI);
+export const MP_URI = environment.MP_URI;

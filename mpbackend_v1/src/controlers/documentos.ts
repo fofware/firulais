@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 import https from 'https';
+import { mpKeys } from "../config/mpKey";
 /*
 import { ExtractJwt } from "passport-jwt";
 import jwt from 'jsonwebtoken';
@@ -7,6 +8,9 @@ import config from '../config/config';
 import passport from "passport";
 import { ObjectID } from 'bson'
 */
+
+const Authorization = `Bearer ${mpKeys.AccessToken}`;
+
 class documentosControler {
 
 	public router: Router = Router();
@@ -31,7 +35,7 @@ class documentosControler {
 			path: '/v1/identification_types',
 			method: 'GET',
 			headers: {
-				'Authorization': 'Bearer TEST-3527848825753216-092312-ea8b6370ee241c138f64f12278d07bfa-84242924'
+				'Authorization': Authorization//'Bearer TEST-3527848825753216-092312-ea8b6370ee241c138f64f12278d07bfa-84242924'
 			}
 		};
 

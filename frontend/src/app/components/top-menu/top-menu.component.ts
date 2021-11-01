@@ -13,11 +13,11 @@ export class TopMenuComponent implements OnInit { // , AfterViewInit, AfterViewC
   autorized: boolean;
   isMenuCollapsed = true;
 
-  constructor(public authService: AuthService) {
-    this.user = this.authService.user;
-  }
+  constructor(private authService: AuthService) {
+      this.user = this.authService.user;
+      console.log('Top-Menu-OnInit');
+    }
 
-  ngOnInit(): void {
-    console.log('Top-Menu-OnInit');
+  async ngOnInit(): Promise<void> {
   }
 }

@@ -7,7 +7,7 @@ import config from '../config/config';
 function createToken(user: IUser | any ) {
   return jwt.sign({ _id: user._id, 
     email: user.email,
-    appellido: user.apellido,
+    apellido: user.apellido,
     nombre: user.nombre,
     roles: user.roles,
     nickname: user.nickname || `${user.nombre} ${user.apellido}`,
@@ -55,7 +55,7 @@ export const signIn = async (req: Request, res: Response): Promise<Response> => 
   delete user.password;
   user.password = null;
   user.__v = null
-  return res.status(200).json( token);
+  return res.status(200).json( token );
 };
 
 export const renew = async (req: Request, res: Response): Promise<Response> => {

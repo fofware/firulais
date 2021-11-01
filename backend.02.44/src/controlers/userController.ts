@@ -86,6 +86,7 @@ class UserControler {
 	}
 
 	config () {
+    this.router.get('/api/user/profile',passport.authenticate('jwt', {session:false}), this.profile );
     this.router.get('/api/users/list',passport.authenticate('jwt', {session:false}), this.list );
     this.router.get('/api/users/search/:search',passport.authenticate('jwt', {session:false}), this.buscar );
     this.router.delete('/api/user/:id',passport.authenticate('jwt', {session:false}), this.delete );
@@ -99,9 +100,18 @@ class UserControler {
 		res.send('Usuarios');
 	}
 
+	async profile(req: Request, res: Response) {
+		//console.log(req.user);
+		const user = await User.findById(req.user['_id'],{ password: 0 });
+		console.log("----------------- profile -------------------------");
+		console.log(user)
+		res.json(user);
+	}
+
 	async list(req: Request, res: Response) {
-		const articulos = await User.find().sort({name: 1});
-		res.json(articulos);
+		//console.log(req.user);
+		const users = await User.find().sort({name: 1});
+		res.json(users);
 	}
 
 	async import(req: Request, res: Response) {

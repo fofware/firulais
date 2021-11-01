@@ -1,0 +1,149 @@
+:host {
+/*  height: 17rem; */
+  margin: 0px;
+}
+
+:host .card-header {
+  font-weight: 700;
+  font-size: 1.1rem;
+  height: 3.3rem;
+}
+
+:host .card-body {
+  /*
+  height: 11.3rem;
+  padding: 0;
+  */
+  position: relative;
+}
+:host .card-footer {
+  box-shadow: inset 1px 1px 1px 1px #b6b6b6;
+  -webkit-box-shadow: inset 1px 1px 1px 1px #b6b6b6;
+}
+
+:host .card-footer > div{
+  border: 0px solid gray;
+  padding-left: 6px;
+  padding-right: 6px;
+  box-shadow: inset 1px 1px 2px 1px #b6b6b6;
+  -webkit-box-shadow: inset 1px 1px 2px 1px #b6b6b6;
+
+}
+
+.imagen {
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
+/*
+  border: 1px solid blueviolet;
+*/
+}
+.imagen .imgBox {
+  height:inherit;
+  max-height: inherit;
+}
+.imagen .imgBox > img {
+  width: auto;
+  height: 98%;
+  max-width: 180px;
+/*
+  height: calc(50% - 33.5px);
+  width:  calc(100vh * 1.3);
+*/
+}
+.pesable {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  z-index: 10;
+  text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
+}
+.stock {
+  position: absolute;
+  top: 0px;
+  left: 16px;
+  z-index: 10;
+  text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
+}
+.preciounidad {
+  position: absolute;
+  bottom: 0;
+  text-align: center;
+  z-index: 10;
+  font-weight: 500;
+  font-size: larger;
+  text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
+}
+.card-body{
+  position: relative;
+}
+.artname {
+  /*
+  position: relative;
+  top: 0;
+  left: 75px;
+  right: 5px;
+  padding-left: 100px;
+  text-align: center;
+  */
+  z-index: 10;
+  font-weight: 500;
+  font-size: x-large;
+  text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
+}
+.prodname {
+  /*
+  position: absolute;
+  bottom: 2.2rem;
+  right: 15px;
+  */
+  text-align: center;
+  z-index: 10;
+  font-weight: 500;
+  font-size: x-large;
+  text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
+}
+.precio {
+  /*
+  position: absolute;
+  bottom: 0;
+  right: 15px;
+  */
+  text-align: center;
+  z-index: 10;
+  font-weight: 500;
+  font-size: x-large;
+  text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
+}
+.detalles {
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+.hero-text {
+  width: 100%;
+  z-index: 10;
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.detalles > ul {
+  max-height: 140px;
+  margin-left: -20px;
+  overflow-y: hidden;
+}
+
+.saltodepagina {
+  display: none;
+}
+
+/*
+@media print {
+  .card {
+    width: 48%;
+    display: block;
+  }
+}
+*/

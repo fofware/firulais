@@ -10,6 +10,15 @@ import { userCtrl } from './controlers/userController';
 import authRoutes from './routes/authRoutes';
 import { documentosCtrl } from './controlers/documentos';
 import { preferenciaCtrl } from './controlers/preferencias';
+import { mediosdepagoCtrl } from './controlers/mediosdepago';
+import { customersCtrl } from './controlers/customers';
+import { puntosdeventaCtrl } from './controlers/puntosdeventa';
+import { storesCtrl } from './controlers/stores';
+import { ordersCtrl } from './controlers/instore_ordersV2';
+import { cardsCtrl } from './controlers/cards';
+import { merchantOrdersCtrl } from './controlers/merchant_orders';
+import { pagosCtrl } from './controlers/payments';
+import { webhooksCtrl } from './controlers/webhooks';
 
 export default class Server {
 
@@ -35,7 +44,16 @@ export default class Server {
 		this.app.use(authRoutes);
 		this.app.use( userCtrl.router );
     this.app.use( documentosCtrl.router );
-    this.app.use( preferenciaCtrl.router )
+    this.app.use( preferenciaCtrl.router );
+    this.app.use( mediosdepagoCtrl.router );
+    this.app.use( customersCtrl.router );
+    this.app.use( puntosdeventaCtrl.router );
+    this.app.use( storesCtrl.router );
+    this.app.use( cardsCtrl.router );
+    this.app.use( ordersCtrl.router );
+    this.app.use( merchantOrdersCtrl.router );
+    this.app.use( pagosCtrl.router );
+    this.app.use( webhooksCtrl.router );
 	}
 	start(): void {
 		this.app.listen(this.app.get('port'), () => {

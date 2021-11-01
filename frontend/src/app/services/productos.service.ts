@@ -25,7 +25,11 @@ export class ProductosService {
               .get(`${this.ApiUri}/productos/list`)
               .toPromise();
   }
-
+  fulldata(params:any): Promise<object>{
+    return this.http
+      .post(`${this.ApiUri}/productos/fulldata`, params)
+      .toPromise();
+  }
   list_post(params: any): Promise<IProducto>{
     return this.http
               .post(`${this.ApiUri}/productos/list`, params )

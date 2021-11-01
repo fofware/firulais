@@ -1,40 +1,61 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, Document, SchemaTypes } from "mongoose";
 
 export interface IProveedoresPrecios extends Document {
-  id_proveedorArticulo: object;
-  fecha: object;
-  id_proveedor?: object;
-  id_producto?: object;
-  precio_lista: number;
-  reposicion: number;
-  precios:[];
+  proveedor_lista_id: Object;
+  proveedor_id: Object;
+  proveedor_articulo: Object;
+  producto_id?: Object;
+  fecha: Object;
+  precio_lista: Number;
+  reposicion: Number;
 }
 
 const ProveedoresPreciosSchema = new Schema({
-  id_proveedoresArticulo: {
+  proveedor_lista_id: {
     type: Schema.Types.ObjectId
-    ,ref: "ProveedoresArticulos"
+    ,ref: "ProveedoresListas"
     ,$id: '_id'
-  }
-  ,fecha:{
-    type: Schema.Types.Date
-  }
-  ,id_proveedor: {
+    ,index: true
+  },
+  proveedor_id: {
     type: Schema.Types.ObjectId
     ,ref: "personas"
     ,$id: "_id"
+    ,index: true
+  },
+  proveedor_articulo: {
+    type: Schema.Types.ObjectId
+    ,ref: "ProveedoresArticulos"
+    ,$id: '_id'
+    ,index: true
   }
-  ,id_producto: {
+  ,producto_id: {
     type: Schema.Types.ObjectId
     ,ref: "productos"
     ,$id: "_id"
+    ,index: true
+  }
+  ,fecha:{
+    type: Schema.Types.Date
+    ,index: true
+  }
+  ,lista: {
+    type: Schema.Types.Number
   }
   ,reposicion: {
     type: Schema.Types.Number
   }
-  ,precios: []
+  , bonificacion: {
+    type: Schema.Types.Number
+  }
 },{
   timestamps: true,
-  versionKey: true
+  versionKey: false
 })
+
+ProveedoresPreciosSchema.on('index', error => {
+  // "_id index cannot be sparse"
+  console.log(error.message);
+});
+
 export default model<IProveedoresPrecios>('ProveedoresPrecios', ProveedoresPreciosSchema);

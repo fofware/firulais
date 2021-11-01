@@ -1,5 +1,4 @@
-import express, { Application, NextFunction } from 'express';
-import { Request, Response } from 'express';
+import express, { Application, NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 
@@ -20,6 +19,7 @@ import authRoutes from './routes/authRoutes';
 import { ProveedoresListasCtrl } from './controlers/proveedoresListasControlers';
 import { TmpListasCtrl } from './controlers/tmpListasControler';
 import { MercadoPagoCtrl } from './controlers/mercadopagoControler';
+import { ProveedoresPreciosCtrl } from './controlers/proveedoresPreciosControlers';
 
 export default class Server {
 
@@ -41,13 +41,14 @@ export default class Server {
 		this.app.disable('etag');
 	}
 	routes(): void {
-	
+
 		this.app.use(indexRoutes);
 		this.app.use(authRoutes);
 		this.app.use('/api', peoplesRoutes);
 		this.app.use('/api', articulosRt);
 		this.app.use('/api', productoCtrl.router);
 		this.app.use('/api', ProveedoresListasCtrl.router)
+		this.app.use('/api', ProveedoresPreciosCtrl.router)
 		this.app.use( TmpListasCtrl.router)
 		this.app.use( ProveedoresArticulosCtrl.router)
 		this.app.use( personaCtrl.router );

@@ -16,6 +16,12 @@ export class UsersService {
               .post(`${this.ApiUri}/user/import`, user)
               .toPromise();
   }
+  profile(): Promise<object> {
+    return this.http
+              .get(`${this.ApiUri}/user/profile`)
+              .toPromise();
+
+  }
   fulllist(): Promise<object> {
     return this.http
               .get(`${this.ApiUri}/users/list`)

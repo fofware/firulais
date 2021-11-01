@@ -19,8 +19,11 @@ export class AuthService {
   public get user(): any {
     const token = localStorage.getItem('token');
     if (token && token !== null ) {
-      const jwtToken = JSON.parse(atob(token.split('.')[1]));
-//      console.log(jwtToken);
+      const jwtToken = JSON.parse(decodeURIComponent(atob(token.split('.')[1]).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join('')));
+      //const jwtToken = JSON.parse(atob(token.split('.')[1]));
+      //console.log(jwtToken);
       return jwtToken;
     }
     return {

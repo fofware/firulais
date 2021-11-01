@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, Router } from '@angular/router';
 import { ApitoapiComponent } from './components/apitoapi/apitoapi.component';
 import { ArticulosListPrintComponent } from './components/articulos-list-print/articulos-list-print.component';
 import { ArticulosListComponent } from './components/articulos-list/articulos-list.component';
@@ -26,6 +26,8 @@ import { ProductoComponent } from './components/producto/producto.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { SigninComponent } from './components/signin/signin.component';
 import { SignupComponent } from './components/signup/signup.component';
+import { TestMpHooksComponent } from './components/test-mp-hooks/test-mp-hooks.component';
+import { TestMpComponent } from './components/test-mp/test-mp.component';
 import { UsersComponent } from './components/users/users.component';
 import { AuthGuard } from './guard/auth.guard';
 import { Roles } from './shared/user-roles';
@@ -34,58 +36,53 @@ const routes: Routes = [
   {
     path: ''
     , component: HomeComponent
-  },
-  {
+  }
+  ,{
     path: 'inicio'
     , component: HomeComponent
-  },
-  {
+  }
+  ,{
     path: 'auth/signup'
     , component: SignupComponent
-  },
-  {
+  }
+  ,{
     path: 'auth/signin'
     , component: SigninComponent
-  },
-  {
+  }
+  ,{
     path: "private/users"
     , component: UsersComponent
     , canActivate: [AuthGuard]
     , data: {
       //userRoles: [] // Multiple Allowed User
     }
-  },
-  {
-    path: "private/profile"
-    , component: ProfileComponent
-    , canActivate: [AuthGuard]
-  },
-  {
+  }
+  ,{
     path: 'private/:id'
     , component: MenuappComponent
     , canActivate: [AuthGuard]
-  },
-  {
+  }
+  ,{
     path: 'private/menu/:id'
     , component: MenuappComponent
     , canActivate: [AuthGuard]
-  },
-  {
+  }
+  ,{
     path: 'producto/:id'
     , component: ProductoComponent
 //    , canActivate: [AuthGuard]
-  },
-  {
+  }
+  ,{
     path: 'productlist'
     , component: ProdListPublicComponent
 //    , canActivate: [AuthGuard]
-  },
-  {
+  }
+  ,{
     path: 'productoedit'
     , component: ProductoEditComponent
     , canActivate: [AuthGuard]
-  },
-  {
+  }
+  ,{
     path: 'reventalist'
     , component: ArticulosReventaComponent
     , canActivate: [AuthGuard]
@@ -115,7 +112,6 @@ const routes: Routes = [
       , component: ProductListPrintComponent
   //    , canActivate: [AuthGuard]
       }
-
     ]
   }
   ,{
@@ -148,6 +144,22 @@ const routes: Routes = [
     , component: ImportDataComponent
 //    , canActivate: [AuthGuard]
   }
+  , { path: '**',
+    component: PageNotFoundComponent
+  }
+];
+
+const MpRoutes = [
+  {
+    path: 'mptest'
+    , component: TestMpComponent
+//    , canActivate: [AuthGuard]
+  }
+  ,{
+    path: 'mptesthooks'
+    , component: TestMpHooksComponent
+//    , canActivate: [AuthGuard]
+  }
   , {
     path: 'checkout'
     , component: CheckoutComponent
@@ -168,13 +180,22 @@ const routes: Routes = [
     , component: MpPendingComponent
 //    , canActivate: [AuthGuard]
   }
-  , { path: '**',
-    component: PageNotFoundComponent
+];
+
+const AccountRoutes = [
+  {
+    path: "private/profile"
+    , component: ProfileComponent
+    , canActivate: [AuthGuard]
   }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [
+    RouterModule.forRoot(AccountRoutes),
+    RouterModule.forRoot(MpRoutes),
+    RouterModule.forRoot(routes)
+  ],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

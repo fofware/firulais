@@ -76,6 +76,9 @@ import { CheckoutComponent } from './components/checkout/checkout.component';
 import { MpSuccessComponent } from './components/mp-success/mp-success.component';
 import { MpFailureComponent } from './components/mp-failure/mp-failure.component';
 import { MpPendingComponent } from './components/mp-pending/mp-pending.component';
+import { TestMpComponent } from './components/test-mp/test-mp.component';
+import { TestMpHooksComponent } from './components/test-mp-hooks/test-mp-hooks.component';
+import { ProdCardViewKartComponent } from './components/prod-card-view-kart/prod-card-view-kart.component';
 
 @NgModule({
   declarations: [
@@ -148,6 +151,9 @@ import { MpPendingComponent } from './components/mp-pending/mp-pending.component
     MpSuccessComponent,
     MpFailureComponent,
     MpPendingComponent,
+    TestMpComponent,
+    TestMpHooksComponent,
+    ProdCardViewKartComponent,
   ],
   imports: [
     BrowserModule,

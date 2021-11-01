@@ -5,13 +5,13 @@ import { API_URI } from '../shared/uris';
 
 export const proveedoresSettings = [
   {
-    "_id": '61413fc2dab04eeaa5a59a38',
+    "_id": "61413fc2dab04eeaa5a59a38",
     "nombre": "Servicios Veterinarios",
     "type": "XLSX",
     "encode": "utf-8",
     "named": false,
     "input": {
-      "Lista de Precios":{
+      "*":{
         "input_fields": [
           "codigo",
           "nombre",
@@ -35,7 +35,6 @@ export const proveedoresSettings = [
             line[0] = ret.codigo;
             line[1] = ret.nombre;
             line[2] = ret.reposicion;
-            //return line;
             if( line[0] && line[1] && line[2]) return line;
           }`
         ]
@@ -1308,14 +1307,14 @@ export const proveedoresSettings = [
             }
           }
           if(line[3]){
-            let reposicion = line[3] ? line[3].match(/[$](?<value>[0-9\.]*)/) : null;
+            let reposicion = line[3] && isNaN(line[3]) ? line[3].match(/[$](?<value>[0-9\.]*)/) : null;
             if (reposicion){
               reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
             }
             ret['reposicion'] = reposicion;
           }
           if(line[4]){
-            let lista = line[4] ? line[4].match(/[$](?<value>[0-9\.]*)/) : null;
+            let lista = line[4] && isNaN(line[3]) ? line[4].match(/[$](?<value>[0-9\.]*)/) : null;
             if (lista){
               lista = lista['groups']['value'] ? parseFloat(lista['groups']['value']): null;
             }
@@ -1725,7 +1724,7 @@ export const proveedoresSettings = [
             }
           }
           if(line[3]){
-            let reposicion = line[3] ? line[3].match(/[$](?<value>[0-9\.]*)/) : null;
+            let reposicion = line[3]  && isNaN(line[3]) ? line[3].match(/[$](?<value>[0-9\.]*)/) : null;
             if (reposicion){
               reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
             }
@@ -1855,6 +1854,7 @@ export const proveedoresSettings = [
 @Injectable({
   providedIn: 'root'
 })
+
 export class ListasProveedoresService {
 
   constructor(private http: HttpClient) { }
@@ -1870,25 +1870,39 @@ export class ListasProveedoresService {
               .post(`${API_URI}/proveedoresarticulos/`, reg)
               .toPromise();
   }
+
+  checkLista(reg): Promise<object> {
+    return this.http
+              .post(`${API_URI}/proveedoreslistas/checklista`, reg)
+              .toPromise();
+  }
+  setprecio(reg): Promise<object> {
+    return this.http
+              .post(`${API_URI}/proveedoresprecios/add`, reg)
+              .toPromise();
+  }
+
   async XLSX(prov: any, src: any[]): Promise<object> {
     const notProcesed = [];
-//    console.log(src);
+    //console.log(src);
     let resultado = [];
     for (const key in src) {
       const data = [];
       if (Object.prototype.hasOwnProperty.call(src, key)) {
-        if (prov.input[key]){
-          const params = prov.input[key];
+        if ( prov.input[key] || prov.input["*"] ){
+          const params = prov.input[key] || prov.input['*'];
           const hoja = JSON.parse(JSON.stringify(src[key]));
           let ret = src[key];
+
           if(params['filters']){
             for (let f = 0; f < params['filters'].length; f++) {
               const func = eval(params['filters'][f]);
               ret = ret.filter(func);
             }
           }
-//          console.log(key,ret,hoja)
+
           let prevNombre = "";
+
           for (let i = 0; i < ret.length; i++) {
             const line = ret[i];
             let e = {};
@@ -1906,6 +1920,7 @@ export class ListasProveedoresService {
             e['proveedor'] = prov._id
             data.push(e)
           }
+
           if(prov.aggregate){
             const result:any = await this.create({data, clean: prov.clean, aggregate: prov.aggregate});
             resultado = resultado.concat(result.result)
@@ -1917,183 +1932,91 @@ export class ListasProveedoresService {
         }
       }
     }
-    console.log(resultado);
+
     return resultado;
   }
 
 
-  sciarrielloXLSX(src: any[]): any {
-    const data = [];
-    for (const key in src) {
-      if (Object.prototype.hasOwnProperty.call(src, key)) {
-        const hoja = src[key];
-        for (let i = 0; i < hoja.length; i++) {
-          const line = hoja[i];
-          if(line['__EMPTY_3'] && line['__EMPTY_3'].substring(0,1) === "$"){
-            const reposicion = (line['__EMPTY_3'] ? parseFloat(line['__EMPTY_3'].substring(1)) : 0)
-            const precio = line['__EMPTY_4'] ? line['__EMPTY_4'].match(/([0-9+]*)|([0-9]*)/g) : "";
-//            const contenido = line['__EMPTY_2'].match(/([0-9]+)\s([a-zA-Z]+)/g)
-            line['__EMPTY_2'] = line['__EMPTY_2'].replace(/,/g, '.');
-            const contenido = line['__EMPTY_2'].match(/(?<bulto>[0-9]+)\s(?<bunidad>[a-zA-Z]+)\s(?:[xX]+)\s(?<contiene>[0-9\.+]+)\s(?<unidad>[a-zA-Z]+)|(?<bulto3>[0-9]+)\s(?:[xX]+)\s(?<contiene3>[0-9\.+]+)\s(?<unidad3>[a-zA-Z]+)|(?<contiene1>[0-9\.+]+)\s(?<unidad1>[a-zA-Z]+)|(?<contiene2>[0-9\.+]+)(?<unidad2>[a-zA-Z]+)/)
-            const e = {
-              hoja: key,
-              nombre: line['__EMPTY_1'],
-              bulto: contenido ? contenido.groups.bulto || 1 : `Err(${line['__EMPTY_2']})`,
-              contiene: contenido ? contenido.groups.contiene || contenido.groups.contiene1 || contenido.groups.contiene2 || contenido.groups.contiene3 : `Err(${line['__EMPTY_2']})`,
-              unidad: contenido ? contenido.groups.unidad || contenido.groups.unidad1 || contenido.groups.unidad2 || contenido.groups.unidad3 : `Err(${line['__EMPTY_2']})`,
-              contenido: contenido ,
-              reposicion: reposicion,
-              precio: precio,
-              tmpcontenido: line['__EMPTY_2'],
-              temp: line['__EMPTY_4']
-            }
-            e.nombre = e.nombre.replace(/[  ]/g, " ");
-            if(e.contiene.search(/[+]/) > -1 ){
-              e.nombre = `${e.nombre} ${e.contiene}`;
-              e.contiene = eval(e.contiene);
-            }
-            e['codigo'] =  (`${e.nombre}${e.bulto}${e.contiene}`).replace(/[ ]/g,'').toLowerCase()
-
-            data.push(e)
-          }
-        }
-      }
-    }
-
-    console.log(data)
-    return data;
-  }
-  cancatXLSX(src: any[]): any {
-    const data = [];
-    console.log(src);
-
-    for (const key in src) {
-      if (Object.prototype.hasOwnProperty.call(src, key)) {
-        const hoja = src[key];
-        console.log(hoja);
-        for (let i = 0; i < hoja.length; i++) {
-          const line = hoja[i];
-          if(line['__EMPTY_6'] && Number(line['__EMPTY_6'])) {
-            const ean = Number(line['__EMPTY_3']) === NaN ? line['__EMPTY_3'].match(/[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/) : line['__EMPTY_3'];
-            const e = {
-              hoja: key,
-              codigo: line['__EMPTY_1'],
-              nombre: line['__EMPTY_2'].trim(),
-              ean: ean,
-              bulto: line['__EMPTY_4'],
-              contiene: line['__EMPTY_5'],
-              unidad: '',
-              reposicion: round(line['__EMPTY_6'],2),
-              sugerido: round(line['__EMPTY_10'],2)
-            }
-            data.push(e)
-          }
-        }
-      }
-    }
-    console.log(data)
-    return data;
-  }
-
-
-  dumasXLSX(src: any[]): any {
-    const data = [];
-    console.log(src);
-
-    for (const key in src) {
-      if (Object.prototype.hasOwnProperty.call(src, key)) {
-        const hoja = src[key];
-//        console.log(hoja);
-        for (let i = 0; i < hoja.length; i++) {
-          const line = hoja[i];
-//          line['hoja'] = key;
-          const e = line;
-            data.push(e)
-        }
-      }
-    }
-
-    console.log(data)
-    return data;
-  }
-  rapTXT(src: string): any {
-    const data: any = src.split('\n');
-    const retData = []
-    data.map((line: string) => {
-//        line = line.replace(/,/g, '');
-        //const capturingRegexText = /(?<codigo>[0-9][0-9][0-9][0-9])\s?(?<ean>[0-9]*)\s(?<description>[0-9a-zA-ZñÑáéíóúÁÉÍÓÚÜü \.,+\-&"/]*)([\$ ]+)(?<precio>[0-9,\.]+)([\$ ]*)([0-9,\.]*)/;
-//        const capturingRegexText = /(?<codigo>[0-9][0-9][0-9][0-9])\s+(?<ean>[0-9]*)\s(?<description>[0-9a-zA-ZñÑ \.,+\-&"/]*)\s*([0-9]*)[xX]\s?([0-9,\.]*)\s?([a-zA-Z\.]+)\s?([0-9]*)([\$ ]+)(?<precio>[0-9,\.]+)([\$ ]*)([0-9,\.]*)/
-        const capturingRegexText = /([0-9][0-9][0-9][0-9])\s+([0-9]+)\s([0-9a-zA-ZñÑáéíóúÁÉÍÓÚÜü \.,+\-&"/]*)\s?([0-9]*)[xX]\s?([0-9,\.]*)\s?([a-zA-Z\.]+)\s?([0-9\.]*)([\$ ]+)([0-9,\.]+)([\$ ]*)([0-9,\.]*)/
-        //const capturingRegexText = /([0-9][0-9][0-9][0-9])\s+([0-9]+)\s([0-9a-zA-ZñÑ \.,+\-&"/]*)\s([0-9xX ,\.]*)([a-zA-Z\.]*)\s?([0-9\.]*)([\$ ]+)([0-9,\.]+)([\$ ]*)([0-9,\.]*)/
-        const reg:any = line.match(capturingRegexText);
-/*
-        reg['groups']['precio'] = parseFloat(reg['groups']['precio'].replace(/[,]/g,''))
-        reg['groups']['details'] = reg['groups']['description'].match(/([0-9a-zA-ZñÑ \.,+\-&"/]*)\s?([0-9,\.]*)[xX]\s?([0-9,\.]+)\s?([a-zA-Z\.]+)\s([0-9]*)/);
-        reg['groups']['bulto'] = reg['groups']['details'][2] === '' ? 1 : parseFloat(reg['groups']['details'][2]) ;
-        reg['groups']['contiene'] = parseFloat(reg['groups']['details'][3]);
-        reg['groups']['unidad'] = reg['groups']['details'][4];
-        reg['groups']['descuento'] = .85
-//        reg['groups']['Name'] = reg['groups']['details'][1];
-        reg['groups']['Name'] = reg['groups']['description'];
-*/
-      if(reg){
-        const extra = reg[3].match(/([0-9\. ]*)$/)
-//        reg[4] = reg[3].match(/([0-9]+)([xX]+)([0-9,\.]*)([a-zA-Z]*)$|([xX])\s([0-9]+)\s?([a-zA-Z\.]*)([0-9]*)$/)
-        extra[0] = extra[0].trim();
-        reg['groups'] = {};
-        reg['groups']['input'] = line;
-        reg[9] = parseFloat(reg[9].replace(/[,]/g,''));
-        reg['groups']['codigo'] = reg[1];
-        reg['groups']['ean'] = reg[2];
-        reg['groups']['nombre'] = reg[3].replace(extra[0],'').replace(/["]/g,'').trim();
-        reg['groups']['bulto'] = extra[0] === '' ? 1 : parseFloat(extra[0]);
-        reg['groups']['contiene'] = parseFloat(reg[5].replace(/,/g,'.'));
-        reg['groups']['unidad'] = reg[6];
-        reg['groups']['reposicion'] = round(reg[9]/1.21*.85*1.245,2);
-        reg['groups']['extra'] = extra;
-//      reg['groups'] = groups
-        retData.push(reg.groups)
-      } else {
-        console.log(line)
-      }
-    })
-    console.log(data)
-    return retData;
-  }
-  rapOptimum(src: string): any {
-    const data: any = src.split('\n');
-    const retData = []
-    data.map((line: string) => {
-//        line = line.replace(/,/g, '');
-        const capturingRegexText = /(?<codigo>[0-9][0-9][0-9][0-9])\s?(?<ean>[0-9]*)\s(?<description>[0-9a-zA-ZñÑáéíóúÁÉÍÓÚÜü \.,+\-&"/]*)([\$ ]+)(?<precio>[0-9,\.]+)([\$ ]*)(?<sugerido>[0-9,\.]*)/;
-        const reg:any = line.match(capturingRegexText);
-        reg['groups']['nombre'] = reg['groups']['description']
-        reg['groups']['precio'] = parseFloat(reg['groups']['precio'].replace(/[,]/g,''))
-        reg['groups']['sugerido'] = parseFloat(reg['groups']['sugerido'].replace(/[,]/g,''))
-        reg['groups']['details'] = reg['groups']['description'].match(/([a-zA-ZñÑáéíóúÁÉÍÓÚÜü0-9 \.,+\-&"/]*)([0-9]+)[xX]([0-9]*)([a-zA-ZñÑáéíóúÁÉÍÓÚÜü]*)/);
-//        reg['groups']['bulto'] = !reg['groups']['details'] || reg['groups']['details'][2] === '' ? 1 : parseFloat(reg['groups']['details'][2]) ;
+//  rapTXT(src: string): any {
+//    const data: any = src.split('\n');
+//    const retData = []
+//    data.map((line: string) => {
+////        line = line.replace(/,/g, '');
+//        //const capturingRegexText = /(?<codigo>[0-9][0-9][0-9][0-9])\s?(?<ean>[0-9]*)\s(?<description>[0-9a-zA-ZñÑáéíóúÁÉÍÓÚÜü \.,+\-&"/]*)([\$ ]+)(?<precio>[0-9,\.]+)([\$ ]*)([0-9,\.]*)/;
+////        const capturingRegexText = /(?<codigo>[0-9][0-9][0-9][0-9])\s+(?<ean>[0-9]*)\s(?<description>[0-9a-zA-ZñÑ \.,+\-&"/]*)\s*([0-9]*)[xX]\s?([0-9,\.]*)\s?([a-zA-Z\.]+)\s?([0-9]*)([\$ ]+)(?<precio>[0-9,\.]+)([\$ ]*)([0-9,\.]*)/
+//        const capturingRegexText = /([0-9][0-9][0-9][0-9])\s+([0-9]+)\s([0-9a-zA-ZñÑáéíóúÁÉÍÓÚÜü \.,+\-&"/]*)\s?([0-9]*)[xX]\s?([0-9,\.]*)\s?([a-zA-Z\.]+)\s?([0-9\.]*)([\$ ]+)([0-9,\.]+)([\$ ]*)([0-9,\.]*)/
+//        //const capturingRegexText = /([0-9][0-9][0-9][0-9])\s+([0-9]+)\s([0-9a-zA-ZñÑ \.,+\-&"/]*)\s([0-9xX ,\.]*)([a-zA-Z\.]*)\s?([0-9\.]*)([\$ ]+)([0-9,\.]+)([\$ ]*)([0-9,\.]*)/
+//        const reg:any = line.match(capturingRegexText);
+///*
+//        reg['groups']['precio'] = parseFloat(reg['groups']['precio'].replace(/[,]/g,''))
+//        reg['groups']['details'] = reg['groups']['description'].match(/([0-9a-zA-ZñÑ \.,+\-&"/]*)\s?([0-9,\.]*)[xX]\s?([0-9,\.]+)\s?([a-zA-Z\.]+)\s([0-9]*)/);
+//        reg['groups']['bulto'] = reg['groups']['details'][2] === '' ? 1 : parseFloat(reg['groups']['details'][2]) ;
 //        reg['groups']['contiene'] = parseFloat(reg['groups']['details'][3]);
 //        reg['groups']['unidad'] = reg['groups']['details'][4];
-//        reg['groups']['nombre'] = reg['groups']['details'][1];
-        reg['groups']['descuento'] = .65
-        reg['groups']['reposicion'] = (reg['groups']['precio']/1.21*reg['groups']['descuento']*1.245)
-        const nname =
-        retData.push(reg.groups)
-    })
-    console.log(data)
-    return retData;
-  }
-  rapRaza(src: string): any {
-    const data: any = src.split('\n');
-    const retData = []
-    data.map((line: string) => {
-//        line = line.replace(/,/g, '');
-        const capturingRegexText = /([0-9][0-9][0-9][0-9])\s+([0-9]*)\s([0-9a-zA-ZñÑñÑáéíóúÁÉÍÓÚÜü \.,+\-&"/]*) ([\$ ]+)([0-9,\.]+)([\$ ]*)([0-9,\.]*)/;
-        const reg:any = line.match(capturingRegexText);
-        //reg['groups']['descuento'] = .94;
-        retData.push(reg)
-    })
+//        reg['groups']['descuento'] = .85
+////        reg['groups']['Name'] = reg['groups']['details'][1];
+//        reg['groups']['Name'] = reg['groups']['description'];
+//*/
+//      if(reg){
+//        const extra = reg[3].match(/([0-9\. ]*)$/)
+////        reg[4] = reg[3].match(/([0-9]+)([xX]+)([0-9,\.]*)([a-zA-Z]*)$|([xX])\s([0-9]+)\s?([a-zA-Z\.]*)([0-9]*)$/)
+//        extra[0] = extra[0].trim();
+//        reg['groups'] = {};
+//        reg['groups']['input'] = line;
+//        reg[9] = parseFloat(reg[9].replace(/[,]/g,''));
+//        reg['groups']['codigo'] = reg[1];
+//        reg['groups']['ean'] = reg[2];
+//        reg['groups']['nombre'] = reg[3].replace(extra[0],'').replace(/["]/g,'').trim();
+//        reg['groups']['bulto'] = extra[0] === '' ? 1 : parseFloat(extra[0]);
+//        reg['groups']['contiene'] = parseFloat(reg[5].replace(/,/g,'.'));
+//        reg['groups']['unidad'] = reg[6];
+//        reg['groups']['reposicion'] = round(reg[9]/1.21*.85*1.245,2);
+//        reg['groups']['extra'] = extra;
+////      reg['groups'] = groups
+//        retData.push(reg.groups)
+//      } else {
+//        console.log(line)
+//      }
+//    })
 //    console.log(data)
-    return retData;
-  }
+//    return retData;
+//  }
+
+
+//  rapOptimum(src: string): any {
+//    const data: any = src.split('\n');
+//    const retData = []
+//    data.map((line: string) => {
+////        line = line.replace(/,/g, '');
+//        const capturingRegexText = /(?<codigo>[0-9][0-9][0-9][0-9])\s?(?<ean>[0-9]*)\s(?<description>[0-9a-zA-ZñÑáéíóúÁÉÍÓÚÜü \.,+\-&"/]*)([\$ ]+)(?<precio>[0-9,\.]+)([\$ ]*)(?<sugerido>[0-9,\.]*)/;
+//        const reg:any = line.match(capturingRegexText);
+//        reg['groups']['nombre'] = reg['groups']['description']
+//        reg['groups']['precio'] = parseFloat(reg['groups']['precio'].replace(/[,]/g,''))
+//        reg['groups']['sugerido'] = parseFloat(reg['groups']['sugerido'].replace(/[,]/g,''))
+//        reg['groups']['details'] = reg['groups']['description'].match(/([a-zA-ZñÑáéíóúÁÉÍÓÚÜü0-9 \.,+\-&"/]*)([0-9]+)[xX]([0-9]*)([a-zA-ZñÑáéíóúÁÉÍÓÚÜü]*)/);
+////        reg['groups']['bulto'] = !reg['groups']['details'] || reg['groups']['details'][2] === '' ? 1 : parseFloat(reg['groups']['details'][2]) ;
+////        reg['groups']['contiene'] = parseFloat(reg['groups']['details'][3]);
+////        reg['groups']['unidad'] = reg['groups']['details'][4];
+////        reg['groups']['nombre'] = reg['groups']['details'][1];
+//        reg['groups']['descuento'] = .65
+//        reg['groups']['reposicion'] = (reg['groups']['precio']/1.21*reg['groups']['descuento']*1.245)
+//        const nname =
+//        retData.push(reg.groups)
+//    })
+//    console.log(data)
+//    return retData;
+//  }
+//  rapRaza(src: string): any {
+//    const data: any = src.split('\n');
+//    const retData = []
+//    data.map((line: string) => {
+////        line = line.replace(/,/g, '');
+//        const capturingRegexText = /([0-9][0-9][0-9][0-9])\s+([0-9]*)\s([0-9a-zA-ZñÑñÑáéíóúÁÉÍÓÚÜü \.,+\-&"/]*) ([\$ ]+)([0-9,\.]+)([\$ ]*)([0-9,\.]*)/;
+//        const reg:any = line.match(capturingRegexText);
+//        //reg['groups']['descuento'] = .94;
+//        retData.push(reg)
+//    })
+////    console.log(data)
+//    return retData;
+//  }
 }

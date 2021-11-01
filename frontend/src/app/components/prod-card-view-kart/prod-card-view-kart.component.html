@@ -1,0 +1,26 @@
+<div class="card p-0 m-0">
+  <div class="card-body bd-highlight" style="position: relative; background: url({{producto.image}}); height: 140px; background-repeat: no-repeat;background-position: left;background-size: contain;">
+    <div class="hero-text">
+      <div class="artname">{{producto.art_fullName}}</div>
+      <div class="p-0 w-100 bd-highlight">
+        <div class="detalles">
+          <div *ngFor="let detail of producto.formula;" [hidden]='!detail.show && !detail.showname'>
+            <span [hidden]='!detail.showname'>{{detail.name}}:</span><span [hidden]='!detail.showvalue'> {{detail.value}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="precio">
+        <span>{{producto.prodName}}</span>
+        <span class="float-right mr-2">$ {{producto.showPrecio}}</span>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer px-0 py-0 d-flex justify-content-between">
+    <div>
+      <i class="fa fa-balance-scale fa-fw fa-1x" aria-hidden="true" [hidden]="!producto.pesable"></i>
+      <i class="fas fa-box fa-1x" aria-hidden="true" [hidden]="!(producto.count_ins === 0)"></i>
+      &nbsp;Stock: {{producto.stock}}
+    </div>
+    <div>${{producto.precioref}}/{{producto.unidad || producto.sname}}</div>
+  </div>
+</div>

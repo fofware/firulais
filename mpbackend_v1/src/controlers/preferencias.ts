@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 import https from 'https';
+import { mpKeys } from "../config/mpKey";
 /*
 import { ExtractJwt } from "passport-jwt";
 import jwt from 'jsonwebtoken';
@@ -18,7 +19,7 @@ import { ObjectID } from 'bson'
 	//	}
 	//};
 
-
+  const Authorization = `Bearer ${mpKeys.AccessToken}`;
 
 class preferenciaControler {
 
@@ -28,13 +29,20 @@ class preferenciaControler {
 	}
 
 	config () {
-    this.router.get('/preferencias',
+    this.router.get('/preferencias/',
+      //passport.authenticate('jwt', {session:false}), 
+      this.list );
+    
+    this.router.get('/preferencias/offset/:offset',
       //passport.authenticate('jwt', {session:false}), 
       this.list );
     this.router.get('/preferencias/:id',
       //passport.authenticate('jwt', {session:false}), 
       this.leer );
-    this.router.get('/preferencias/add',
+    //this.router.get('/preferencias/add',
+    //  //passport.authenticate('jwt', {session:false}), 
+    //  this.add );
+    this.router.post('/preferencias/add',
       //passport.authenticate('jwt', {session:false}), 
       this.add );
   }
@@ -45,13 +53,14 @@ class preferenciaControler {
     'https://api.mercadopago.com/checkout/preferences/search?sponsor_id=undefined&external_reference=undefined&site_id=undefined&marketplace=undefined' \
     -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' 
     */
+    const {offset} = req.params || 0
 		const options = {
 			host: 'api.mercadopago.com',
 			//path: '/checkout/preferences/search?external_reference=REeFerencIA%20que%20Le%20Mando%20Al%20Iniciar%20el%20proceso%20de%20cobro%20y%20Puedo%20Usar',
-			path: '/checkout/preferences/search?offset=20',
+			path: `/checkout/preferences/search?offset=${offset}`,
 			method: 'GET',
 			headers: {
-				'Authorization': 'Bearer TEST-3527848825753216-092312-ea8b6370ee241c138f64f12278d07bfa-84242924'
+				'Authorization': Authorization
 			}
 		};
     
@@ -96,7 +105,7 @@ class preferenciaControler {
 			path: `/checkout/preferences/${id}`,
 			method: 'GET',
 			headers: {
-				'Authorization': 'Bearer TEST-3527848825753216-092312-ea8b6370ee241c138f64f12278d07bfa-84242924'
+				'Authorization': Authorization
 			}
 		};
 		const request = https.request(options, (ret) => {
@@ -176,56 +185,71 @@ class preferenciaControler {
     const options = {
       host: 'api.mercadopago.com',
       //path: '/checkout/preferences/search?external_reference=REeFerencIA%20que%20Le%20Mando%20Al%20Iniciar%20el%20proceso%20de%20cobro%20y%20Puedo%20Usar',
-      path: '/checkout/preferences',
+      path: '/checkout/preferences/',
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer TEST-3527848825753216-092312-ea8b6370ee241c138f64f12278d07bfa-84242924',
-        'Content-Type': 'application/json; charset=UTF-8'
+        'Authorization': Authorization,
+        'Content-Type': 'application/json'
       }
     };
-    const requestData = {
-      "items": [
-        {
-          "title": "Dummy Title",
-          "description": "Dummy description",
-          "picture_url": "http://www.myapp.com/myimage.jpg",
-          "category_id": "cat123",
-          "quantity": 1,
-          "currency_id": "ARS",
-          "unit_price": 10
-        }
-      ],
-      "external_reference": "MP-MiApiTest_FofWare",
+    req.body['integrator_id'] = 'dev_24c65fb163bf11ea96500242ac130004'
+    const requestData = req.body;
+/*
+    {
+      "site_id": "MLA",
+      "auto_return": "approved",
+      "back_urls": {
+        "failure": "https://firulais.net.ar/mp/mptesthooks",
+        "pending": "https://firulais.net.ar/mp/mptesthooks",
+        "success": "https://firulais.net.ar/mp/mptesthooks"
+      },
+      'items': req.body.items,
+      "external_reference": "fofware@gmail.com",
+      "binary_mode": false,
+      //A. Nombre y Apellido: Lalo Landa
+      //B. Email: El email del test-user pagador entregado en este documento.
+      //C. Código de área: 11
+      //D. Teléfono: 2222333
       "payer": {
-        "phone": {},
-        "identification": {},
-        "address": {}
+        "phone": {
+        "area_code": "11",
+        "number": "2222333"
+        },
+        "address": {
+        "zip_code": "1111",
+        "street_name": "falsa",
+        "street_number": "123"
+        },
+        "email": "Test@user.com",
+        "identification": {
+        "number": "",
+        "type": ""
+        },
+        "name": "Lalo",
+        "surname": "Landa"
       },
       "payment_methods": {
         "excluded_payment_methods": [
-          {}
+          { "id":"amex"}
         ],
         "excluded_payment_types": [
-          {}
-        ]
-      },
-      "shipments": {
-        "free_methods": [
-          {}
+          { 'id':'atm'}
         ],
-        "receiver_address": {}
+        'installments': 6,
+        'default_installments': 1
       },
-      "back_urls": {},
-      "differential_pricing": {},
-      "tracks": [
-        {
-          "type": "google_ad"
-        }
-      ]
     }
+
+    //requestData['items'] = [];
+    //for (let i = 0; i < req.body.items.length; i++) {
+    //  const element:any = req.body.items[i];
+    //  requestData['items'].push( element );
+    //}
+    //req.body.items.forEach( element => requestData['items'].push(element));
+*/
     const request = https.request(options, (ret) => {
-      if (ret.statusCode !== 200) {
-        console.error(`Did not get an OK from the server. Code: ${ret.statusCode}`);
+      if (ret.statusCode !== 201) {
+        console.error(`Did not get a Created from the server. Code: ${ret.statusCode}`);
         //console.log(ret)
         res.status(200).json({ code: ret.statusCode, msg: ret.statusMessage });
         ret.resume();

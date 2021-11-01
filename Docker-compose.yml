@@ -45,3 +45,7 @@ services:
       - ${LETSENCRYPT}:/etc/letsencrypt
 #      - ${SCRIPTS}:/scripts
       - ${IMAGES_DIR_DATA}:/webroots/firulais.net.ar/assets/images
+
+  mphumberto:
+    container_name: mphumberto
+    image: webdevops/php-nginx:8.0-alpaine

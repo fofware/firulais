@@ -76,7 +76,7 @@ export class AuthGuard implements CanActivate {
 
     private checkPermission(allowedUserRoles: Roles[]): boolean {
 //      const session =  this.authService.loggedIn();
-      const user = this.authService.getUser();
+      const user = this.authService.user;
       console.log('allowedUserRoles',allowedUserRoles)
       console.log('user', user)
       if( !allowedUserRoles ) return true;
