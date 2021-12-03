@@ -76,17 +76,17 @@ class ProveedoresListasControler {
   async savelink(req: Request, res: Response){
     try {
       if(req.body._id) req.body._id = new ObjectID(req.body._id);
-      if(req.body.id_articulo) req.body.id_articulo = new ObjectID(req.body.id_articulo);
-      if(req.body.id_producto) req.body.id_producto = new ObjectID(req.body.id_producto);
+      if(req.body.id_articulo) req.body.id_articulo = new ObjectID(req.body.articulo_id);
+      if(req.body.id_producto) req.body.id_producto = new ObjectID(req.body.producto_id);
       if(!(req.body._id)) {
-          return res.status(400).json({msg: 'falta dato requerido', id_proveedor: req.body.id_proveedor, codigo_proveedor: req.body.codigo_proveedor})
+          return res.status(400).json({msg: 'falta dato requerido', id_proveedor: req.body.proveedor, codigo_proveedor: req.body.codigo_proveedor})
       }
       const newReg = await lista.updateOne(
         { _id: req.body._id },   // Query parameter
         { $set: req.body }, 
         { upsert: true }    // Options
       );
-			res.status(200).json({ msg: 'Registro creado satisfactoriamente', newReg });
+			res.status(200).json({ msg: 'Registro grabado satisfactoriamente', newReg });
 		} catch (error) {
 			res.status(500).json(error);
 		}

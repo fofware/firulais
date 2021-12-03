@@ -1,8 +1,8 @@
-version: "3.3"
+version: "3.9"
 
 services: 
   mongo:
-    image: mongo:4.4.4
+    image: mongo:5.0.4
     restart: unless-stopped
 #    environment:
 #      MONGO_INITDB_ROOT_USERNAME: root
@@ -11,18 +11,20 @@ services:
     volumes:
       - ${MONGO_DIR_DATA}:/data/db
 
-#  mongo-express:
-#    image: mongo-express
-#    restart: always
-#    ports:
-#      - 8081:8081
-#    environment:
+  mongo-express:
+    image: mongo-express:0.54
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: ${ME_CONFIG_BASICAUTH_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${ME_CONFIG_BASICAUTH_PASSWORD}
 #      ME_CONFIG_MONGODB_ADMINUSERNAME: root
 #      ME_CONFIG_MONGODB_ADMINPASSWORD: example
 
   apiapp:
     container_name: apiapp
-    image: fofware/firulais_backend:v0.4
+    image: fofware/firulais_backend:v0.48
     restart: unless-stopped
 #    ports: 
 #      - 4000:4400
@@ -33,7 +35,7 @@ services:
 
   websrv:
     container_name: websrv
-    image: fofware/mydockersrvweb:0.0.15
+    image: fofware/mydockersrvweb:0.0.16
     restart: unless-stopped
     ports:
       - 80:80
@@ -46,6 +48,6 @@ services:
 #      - ${SCRIPTS}:/scripts
       - ${IMAGES_DIR_DATA}:/webroots/firulais.net.ar/assets/images
 
-  mphumberto:
-    container_name: mphumberto
-    image: webdevops/php-nginx:8.0-alpaine
+#  mphumberto:
+#    container_name: mphumberto
+#    image: webdevops/php-nginx:8.0-alpaine

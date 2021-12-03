@@ -1,39 +1,51 @@
 <div id='topmenu' class="sticky-top">
   <app-top-menu></app-top-menu>
+  <div class="row" [hidden]='stage !== 0'>
+    <div class="col-6">
+      <select name="proveedor"  [(ngModel)]="proveedor">
+        <option value=""></option>
+        <option *ngFor="let val of provSettings; index as i"  value="{{val._id}}" >{{val.nombre}}</option>
+      </select>
+      <div>
+        <input type="text" name="searchProveedoProducto" (input)="provProdSearch()" [(ngModel)]="itemSearchProdProv">
+      </div>
+
+    </div>
+    <div class="col-6">
+      <div class="form-control">
+        <input type="text" name="itemSearchProducto" [(ngModel)]="itemSearchProducto" (change)="searchProducto()">
+        <button (click)="dbProductoClear()">Limpiar</button>
+      </div>
+    </div>
+  </div>
 </div>
 <header [hidden]='stage === 0'>
+  <app-producto-link-set
+  [setToSave]="readyData"
+  ></app-producto-link-set>
   <table>
-    <tr *ngFor="let reg of readyData;index as i;">
-      <td>{{reg.descripcion}}</td>
+    <tr *ngFor="let reg of readyData;index as i;"
+      class="{{reg.class}}"
+    >
+      <td >{{reg.nombre}}</td>
       <td style="width: 50px; text-align: right;">{{reg.bulto}}</td>
       <td style="width: 50px; text-align: right;">{{reg.contiene}}</td>
-      <td>&lt;==&gt;</td>
-      <td>{{reg.prodName}}</td>
-      <td><button (click)='revertReadyData(i)'>cancel</button></td>
+      <td style="width: 50px; text-align: right;">{{reg.unidad}}</td>
     </tr>
   </table>
-<!--select name="proveedor"  [(ngModel)]="proveedor">
-    <option value=""></option>
-    <option *ngFor="let val of dbPersonas"  value="{{val._id}}" >{{val.apellido}}{{val.nombre}}</option>
-  </select-->
-<!--app-producto-autocomplete
-></app-producto-autocomplete-->
 </header>
 <div id='main' (window:resize)="onResize($event)">
   <article>
     <table>
-      <tr *ngFor="let reg of dbProvProd;index as i;"
-        class="{{reg.class}}"
-      >
+      <tr class="{{reg.class}}" *ngFor="let reg of dbProvProd | proveedorProductoFilter: itemSearchProdProv;index as i;">
+      <!--tr class="{{reg.class}}" *ngFor="let reg of dbProvProd;index as i;"-->
         <td>
-          <input type="checkbox" value='{{i}}' (change)='toggleCheck($event)'>
+          <input type="checkbox" value='{{i}}' (change)='toggleCheck($event,reg)'>
         </td>
-        <td >{{reg.marca}}</td>
-        <td >{{reg.especie}}</td>
-        <td>{{reg.edad}}</td>
-        <td>{{reg.descripcion}}</td>
+        <td >{{reg.nombre}}</td>
         <td style="width: 50px; text-align: right;">{{reg.bulto}}</td>
         <td style="width: 50px; text-align: right;">{{reg.contiene}}</td>
+        <td style="width: 50px; text-align: right;">{{reg.unidad}}</td>
       </tr>
     </table>
   </article>

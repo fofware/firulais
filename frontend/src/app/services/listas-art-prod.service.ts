@@ -14,8 +14,13 @@ export class ListasArtProdService {
   list(): Promise<any>{
     return this.http.get(`${API_URI}/proveedoreslistas/list`).toPromise();
   }
+
   getData(srv: string, params: any): Promise<any> {
     return this.http.get( srv, params ).toPromise();
+  }
+
+  leerData(srv: string): Promise<any> {
+    return this.http.get( srv ).toPromise();
   }
 
   readData(srv: string, params: any): Promise<any> {
@@ -27,7 +32,7 @@ export class ListasArtProdService {
   }
 
   savelink(data:any): Promise<object>{
-    return this.http.post(`${API_URI}/proveedoreslistas/savelink`, data ).toPromise();
+    return this.http.post(`${API_URI}/proveedoresarticulos/linkproducto`, data ).toPromise();
   }
 
   import(data: any): Promise<object>{

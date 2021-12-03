@@ -60,11 +60,11 @@ userSchema.pre<IUser>('save', async function(next) {
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(user.password, salt);
   */
-  user.password = this.encriptPassword(user.password);
+  user.password = await this.encriptPassword(user.password);
   next();
 });
 
-userSchema.statics.encriptPassword = async (password: string) => {
+userSchema.methods.encriptPassword = async (password: string) => {
   const salt = await bcrypt.genSalt(10);
   return await bcrypt.hash(password, salt);
 }

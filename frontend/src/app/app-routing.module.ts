@@ -11,6 +11,7 @@ import { CargalistasComponent } from './components/cargalistas/cargalistas.compo
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { HomeComponent } from './components/home/home.component';
 import { ImportDataComponent } from './components/import-data/import-data.component';
+import { MarcasComponent } from './components/marcas/marcas.component';
 import { MenuappComponent } from './components/menuapp/menuapp.component';
 import { MpFailureComponent } from './components/mp-failure/mp-failure.component';
 import { MpPendingComponent } from './components/mp-pending/mp-pending.component';
@@ -66,6 +67,11 @@ const routes: Routes = [
     path: 'private/menu/:id'
     , component: MenuappComponent
     , canActivate: [AuthGuard]
+  }
+  ,{
+    path: 'marcas'
+    , component: MarcasComponent
+//    , canActivate: [AuthGuard]
   }
   ,{
     path: 'producto/:id'

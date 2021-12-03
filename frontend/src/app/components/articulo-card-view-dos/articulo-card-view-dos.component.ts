@@ -46,6 +46,7 @@ export class ArticuloCardViewDosComponent implements OnInit {
       this.productos[i].reventa1 = Math.ceil(((e.compra || this.productos[i].showCompra)*((e.margen/3*1.5)+100)/100));
     }
     */
+    /*
     for (let i = 0; i < this.productos.length; i++) {
       const e = this.productos[i];
       let reventa = 30;
@@ -74,6 +75,7 @@ export class ArticuloCardViewDosComponent implements OnInit {
       this.productos[i].reventa = Math.ceil(((e.compra || this.productos[i].showCompra)*((reventa/3*2)+100)/100));
       this.productos[i].reventa1 = Math.ceil(((e.compra || this.productos[i].showCompra)*((reventa/3*1.5)+100)/100));
     }
+    */
 
   }
   ngOnChanges(changes: SimpleChanges): void {

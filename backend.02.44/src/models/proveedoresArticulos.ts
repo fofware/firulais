@@ -13,29 +13,37 @@ export interface IProveedoresArticulos extends Document {
 }
 
 const ProveedoresArticulosSchema = new Schema({
-  proveedor: {
+  proveedor: {                        // id del proveedor
     type: Schema.Types.ObjectId
     ,ref: "Persona"
     ,$id: '_id'
     ,required: true
   }
-  ,codigo: { 
+  ,codigo: {                          // codigo del producto en el proveedor
     type: String
     , trim: true
     , required: true 
     , index: true
   }
-  ,ean: { 
+  ,ean: {                             // codigo EAN (código de barras)
     type: String
     , trim: true
     , default: null
     , index: true
   }
-  ,producto: {
+  ,articulo_id: {                        // id del articulo en nuestro sistema
     type: Schema.Types.ObjectId
-    ,ref: "productos"
-    ,$id: "_id"
-    ,default: null
+    , ref: "articulos"
+    , $id: "_id"
+    , default: null
+    , index: true
+  }
+  ,producto_id: {                        // id del producto en nuestro sistema
+    type: Schema.Types.ObjectId
+    , ref: "productos"
+    , $id: "_id"
+    , default: null
+    , index: true
   }
   , hoja: { type: String, trim: true, requierd: false, default: null }
   , nombre: { type: String, trim: true, requierd: false }
@@ -65,7 +73,7 @@ ProveedoresArticulosSchema.index(
 
 ProveedoresArticulosSchema.on('index', error => {
   // "_id index cannot be sparse"
-  console.log(error.message);
+  console.log(error);
 });
 
 export default model<IProveedoresArticulos>('ProveedoresArticulos', ProveedoresArticulosSchema);

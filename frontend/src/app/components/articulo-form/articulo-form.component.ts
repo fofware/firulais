@@ -201,6 +201,55 @@ export class ArticuloFormComponent implements OnInit {
       console.log("dismissed",retData);
     })
   }
+  setformulatempate(){
+    this.selectedArticulo.formula = [{
+      name: 'Proteinas Cruda (mín)',
+      showname: true,
+      value: '%',
+      showvalue: true
+  },
+  {
+      name: 'Grasa (mín)',
+      value: '%',
+      show: false,
+      showname: false
+  },
+  {
+    name: 'Extracto Etéreo (mín)',
+    value: '%',
+    show: false
+  },
+  {
+      name: 'Fibra Cruda (máx)',
+      value: '%',
+      show: false
+  },
+  {
+      name: 'Minerales Totales (máx)',
+      value: '%',
+      show: false
+  },
+  {
+      name: 'Humedad (máx)',
+      value: '%',
+      show: false
+  },
+  {
+      name: 'Calcio (mín - máx)',
+      value: '% - %',
+      show: false
+  },
+  {
+      name: 'Fósforo (mín - máx)',
+      value: '% - %',
+      show: false
+  },
+  {
+      name: 'Energía Metabolizable',
+      value: ' Kcal/Kg',
+      show: false
+  }]
+  }
 }
 
 @Component({

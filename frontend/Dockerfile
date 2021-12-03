@@ -1,12 +1,14 @@
 FROM nginx:1.20.1
 # Inspiration:
 # https://hub.docker.com/r/gaafar/cron/
+# https://devanswers.co/install-lets-encrypt-ssl-cert-nginx-ubuntu-20-04/#id-3-test-ssl
+# https://www.ssllabs.com/ssltest/analyze.html?d=www.firulais.net.ar&latest
 
 # Install cron, certbot, bash, plus any other dependencies
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    cron bash curl certbot
+    cron bash curl certbot python3-certbot-nginx
 
 # /webroots/DOMAIN.TLD/.well-known/... files go here
 VOLUME /webroots
@@ -62,7 +64,7 @@ RUN echo "2,7,12,17,22,27,32,37,42,47,52,57 * * * * sleep 10 ; curl -s http://sy
 #RUN echo "22 03 * * 2,4,6,7 root /scripts/register.sh test.geekwisdom.net" >/etc/cron.d/certbot-test-geekwisdom-net
 
 
-COPY ./conf.d/* /etc/nginx/conf.d/
+COPY ./conf.d/* /etc/nginx/conf.d/*
 
 #/usr/share/nginx/html
 #COPY ./dist/frontend/ /webroots/admin.firulais.net.ar/

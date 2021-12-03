@@ -4,7 +4,10 @@ import { regExpEscape } from '@ng-bootstrap/ng-bootstrap/util/util';
 import { IArticulo } from 'src/app/models/i-articulo';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
 import { ProductosService } from 'src/app/services/productos.service';
+import { ListasProveedoresService, proveedoresSettings } from 'src/app/services/listas-proveedores.service';
+
 import { API_URI } from 'src/app/shared/uris';
+import { ArticulosLinkService } from 'src/app/services/articulos-link.service';
 
 @Component({
   selector: 'app-producto-link',
@@ -12,6 +15,12 @@ import { API_URI } from 'src/app/shared/uris';
   styleUrls: ['./producto-link.component.css']
 })
 export class ProductoLinkComponent implements OnInit {
+  provSettings = proveedoresSettings;
+  proveedor = 0;
+  itemSearchProducto = "";
+  itemSearchProdProv = "";
+  tmpList = [];
+
   active;
   stage = 0;
   disabled = true;
@@ -46,7 +55,8 @@ export class ProductoLinkComponent implements OnInit {
 
   constructor(
     private producto: ProductosService,
-    private provprod: ListasArtProdService
+    private provprod: ListasArtProdService,
+    private artprov: ArticulosLinkService
   ) { }
 
   async ngOnInit() {
@@ -58,13 +68,14 @@ export class ProductoLinkComponent implements OnInit {
     this.stage = 0;
     this.readyData = [];
     this.dbProducto = [];
-    const retProvProd:any = await this.provprod.list();
+    const retProvProd:any = await this.artprov.artProvList()
     for (let i = 0; i < retProvProd.length; i++) {
       const element = retProvProd[i];
-      if(element.id_articulo) element.class="ready1";
-      if(element.id_producto) element.class="ready2";
+      if(element.articulo_id) element.class="ready1";
+      if(element.producto_id) element.class="ready2";
     }
     this.dbProvProd = retProvProd;
+    this.filtrar();
     console.log(this.dbProducto);
     console.log(this.dbProvProd);
   }
@@ -101,10 +112,29 @@ export class ProductoLinkComponent implements OnInit {
     }
   }
 */
-  async toggleCheck(e){
+  dbProductoClear(){
+    this.dbProducto = [];
+  }
+  async searchProducto(){
+    try {
+      const data:any = await this.provprod.leerData(
+        `${API_URI}/articulos/test/${this.itemSearchProducto}`
+      );
+//        console.log(data);
+      for (let i = 0; i < data.length; i++) {
+        const e = data[i];
+        if (this.dbProducto.every( p => p._id !== e._id)) this.dbProducto.push(e);
+      }
+//        console.log(this.dbProducto);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async toggleCheck(e,r){
     if (e.target.checked) {
-//      console.log("Checked", e.target.value)
-      this.selected.push(e.target.value);
+      console.log("Checked", e.target.value)
+      console.log("Checked reg", r)
+      this.selected.push(r);
       //selected.push(new FormControl(e.target.value));
 /*
       _id?: object;
@@ -129,11 +159,12 @@ export class ProductoLinkComponent implements OnInit {
       coef_descuento?: number;
       coef_retenciones?: number;
       precio_final?: number;
-      id_articulo?: object;
-      id_producto?: object;
+      articulo_id?: object;
+      producto_id?: object;
 */
       if ( this.stage > 0 ) return;
-      const reg = this.dbProvProd[e.target.value];
+      //const reg = this.dbProvProd[e.target.value];
+      console.log('stage > 0',r);
       const art_keys = [
         'fabricante',
         'marca',
@@ -157,99 +188,111 @@ export class ProductoLinkComponent implements OnInit {
       const Articulo = {};
       for (let i = 0; i < art_keys.length; i++) {
         const key = art_keys[i];
-        if(reg[key]){
-          Articulo[key] = {'$regex': {flags: 'i', params: reg[key] }};
+        if(r[key]){
+          Articulo[key] = {'$regex': {flags: 'i', params: r[key] }};
         }
       }
-      const names = reg['descripcion'].split(' ');
-/*
-      const o = [];
-      for (let i = 0; i < names.length; i++) {
-//      for (let i = 0; i < 1; i++) {
-        const n = names[i].trim();
-        if(n.length > 2) o.push({'name':{'$regex': names[i], '$options': 'i'}});
-//        const regex = new RegExp(names[i],'i');
-//        o.push(regex);
-      }
-      console.log(o);
-//      Articulo['$and'] = [{'$or': o}];
-      console.log(Articulo);
-*/
-      try {
-        const data:any = await this.provprod.readData(
-          `${API_URI}/articulos/productos/listdata`,
-          {Articulo, Producto: {}, Extra: {}, searchItem: '', Sort: {fullName: 1} }
-        );
-//        console.log(data);
-        for (let i = 0; i < data.length; i++) {
-          const e = data[i];
-          if (this.dbProducto.every( p => p._id !== e._id)) this.dbProducto.push(e);
-        }
-//        console.log(this.dbProducto);
-      } catch (error) {
-        console.log(error);
-      }
+      //const names = reg['nombre'].split(' ');
+      this.itemSearchProducto = r['nombre'];
+      this.searchProducto();
     } else {
-       const index = this.selected.findIndex(x => x === e.target.value);
-//       console.log("UnChecked", e.target.value)
+       const index = this.selected.findIndex(x => x._id === r._id);
+       console.log("UnChecked", r)
        this.selected.splice(index,1);
     }
-//    console.log(this.selected);
+    console.log(this.selected);
   }
+
   setArticulo(ev){
+    //console.log(ev)
     this.stage = 1;
     const e = JSON.parse(JSON.stringify(ev));
+    //console.log("Articulo",e);
     const newData = [];
-//    console.log(e);
+    //console.log(e);
     for (let i = 0; i < this.selected.length; i++) {
-      const idx = this.selected[i];
-      this.dbProvProd[idx]['id_articulo'] = e._id;
+      //const idx = this.dbProvProd.findIndex(x => x._id === e._id);
+      //console.log("selected",this.selected[i]);
+      const idx = this.dbProvProd.findIndex(x => x._id === this.selected[i]._id);
+      this.dbProvProd[idx]['articulo_id'] = e._id;
       newData.push(JSON.parse(JSON.stringify(this.dbProvProd[idx])));
     }
     this.selected = [];
     this.dbProducto = [];
+    this.itemSearchProdProv = "";
     this.dbProducto.push(e);
     this.dbProvProd = JSON.parse(JSON.stringify(newData)).sort((a,b) =>  b.contiene-a.contiene );
     this.setHeight()
   }
+
   setProducto(ev){
     const newData = [];
-//    console.log(ev)
-    for (let i = 0; i < this.selected.length; i++) {
-      const idx = this.selected[i];
-      this.dbProvProd[idx]['id_producto'] = ev._id;
-      this.dbProvProd[idx]['prodName'] = `${ev.name} ${ev.strContiene} ${ev.unidad || ''} ${ev.sname} ${ev.sStrContiene} ${ev.sunidad}`
-      this.readyData.push(JSON.parse(JSON.stringify(this.dbProvProd[idx])));
+    const newSet = {
+      _id: this.dbProducto[0]._id,
+      fullName: this.dbProducto[0].fullName,
+      prodName: `${ev.name} ${ev.strContiene} ${ev.unidad || ''} ${ev.sname} ${ev.sStrContiene} ${ev.sunidad}`,
+      image: this.dbProducto[0].image || ev.image,
+      productos: []
     }
-    for (let i = 0; i < this.readyData.length; i++) {
-      const e = this.readyData[i];
-      const index = this.dbProvProd.findIndex(x => x.id_producto === e.id_producto);
+
+    for (let i = 0; i < this.selected.length; i++) {
+      const idx = this.dbProvProd.findIndex(x => x._id === this.selected[i]._id);
+      this.dbProvProd[idx]['producto_id'] = ev._id;
+      this.dbProvProd[idx]['prodName'] = `${ev.name} ${ev.strContiene} ${ev.unidad || ''} ${ev.sname} ${ev.sStrContiene} ${ev.sunidad}`
+      newSet['productos'].push(JSON.parse(JSON.stringify(this.dbProvProd[idx])));
+    }
+
+    //console.log("New Set");
+    //console.log(newSet);
+    for (let i = 0; i < newSet['productos'].length; i++) {
+      const e = newSet['productos'][i];
+      const index = this.dbProvProd.findIndex(x => x.producto_id === e.producto_id);
       if(index >= 0) this.dbProvProd.splice(index,1);
     }
+
+    this.readyData.push(JSON.parse(JSON.stringify(newSet)));
 
     this.selected = [];
     this.setHeight()
   }
+
   revertReadyData(idx){
-    this.readyData[idx]['id_producto'] = null;
+    this.readyData[idx]['producto_id'] = null;
     this.readyData[idx]['prodName'] = null;
-    delete this.readyData[idx]['id_producto'];
+    delete this.readyData[idx]['producto_id'];
     delete this.readyData[idx]['prodName'];
     this.dbProvProd.push(JSON.parse(JSON.stringify(this.readyData[idx])))
     this.dbProvProd.sort((a,b) =>  b.contiene-a.contiene );
     this.readyData.splice(idx,1);
   }
+
+  filtrar(): void {
+    //if(this.itemSearchProdProv.trim().length === 0)  this.tmpList = JSON.parse(JSON.stringify(this.dbProvProd));
+    //else this.tmpList = this.dbProvProd.filter( (val) => (val.nombre).trim().toLowerCase().includes(this.itemSearchProdProv));
+  }
+
+  provProdSearch(){
+    console.log(this.itemSearchProdProv);
+    this.filtrar();
+  }
+
   async saveReadyData(){
+    //console.log("Se graba...");
     for (let i = 0; i < this.readyData.length; i++) {
-      const e = this.readyData[i];
-      const save = {
-        _id: e._id,
-        id_articulo: e.id_articulo,
-        id_producto: e.id_producto
+      const array = this.readyData[i].productos;
+      for (let n = 0; n < array.length; n++) {
+        const e = array[n];
+        const save = {
+          _id: e._id,
+          articulo_id: e.articulo_id,
+          producto_id: e.producto_id
+        }
+        //console.log(save);
+        const rslt = await this.provprod.savelink(save)
+        //console.log(rslt);
       }
-      const rslt = this.provprod.savelink(save)
-      console.log(rslt);
     }
+    //console.log('Fin grabación');
     this.ngOnInit();
   }
 }

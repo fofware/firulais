@@ -4,6 +4,7 @@ import passport from "passport";
 import articulo, { IArticulo } from '../models/articulos';
 import producto, { IProducto } from '../models/producto';
 import provArt from '../models/proveedoresArticulos';
+import { AggregationCursor } from 'mongoose';
 
 /*
 db.proveedoresarticulos.aggregate([
@@ -231,18 +232,33 @@ class ProveedoresArticulosControler {
 	}
 
 	config () {
-    this.router.get('/api/proveedoresarticulos/list', this.list );
-    this.router.get('/api/proveedoresarticulos/nombre/:search', this.search );
-		this.router.post( '/api/proveedoresarticulos/', passport.authenticate('jwt', {session:false}), this.add );
-		this.router.post( '/api/proveedoresarticulos/insmany', passport.authenticate('jwt', {session:false}), this.insMany );
-		this.router.post( '/api/proveedoresarticulos/buscar', passport.authenticate('jwt', {session:false}), this.buscar );
+    this.router.get('/api/proveedoresarticulos/list'
+										//, passport.authenticate('jwt', {session:false})
+										, this.list );
+		this.router.post( '/api/proveedoresarticulos/buscar'
+										, passport.authenticate('jwt', {session:false})
+										, this.buscar );
+		this.router.post( '/api/proveedoresarticulos/'
+										, passport.authenticate('jwt', {session:false})
+										, this.add );
+
+		this.router.get('/api/proveedoresarticulos/nombre/:search'
+										//, passport.authenticate('jwt', {session:false})
+										, this.search );
+		this.router.post('/api/proveedoresarticulos/text/'
+										//, passport.authenticate('jwt', {session:false})
+										, this.textSearch );
+		//this.router.post( '/api/proveedoresarticulos/insmany', passport.authenticate('jwt', {session:false}), this.insMany );
 		this.router.put( '/api/proveedoresarticulos/:id', passport.authenticate('jwt', {session:false}), this.put );
 		this.router.delete( '/api/proveedoresarticulos/:id', passport.authenticate('jwt', {session:false}), this.delete );
+		this.router.post( '/api/proveedoresarticulos/linkproducto'
+										, passport.authenticate('jwt', {session:false})
+										, this.linkproducto );
 
 	}
 
 	async list(req: Request, res: Response) {
-		const articulos = await provArt.find().populate('proveedor')
+		const articulos = await provArt.find({}).sort({ nombre: 1, bulto: 1, contiene: 1 }); //.populate('proveedor')
 		res.json(articulos);
 	}
 
@@ -255,18 +271,13 @@ class ProveedoresArticulosControler {
 				return {nombre: {$regex: tiene}}
 			});
 
-		//await provArt.createIndexes( { nombre: "text" } );
-		//const pattern = new RegExp(search,'i')
-		//console.log(pattern);
-		//console.log(values);
-		//const data = await provArt.find({ nombre: { $regex: pattern }}).limit(20);
-		//const data = await provArt.find({ $text: { $search: search, $caseSensitive: false, $diacriticSensitive: true, $language: 'es' } }, { idxKey: { $meta: "textScore" } }).limit(10);
-		//const data = await provArt.find({ $text: { $search: search, $caseSensitive: false, $diacriticSensitive: true, $language: 'es' } },{ score: { $meta: "textScore" } }).sort( { score: { $meta: "textScore" } } );
-		//const data = await provArt.find({ nombre: {$in: values}}).limit(10);
 		const data = await provArt.aggregate(
 			[
 				{ $match: { $text: { $search: search } } },
-				{ $match: { producto: null, '$and': values } },
+				{ $addFields: {
+					score: { $meta: "textScore" } 
+				}},
+				//{ $match: { producto_id: null, '$and': values } },
 				{
 					$lookup: {
 						from: "personas",
@@ -286,6 +297,58 @@ class ProveedoresArticulosControler {
 				//{ $match: { score: { $gt: 1.0 } } }
 			]
 		).limit(30);
+		const retData = data.map(item => `${item.nombre} ${item.contiene} ${item.unidad} ${item.proveedor} ${item.score}` )
+		res.status(200).json(data);
+	}
+
+	async textSearch(req: Request, res: Response){
+		const { search } = req.body;
+		let data = [];
+		if( search && search.length > 0 ){
+			data = await provArt.aggregate([
+				{ $match: { $text: { $search: search } } },
+				{
+					$addFields: {
+						score: { $meta: "textScore" }
+					}
+				}, 
+				{
+					$lookup: {
+						from: "personas",
+						localField: "proveedor",    // field in the orders collection
+						foreignField: "_id",  // field in the items collection
+						as: "proveedor"
+			 		}
+				},
+				{
+					$unwind: {
+						path: '$proveedor',
+						preserveNullAndEmptyArrays: true
+					}				
+				},
+				//{ $project: { nombre: 1, contiene: 1, unidad:1, proveedor: { $concat:['$proveedor.apellido', " ", '$proveedor.nombre']}, score: { $meta: "textScore" } } },
+				{ $sort: { score: -1, nombre: 1, contiene: 1 } },
+				//{ $match: { score: { $gt: 1.0 } } }
+			]);
+		} else {
+			data = await provArt.aggregate([
+				{
+					$lookup: {
+						from: "personas",
+						localField: "proveedor",    // field in the orders collection
+						foreignField: "_id",  // field in the items collection
+						as: "proveedor"
+					 }
+				},
+				{
+					$unwind: {
+						path: '$proveedor',
+						preserveNullAndEmptyArrays: true
+					}				
+				},
+				{ $sort: { nombre: 1, contiene: 1 } },
+			]);
+		}
 		const retData = data.map(item => `${item.nombre} ${item.contiene} ${item.unidad} ${item.proveedor} ${item.score}` )
 		res.status(200).json(data);
 	}
@@ -395,7 +458,7 @@ class ProveedoresArticulosControler {
 
 	async put( req: Request, res: Response) {
 		try {
-			const filter = { _id: req.params.id };
+			const filter = { _id: req.params._id };
 			const rpta = await provArt.findOneAndUpdate ( filter, { $set :  req.body  });
 			return res.status(200).json( rpta );
 		} catch (error) {
@@ -403,6 +466,18 @@ class ProveedoresArticulosControler {
 		}
 	}
 
+	async linkproducto( req: Request, res: Response) {
+		console.log(req.body)
+		const prod_id = new ObjectID(req.body._id);
+		delete req.body._id;
+		try {
+			const rpta = await provArt.findByIdAndUpdate ( {_id: prod_id}, { $set :  req.body  });
+			return res.status(200).json( rpta );
+		} catch (error) {
+			console.log(error);
+			return res.status(500).json( error );
+		}
+	}
 	async delete( req: Request, res: Response ){
 		try {
 			const { id } = req.params;

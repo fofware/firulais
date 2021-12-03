@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, AsyncValidator, AsyncValidatorFn } 
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertService } from 'src/app/services/alert.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { UsersService } from 'src/app/services/users.service';
 import { MustMatch } from 'src/app/_helpers/must-match-validator';
 import { userEmailExistsValidator } from './email-exists.validator';
 
@@ -24,7 +25,8 @@ export class SignupComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private userService: UsersService
   ) { }
 
   ngOnInit(): void {
@@ -61,6 +63,14 @@ export class SignupComponent implements OnInit {
 
     this.alertService.success('Va a grabar Registro');
     console.log(this.form.value);
+    this.authService.signUp(this.form.value).subscribe(
+      res => {
+
+      },
+      err => {
+        console.log(err);
+      }
+    );
     /*
     this.loading = true;
     this.accountService.register(this.form.value)

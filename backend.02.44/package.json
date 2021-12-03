@@ -18,6 +18,7 @@
     "@types/jsonwebtoken": "^8.5.0",
     "@types/mercadopago": "^1.5.4",
     "@types/mongoose": "^5.10.3",
+    "@types/mongoose-aggregate-paginate-v2": "^1.0.3",
     "@types/morgan": "^1.9.2",
     "@types/passport": "^1.0.5",
     "@types/passport-jwt": "^3.0.3",
@@ -36,6 +37,7 @@
     "jsonwebtoken": "^8.5.1",
     "mercadopago": "^1.5.8",
     "mongoose": "^5.11.11",
+    "mongoose-aggregate-paginate-v2": "^1.0.5",
     "morgan": "^1.10.0",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0"

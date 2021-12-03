@@ -3,7 +3,7 @@ export default {
   mongoDB:{
 //    URI: process.env.MONGODB_URI || 'mongodb://firulais.net.ar:27044/gestion',
 //    URI: process.env.MONGODB_URI || 'mongodb://192.168.100.150:27044/gestion',
-    URI: process.env.MONGODB_URI || 'mongodb://firulais.net.ar:27044/gestion',
+    URI: process.env.MONGODB_URI || 'mongodb://localhost:27084/gestion',
 //    URI: process.env.MONGODB_URI || 'mongodb+srv://fabian:tamara01@cluster0.wk2fd.mongodb.net/gestion?retryWrites=true&w=majority',
     USER: process.env.MONGODB_USER,
     PASSWORD: process.env.MONGODB_PASSWORD

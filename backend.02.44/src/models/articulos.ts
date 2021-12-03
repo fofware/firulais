@@ -19,6 +19,7 @@ export interface IArticulo extends Document {
   d_raza: boolean;
   private_web: boolean;
   image: string;
+  images: string;
   url: string;
   iva: number;
   margen: number;
@@ -31,14 +32,14 @@ export interface IArticulo extends Document {
 };
 
 const articuloSchema = new Schema({
-  fabricante: { type: String, trim: true, default: ''}, // Nestle
-  marca: { type: String, trim: true, default: ''},      // Purina Dog Chow / Purina Cat Chow
-  rubro: { type: String, trim: true, default: ''},      // Alimento Seco / Alimento Húmedo
-  linea: { type: String, trim: true, default: ''},      // ???????
-  especie: { type: String, trim: true, default: '' },   // Gato
-  edad: { type: String, trim: true, default: '' },
-  raza: { type: String, trim: true, default: '' },
-  name: { type: String, trim: true, default: '' },      // Gatitos Carne y Leche
+  fabricante: { type: String, trim: true, default: '', index: true }, // Nestle
+  marca: { type: String, trim: true, default: '', index: true },      // Purina Dog Chow / Purina Cat Chow
+  rubro: { type: String, trim: true, default: '', index: true },      // Alimento Seco / Alimento Húmedo
+  linea: { type: String, trim: true, default: '', index: true },      // ???????
+  especie: { type: String, trim: true, default: '', index: true },   // Gato
+  edad: { type: String, trim: true, default: '', index: true },
+  raza: { type: String, trim: true, default: '', index: true },
+  name: { type: String, trim: true, default: '', index: true },      // Gatitos Carne y Leche
   d_fabricante: {type: Boolean, default: false },
   d_marca: {type: Boolean, default: true },
   d_rubro: {type: Boolean, default: false },
@@ -46,15 +47,39 @@ const articuloSchema = new Schema({
   d_especie: {type: Boolean, default: false},
   d_edad: {type: Boolean, default: false},
   d_raza: {type: Boolean, default: false},
-  private_web: {type: Boolean, default: false },
+  private_web: {type: Boolean, default: false, index: true },
   image: { type: String, trim: true, required: false },
+  images: [],
   url: { type: String, trim: true, required: false, default:'' },
   iva: {type:Number, default: 0},
   margen: { type: Number, default: 35},
-  tags: { type: String, trim: true, default: '' },
+  tags: { type: String, trim: true, default: '', index: true },
   formula: [],
   detalles: { type: String, trim: true, default: '' },
   beneficios: []
+});
+
+articuloSchema.index(
+  {
+    fabricante: "text",
+    marca: "text",
+    rubro: "text",
+    linea: "text",
+    especie: "text",
+    edad: "text",
+    raza: "text",
+    name: "text",
+    tags: "text"
+  },
+  {
+    default_language: "spanish",
+    name: "ArticuloTextIndex"
+  }
+)
+
+articuloSchema.on('index', error => {
+  // "_id index cannot be sparse"
+  console.log(error.message);
 });
 
 articuloSchema.methods.setObjectIDs = async function (): Promise<void> {

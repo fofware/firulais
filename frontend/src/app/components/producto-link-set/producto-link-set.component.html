@@ -1,0 +1,12 @@
+<div class="container">
+  <div class="card" *ngFor="let item of setToSave">
+    <div class="card-title">{{item.fullName}} {{item.prodName}}</div>
+    <div class="card-body">
+      <ul>
+        <li *ngFor="let prod of item.productos">
+          {{prod.nombre}} {{prod.bulto}} {{prod.contiene}} {{prod.unidad}} {{prod.proveedor.apellido}} {{prod.proveedor.nombre}}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

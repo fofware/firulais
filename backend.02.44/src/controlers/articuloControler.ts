@@ -12,14 +12,16 @@ export const art_name_template = { $trim:
 			{ $cond: ['$art.d_fabricante', '$art.fabricante', '']},
 			{ $cond: ['$art.d_marca', ' ', '']},
 			{ $cond: ['$art.d_marca', '$art.marca', '']},
+			{ $cond: [ { $or: ['$art.d_marca','$art.d_fabricante'] }, ' ', '']},
+			'$art.name',
 			{ $cond: ['$art.d_especie', ' ', '']},
 			{ $cond: ['$art.d_especie', '$art.especie', '']},
 			{ $cond: ['$art.d_edad', ' ', '']},
 			{ $cond: ['$art.d_edad', '$art.edad', '']},
 			{ $cond: ['$art.d_raza', ' ', '']},
 			{ $cond: ['$art.d_raza', '$art.raza', '']},
-			{ $cond: [ { $or: ['$art.d_marca','$art.d_fabricante','$art.d_especie','$art.d_edad','$art.d_raza'] }, ' ', '']},
-			'$art.name',
+			//{ $cond: [ { $or: ['$art.d_marca','$art.d_fabricante','$art.d_especie','$art.d_edad','$art.d_raza'] }, ' ', '']},
+			//'$art.name',
 			{ $cond: ['$art.d_rubro', ' ', '']},
 			{ $cond: ['$art.d_rubro', '$art.rubro', '']},
 			{ $cond: ['$art.d_linea', ' ', '']},
@@ -28,6 +30,30 @@ export const art_name_template = { $trim:
 		}
 	}
 }
+export const art_full_name_template = 
+	{ $trim: 
+		{ input: 
+			{	$concat: [
+				{ $cond: ['$d_fabricante', '$fabricante', '']},
+				{ $cond: ['$d_marca', ' ', '']},
+				{ $cond: ['$d_marca', '$marca', '']},
+				{ $cond: [ { $or: ['$d_marca','$d_fabricante'] }, ' ', '']},
+				'$name',
+				{ $cond: ['$d_especie', ' ', '']},
+				{ $cond: ['$d_especie', '$especie', '']},
+				{ $cond: ['$d_edad', ' ', '']},
+				{ $cond: ['$d_edad', '$edad', '']},
+				{ $cond: ['$d_raza', ' ', '']},
+				{ $cond: ['$d_raza', '$raza', '']},
+				{ $cond: ['$d_rubro', ' ', '']},
+				{ $cond: ['$d_rubro', '$rubro', '']},
+				{ $cond: ['$d_linea', ' ', '']},
+				{ $cond: ['$d_linea', '$linea', '']},
+				]
+			}
+		}
+	}
+
 export const artProject = {
 	'_id': 1,
 	'tags': 1,
@@ -54,28 +80,29 @@ export const artProject = {
 	'formula': 1,
 	'detalles': 1,
 	'beneficios': 1,
-	'fullName':	{ $trim: 
-		{ input: 
-			{	$concat: [
-				{ $cond: ['$d_fabricante', 'fabricante', '']},
-				{ $cond: ['$d_marca', ' ', '']},
-				{ $cond: ['$d_marca', '$marca', '']},
-				{ $cond: ['$d_especie', ' ', '']},
-				{ $cond: ['$d_especie', '$especie', '']},
-				{ $cond: ['$d_edad', ' ', '']},
-				{ $cond: ['$d_edad', '$edad', '']},
-				{ $cond: ['$d_raza', ' ', '']},
-				{ $cond: ['$d_raza', '$raza', '']},
-				{ $cond: [ { $or: ['$d_marca','$d_fabricante','$d_especie','$d_edad','$d_raza'] }, ' ', '']},
-				'$name',
-				{ $cond: ['$d_rubro', ' ', '']},
-				{ $cond: ['$d_rubro', '$rubro', '']},
-				{ $cond: ['$d_linea', ' ', '']},
-				{ $cond: ['$d_linea', '$linea', '']},
-				]
-			}
-		}
-	}
+	'fullName':	art_full_name_template,
+	//{ $trim: 
+	//	{ input: 
+	//		{	$concat: [
+	//			{ $cond: ['$d_fabricante', 'fabricante', '']},
+	//			{ $cond: ['$d_marca', ' ', '']},
+	//			{ $cond: ['$d_marca', '$marca', '']},
+	//			{ $cond: ['$d_especie', ' ', '']},
+	//			{ $cond: ['$d_especie', '$especie', '']},
+	//			{ $cond: ['$d_edad', ' ', '']},
+	//			{ $cond: ['$d_edad', '$edad', '']},
+	//			{ $cond: ['$d_raza', ' ', '']},
+	//			{ $cond: ['$d_raza', '$raza', '']},
+	//			{ $cond: [ { $or: ['$d_marca','$d_fabricante','$d_especie','$d_edad','$d_raza'] }, ' ', '']},
+	//			'$name',
+	//			{ $cond: ['$d_rubro', ' ', '']},
+	//			{ $cond: ['$d_rubro', '$rubro', '']},
+	//			{ $cond: ['$d_linea', ' ', '']},
+	//			{ $cond: ['$d_linea', '$linea', '']},
+	//			]
+	//		}
+	//	}
+	//}
 };
 
 export const saleProduct =
@@ -633,6 +660,9 @@ export const readProductos = function ( qry: any, prodTemplate ): PromiseLike<an
 			}
 		]);
 }	
+export const articuloTextSearch = async function (search) {
+	return await articulo.find({ $text: { $search: search } } );
+}
 
 export const articuloSanitize = async function (qry: any) {
 	const artFlds = ['fabricante', 'marca', 'rubro', 'linea', 'especie', 'edad', 'raza', 'tags', 'name'];
@@ -696,6 +726,7 @@ export const articuloSanitize = async function (qry: any) {
 				v.push(o);
 			}
 			Articulo['$or'] = v;
+			console.log(v)
 			if( i > 0 ) Articulo['_id'] = {'$in': lista};
 			lista = await articulo.aggregate([{ '$match': Articulo },{'$project': {'_id': 1}}]);
 			for (let index = 0; index < lista.length; index++) {
@@ -807,7 +838,7 @@ class ArticuloControler {
 		this.router.post( '/articulo/import', this.import );
 		this.router.put( '/articulo/:id', this.modifica );
 
-		this.router.get( '/articulos/test', this.test );
+		this.router.get( '/articulos/test/:search', this.test );
 		this.router.get( '/articulos/list', this.searchArticulos );
 		this.router.get( '/articulos/list/:search', this.searchArticulos )
 		this.router.post( '/articulos/list', this.findArticulos );
@@ -826,6 +857,7 @@ class ArticuloControler {
 		this.router.post( '/articulos/productos/listpublicdata', this.findPublicProductosData );
 		this.router.post( '/articulos/productos/updatefullData', passport.authenticate('jwt', { session: false }), this.updateFullData );
 //		this.router.post( '/articulos/productos/updatefullData', this.updateFullData );
+		this.router.get( '/articulos/productos/text/:search', this.textSearch );
 	}
 
 	public index(req: Request, res: Response) {
@@ -946,6 +978,7 @@ class ArticuloControler {
 			const rpta = await readProductos(qry,saleProduct);
 			res.status(200).json(rpta);
 		} catch (error) {
+			console.log(error)
 			res.status(403).json(error);
 		}
 	}
@@ -969,12 +1002,67 @@ class ArticuloControler {
 		try {
 			const qry = req.body;
 			console.log('Entra qry', qry);
+			//const values = req.body.searchItem.split(' ').map(val => 
+			//		{
+			//			const tiene = new RegExp(val,'i');
+			//			console.log(tiene);
+			//			return { $or: [ 
+			//				{fabricante: {$regex: tiene}},
+			//				{marca: {$regex: tiene}}, 
+			//				{name: {$regex: tiene}}, 
+			//				{rubro: {$regex: tiene}}, 
+			//				{linea: {$regex: tiene}}, 
+			//				{edad: {$regex: tiene}}, 
+			//				{especie: {$regex: tiene}}, 
+			//				{raza: {$regex: tiene}}, 
+			//				{tags:{$regex: tiene}}
+			//			] }
+			//		});
+			//const vfb = req.body.searchItem.split(' ').map(val => 
+			//	{
+			//		return val;
+			//		//return new RegExp(val,'i');
+			//	}
+			//);
+			//const artList = await articulo.aggregate([
+			//	{ $match: { $or: values } },
+			//	{ $addFields: 
+			//		{
+			//			full_name: art_full_name_template,
+			//			/*
+			//			finalTotal: {
+			//				$add: [ 
+			//					{ $cond: [{ $in: ["$fabricante", vfb ] },1,0]},
+			//					{ $cond: [{ $in: ["$marca", vfb ] },1,0]},
+			//					{ $cond: [{ $in: ["$name", vfb ] },1,0]},
+			//					{ $cond: [{ $in: ["$rubro", vfb ] },1,0]},
+			//					{ $cond: [{ $in: ["$linea", vfb ] },1,0]},
+			//					{ $cond: [{ $in: ["$edad", vfb ] },1,0]},
+			//					{ $cond: [{ $in: ["$especie", vfb ] },1,0]},
+			//					{ $cond: [{ $in: ["$raza", vfb ] },1,0]},
+			//					{ $cond: [{ $in: ["$tags", vfb ] },1,0]},
+			//					 
+			//				]  
+			//			}
+			//			*/
+			//		}
+			//	}
+			//
+			//	//{$sort: { marca: 1, name:1 }},
+			//	//{$project: {_id:1}}
+			//]);
+//		//	console.log(artList);
+			////artList.map( e => new ObjectID(e._id));
+			////console.log(artList.map( e => new ObjectID(e._id)));
+
+
 			const ret = await articuloSanitize(qry);
-			qry.Articulo = ret.Articulo;
-			qry.Extra = ret.Extra;
+			qry.Articulo = ret.Articulo;//{_id: {$in: artList.map( e => new ObjectID(e._id))}};
+			//qry.Extra = ret.Extra;
 			const rpta = await readProductos(qry,dataProduct({}));
 			res.status(200).json(rpta);
 		} catch (error) {
+			console.log(error)
 			res.status(408).json(error);
 		}
 	}
@@ -1024,21 +1112,143 @@ class ArticuloControler {
 	async test ( req: Request, res: Response ) {
 		try {
 			const { search } = req.params;
-			let Articulo = {};
-			const qry = { Articulo, Producto:{}, Sort: {'fabricante': 1, 'marca': 1, 'rubro': 1, 'linea': 1, 'name': 1 } }
-			const array = await readArticulos(qry);
-/*
-			for (let index = 0; index < array.length; index++) {
-				const element = array[index];
-				if (element.tags)
-					if (Array.isArray(element.tags))
-						element.tags = element.tags.toString();
-				const filter = { _id: new ObjectID(element._id) };
-				const rpta = await articulo.updateOne( filter, { $set :  element  }, { upsert: true });
-				console.log(rpta);
-			}
-*/
-			res.status(200).json(array);
+			const txtArr = search.split(' ').filter( val => {
+				if (val.length > 0) return val;
+			}).map( value => { return value; });
+
+			//const contador = txtArr.map(val => {
+			//	const tiene = new RegExp(val,'i');
+			//	return { $cond: [ { $regexMatch: { input: "$full_text", regex: tiene } },1,0]} 
+			//});
+			//console.log(contador);
+			//
+			//const values = txtArr.map(async (val) => {
+			//	const tiene = new RegExp(val, 'i');
+			//	return await articulo.aggregate([
+			//		{
+			//			$match: {
+			//				$or: [
+			//					{ fabricante: { $regex: tiene } },
+			//					{ marca: { $regex: tiene } },
+			//					{ name: { $regex: tiene } },
+			//					{ rubro: { $regex: tiene } },
+			//					{ linea: { $regex: tiene } },
+			//					{ edad: { $regex: tiene } },
+			//					{ especie: { $regex: tiene } },
+			//					{ raza: { $regex: tiene } },
+			//					{ tags: { $regex: tiene } }
+			//				]
+			//			}
+			//		},
+			//		{ $addFields: 
+			//			{
+			//				full_text: { $concat: [
+			//					'$fabricante', ' ',
+			//					'$marca', ' ',
+			//					'$name', ' ',
+			//					'$rubro', ' ',
+			//					'$linea', ' ',
+			//					'$edad', ' ',
+			//					'$especie', ' ',
+			//					'$raza', ' ',
+			//					'$tags', ' '
+			//				]},
+			//				fullName: art_full_name_template
+			//			}
+			//		},
+			//		{ $addFields: 
+			//			{
+			//				finalTotal: {
+			//					$add: contador
+			//				}
+			//			}
+			//		},
+			//		{ 
+			//			$match: { 
+			//				//full_text: { $in: vfb },
+			//				finalTotal: { $gt: 0 }
+			//			}
+			//		},
+			//		{$sort: { finalTotal: -1, fullName: 1 }},
+			//	]);
+			//});
+			//const pepe = Promise.all(values).then( resultado => {
+			//	let data:any[] = [];
+			//	for (let i = 0; i < resultado.length; i++) {
+			//		data = data.concat(resultado[i]);
+			//	}
+//
+			//	res.status(200).json(data);
+			//})
+
+			//const vfb = txtArr.map(val => 
+			//	{
+			//		return new RegExp(val,'i');
+			//	}
+			//);
+			//
+			//const contador = txtArr.map(val => {
+			//	const tiene = new RegExp(val,'i');
+			//	return { $cond: [ { $regexMatch: { input: "$full_text", regex: tiene } },1,0]} 
+			//});
+			//
+			//const artList = await articulo.aggregate([
+			//	{ $match: { $and: values 
+			//			//$or: [
+			//			//	{"fabricante": { $in:  vfb  }},
+			//			//	{"marca": { $in:  vfb  }},
+			//			//	{"name": { $in:  vfb  }},
+			//			//	//{"rubro": { $in:  vfb  }},
+			//			//	//{"linea": { $in:  vfb  }},
+			//			//	//{"edad": { $in:  vfb  }},
+			//			//	//{"especie": { $in:  vfb  }},
+			//			//	//{"raza": { $in:  vfb  }},
+			//			//	//{"tags": { $in:  vfb  }}
+			//			//]
+			//		} 
+			//	},
+			//	{ $addFields: 
+			//		{
+			//			full_text: { $concat: [
+			//				'$fabricante', ' ',
+			//				'$marca', ' ',
+			//				'$name', ' ',
+			//				'$rubro', ' ',
+			//				'$linea', ' ',
+			//				'$edad', ' ',
+			//				'$especie', ' ',
+			//				'$raza', ' ',
+			//				'$tags', ' '
+			//			]},
+			//			fullName: art_full_name_template
+			//		}
+			//	},
+			//	{ $addFields: 
+			//		{
+			//			finalTotal: {
+			//				$add: contador
+			//			}
+			//		}
+			//	},
+			//	{ $match: { 
+			//			//full_text: { $in: vfb },
+			//			finalTotal: { $gt: 0 }
+			//		}
+			//	},
+			//	{$sort: { finalTotal: -1, fullName: 1 }},
+			//]);
+
+			const qry:any = {};
+			qry.searchItem = search;
+			const ret = await articuloSanitize(qry);
+			qry.Articulo = ret.Articulo;
+			qry.Extra = ret.Extra;
+
+			//qry.Articulo = {_id: {$in: artList.map( e => new ObjectID(e._id))}};
+			//qry.Extra = ret.Extra;
+			const rpta = await readProductos(qry,dataProduct({}));
+
+			res.status(200).json(rpta);
 		} catch (error) {
 			console.log(error);
 			res.status(403).json(error);
@@ -1092,6 +1302,8 @@ class ArticuloControler {
 					,contiene: e.contiene
 					,unidad: e.unidad
 					,precio: e.precio
+					,precio_desde: e.precio_desde
+					,precio_hasta: e.precio_hasta
 					,compra: e.compra
 					,reposicion: e.reposicion
 					,pesable: e.pesable
@@ -1130,5 +1342,16 @@ class ArticuloControler {
 		}
 	}
 
+	async textSearch( req: Request, res: Response ){
+		const {search} = req.params;
+		const qry:any = {};
+		qry.searchItem = search;
+		const ret = await articuloSanitize(qry);// = function (search: string, artQry?: any) {
+		qry.Articulo = ret.Articulo;
+		const rpta = await readProductos(qry,dataProduct({}));
+		res.status(200).json(rpta);
+	}
+
 }
+
 export const articuloCtrl = new ArticuloControler();

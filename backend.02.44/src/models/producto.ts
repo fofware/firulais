@@ -8,8 +8,12 @@ export interface IProducto extends Document {
   contiene?: number;
   unidad?: string;
   precio?: number;
+  precio_desde?: number;
+  precio_hasta?: number;
   compra?: number;
+  compra_fecha: number;
   reposicion?: number;
+  reposicion_fecha: number;
   pesable?: boolean;
   servicio?: boolean;
   pVenta?: boolean;
@@ -29,20 +33,24 @@ export interface IProducto extends Document {
 
 const productoSchema = new Schema({
   _id: { type: Schema.Types.ObjectId }
-  , articulo: { type: Schema.Types.ObjectId, ref: "articulos" }
+  , articulo: { type: Schema.Types.ObjectId, ref: "articulos", index: true }
   , parent: { type: Schema.Types.ObjectId, ref: "productos", default: null }
-  , name: { type: String, trim: true, default: "" }
-  , contiene: { type: Number, default: 0 }
+  , name: { type: String, trim: true, default: "", index: true }
+  , contiene: { type: Number, default: 0, index: true }
   , unidad: { type: String, trim: true, default: "" }
   , precio: { type: Number, default: 0 }
+  , precio_desde: { type: Schema.Types.Date }
+  , precio_hasta: { type: Schema.Types.Date }
   , compra: { type: Number, default:0 }
+  , compra_fecha: { type: Schema.Types.Date }
   , reposicion: { type: Number, default:0 }
-  , pesable: { type: Boolean, default: false }
-  , servicio: { type: Boolean, default: false }
-  , pVenta: { type: Boolean, default: true }
-  , pCompra: { type: Boolean, default: true }
-  , codigo: { type: String, trim: true, default: '' }
-  , plu: { type: String, default: "" }
+  , reposicion_fecha: { type: Schema.Types.Date }
+  , pesable: { type: Boolean, default: false, index: true }
+  , servicio: { type: Boolean, default: false, index: true }
+  , pVenta: { type: Boolean, default: true, index: true }
+  , pCompra: { type: Boolean, default: true, index: true }
+  , codigo: { type: String, trim: true, default: '', index: true }
+  , plu: { type: String, default: "", index: true }
   , image: { type: String, trim: true, default: "" }
   , stock: { type: Number, default: 0 }
   , stockMin: { type: Number, default: 0 }
@@ -55,6 +63,23 @@ const productoSchema = new Schema({
   versionKey: true
 })
 
+
+productoSchema.index(
+  { 
+    name : "text",
+    contiene: "text",
+    unidad: "text"
+  },
+  { 
+    default_language: "spanish",
+    name: "ProductoTextIndex"
+  }
+)
+
+productoSchema.on('index', error => {
+  // "_id index cannot be sparse"
+  console.log(error.message);
+});
 
 /*
 productoSchema.methods.getFullName = async function (): Promise<string> {

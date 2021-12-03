@@ -79,6 +79,9 @@ import { MpPendingComponent } from './components/mp-pending/mp-pending.component
 import { TestMpComponent } from './components/test-mp/test-mp.component';
 import { TestMpHooksComponent } from './components/test-mp-hooks/test-mp-hooks.component';
 import { ProdCardViewKartComponent } from './components/prod-card-view-kart/prod-card-view-kart.component';
+import { ProveedorProductoFilterPipe } from './pipes/proveedor-producto-filter.pipe';
+import { ProductoLinkSetComponent } from './components/producto-link-set/producto-link-set.component';
+import { MarcasComponent } from './components/marcas/marcas.component';
 
 @NgModule({
   declarations: [
@@ -154,6 +157,9 @@ import { ProdCardViewKartComponent } from './components/prod-card-view-kart/prod
     TestMpComponent,
     TestMpHooksComponent,
     ProdCardViewKartComponent,
+    ProveedorProductoFilterPipe,
+    ProductoLinkSetComponent,
+    MarcasComponent,
   ],
   imports: [
     BrowserModule,

@@ -3,9 +3,9 @@
     <h4 class="modal-title" id="modal-basic-title">
       <span *ngIf="selectedArticulo.d_fabricante">{{selectedArticulo.fabricante}} </span>
       <span *ngIf="selectedArticulo.d_marca">{{selectedArticulo.marca}} </span>
+      <span>{{selectedArticulo.name}} </span>
       <span *ngIf="selectedArticulo.d_especie">{{selectedArticulo.especie}} </span>
       <span *ngIf="selectedArticulo.d_edad">{{selectedArticulo.edad}} </span>
-      <span>{{selectedArticulo.name}} </span>
       <span *ngIf="selectedArticulo.d_raza">{{selectedArticulo.raza}} </span>
       <span *ngIf="selectedArticulo.d_rubro">{{selectedArticulo.rubro}} </span>
       <span *ngIf="selectedArticulo.d_linea">{{selectedArticulo.linea}} </span>
@@ -200,7 +200,7 @@
               <th>Descripción</th>
               <th>Valor</th>
               <th>Mostrar</th>
-              <th>boton</th>
+              <th><button *ngIf="selectedArticulo.formula.length === 0" (click)="setformulatempate()">Default</button>&nbsp;</th>
             </thead>
             <tbody>
               <tr *ngFor="let item of selectedArticulo.formula; index as i;" class="">
