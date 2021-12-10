@@ -48,7 +48,7 @@ export const proveedoresSettings = [
     "encode": "iso8859-3",
     "named": false,
     "input": {
-      "DOG MENU":{
+      "*":{
         "input_fields": [
           "nombre",
           "codigo",
@@ -58,10 +58,15 @@ export const proveedoresSettings = [
           "neto",
           "bultolista",
           "lista",
+          "sugeridobulto",
           "sugerido",
+          "pesable",
+          "reposicionbuto",
           "reposicion",
           "margen",
-          "unidad"
+          "unidad",
+          "vtabulto",
+          "vtaunidad"
         ]
         ,
         "filters":[
@@ -69,876 +74,53 @@ export const proveedoresSettings = [
             const ret = {};
             ret['nombre'] = line[0];
             ret.codigo = line[1];
-            ret.bulto = line[2];
-            ret.contiene = line[3];
+            ret.bulto = line[3];
+            ret.contiene = line[2];
             ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
             ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
             ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
             ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+            ret.sugeridobulto = isNaN(line[10]) ? null : Math.round(line[10]*100)/100;;
             ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+            ret.pesable = isNaN(line[11]) ? 0 : line[11];
+            ret.reposicionbulto = isNaN(line[12]) ? null : Math.round(line[12]*100)/100;;
+            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+            ret.vtaunidad = isNaN(line[26]) ? null : line[26]; //Math.round(line[26]*100)/100;
             line[0] = ret.nombre;
             line[1] = ret.codigo + '';
-            line[2] = ret.bulto;
-            line[3] = ret.contiene;
+            line[3] = ret.bulto;
+            line[2] = ret.contiene;
             line[4] = ret.bultoneto;
             line[5] = ret.neto;
             line[6] = ret.bultolista;
             line[7] = ret.lista;
-            line[8] = ret.sugerido;
-            line[9] = ret.reposicion;
-            line[10]= ret.margen;
-            line[11]= "Kg";
-            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`,
-          `(line,idx,array) => {
-            if(!line[0]){
-              array[idx][0] = array[idx-1][0];
+            line[8] = ret.sugeridobulto;
+            line[9] = ret.sugerido;
+            line[10] = ret.pesable;
+            line[11] = ret.reposicionbulto;
+            line[12] = ret.reposicion;
+            line[13]= ret.margen;
+            line[14]= "Kg";
+            line[15]= ret.vtabulto;
+            line[16]= ret.vtaunidad;
+            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+              return line;
+        }`,
+        `(line,idx,array) => {
+          if(!line[0]){
+            if(array[idx-1]){
+              array[idx][0] =  array[idx-1][0];
               line[0] = array[idx-1][0];
-            }
-            return line;
-          }`
-        ]
-      },
-      "NG CAT CHOW":{
-        "input_fields": [
-          ,
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[1];
-            ret.codigo = line[2];
-            ret.bulto = line[3];
-            ret.contiene = line[4];
-            ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[1] = ret.nombre;
-            line[2] = ret.codigo;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.bultoneto;
-            line[6] = ret.neto;
-            line[7] = ret.bultolista;
-            line[8] = ret.lista;
-            line[9] = ret.sugerido;
-            line[10]= ret.reposicion;
-            line[11]= ret.margen;
-            line[12]= "Kg";
-            if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`
-          ,
-          `(line,idx,array) => {
-            if(!line[1]){
-              array[idx][1] = array[idx-1][1];
-              line[1] = array[idx-1][1];
-            }
-            return line;
-          }`
-
-        ]
-      },
-      "NG CRIADORES":{
-        "input_fields": [
-          ,
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[1];
-            ret.codigo = line[2];
-            ret.bulto = line[3];
-            ret.contiene = line[4];
-            ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-//            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[1] = ret.nombre;
-            line[2] = ret.codigo;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.bultoneto;
-            line[6] = ret.neto;
-            line[7] = ret.bultolista;
-            line[8] = ret.lista;
-//            line[9] = ret.sugerido;
-            line[10]= ret.reposicion;
-//            line[11]= ret.margen;
-            line[12]= "Kg";
-            if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] ) return line;
-          }`
-          //,
-          //`(line,idx,array) => {
-          //  if(!line[1]){
-          //    console.log(line[1]);
-          //    console.log(idx);
-          //    array[idx][1] = array[idx-1][1];
-          //    line[1] = array[idx-1][1];
-          //  }
-          //  return line;
-          //}`
-        ]
-      },
-      "NG DOG CHOW":{
-        "input_fields": [
-          ,
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[1];
-            ret.codigo = line[2];
-            ret.bulto = line[3];
-            ret.contiene = line[4];
-            ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[1] = ret.nombre;
-            line[2] = ret.codigo;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.bultoneto;
-            line[6] = ret.neto;
-            line[7] = ret.bultolista;
-            line[8] = ret.lista;
-            line[9] = ret.sugerido;
-            line[10]= ret.reposicion;
-            line[11]= ret.margen;
-            line[12]= "Kg";
-            if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] ) return line;
-          }`
-          ,
-          `(line,idx,array) => {
-            if(!line[1]){
-              // dog chow
-              //console.log(line[1]);
-              //console.log(idx);
-              array[idx][1] = array[idx-1][1];
-              line[1] = array[idx-1][1];
-            }
-            return line;
-          }`
-        ]
-      },
-      "NG DOGUI":{
-        "input_fields": [
-          ,
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[1];
-            ret.codigo = line[2];
-            ret.bulto = line[3];
-            ret.contiene = line[4];
-            ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[1] = ret.nombre;
-            line[2] = ret.codigo;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.bultoneto;
-            line[6] = ret.neto;
-            line[7] = ret.bultolista;
-            line[8] = ret.lista;
-            line[9] = ret.sugerido;
-            line[10]= ret.reposicion;
-            line[11]= ret.margen;
-            line[12]= "Kg";
-            if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`
-          ,
-          `(line,idx,array) => {
-            if(!line[1]){
-              array[idx][1] = array[idx-1][1];
-              line[1] = array[idx-1][1];
-            }
-            return line;
-          }`
-        ]
-      },
-      "NG EXCELLENT CAT":{
-        "input_fields": [
-          ,
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[1];
-            ret.codigo = line[2];
-            ret.bulto = line[3];
-            ret.contiene = line[4];
-            ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[1] = ret.nombre;
-            line[2] = ret.codigo;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.bultoneto;
-            line[6] = ret.neto;
-            line[7] = ret.bultolista;
-            line[8] = ret.lista;
-            line[9] = ret.sugerido;
-            line[10]= ret.reposicion;
-            line[11]= ret.margen;
-            line[12]= "Kg";
-            if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`
-          ,
-          `(line,idx,array) => {
-            if(!line[1]){
-              array[idx][1] = array[idx-1][1];
-              line[1] = array[idx-1][1];
-            }
-            return line;
-          }`
-        ]
-      },
-      "NG EXCELLENT DOG":{
-        "input_fields": [
-          ,
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[1];
-            ret.codigo = line[2];
-            ret.bulto = line[3];
-            ret.contiene = line[4];
-            ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[1] = ret.nombre;
-            line[2] = ret.codigo;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.bultoneto;
-            line[6] = ret.neto;
-            line[7] = ret.bultolista;
-            line[8] = ret.lista;
-            line[9] = ret.sugerido;
-            line[10]= ret.reposicion;
-            line[11]= ret.margen;
-            line[12]= "Kg";
-            if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`
-          ,
-          `(line,idx,array) => {
-            if(!line[1]){
-              array[idx][1] = array[idx-1][1];
-              line[1] = array[idx-1][1];
-            }
-            return line;
-          }`
-        ]
-      },
-      "NG FANCY FEAST":{
-        "input_fields": [
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[0];
-            ret.codigo = line[1];
-            ret.bulto = line[2];
-            ret.contiene = line[3];
-            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[0] = ret.nombre;
-            line[1] = ret.codigo;
-            line[2] = ret.bulto;
-            line[3] = ret.contiene;
-            line[4] = ret.bultoneto;
-            line[5] = ret.neto;
-            line[6] = ret.bultolista;
-            line[7] = ret.lista;
-            line[8] = ret.sugerido;
-            line[9] = ret.reposicion;
-            line[10]= ret.margen;
-            line[11]= "Kg";
-            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`
-          ,
-          `(line,idx,array) => {
-            if(!line[0]){
-              array[idx][0] = array[idx-1][0];
-              line[0] = array[idx-1][0];
-            }
-            return line;
-          }`
-        ]
-      },
-      "NG FELIX":{
-        "input_fields": [
-          ,
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[1];
-            ret.codigo = line[2];
-            ret.bulto = line[3];
-            ret.contiene = line[4];
-            ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[1] = ret.nombre;
-            line[2] = ret.codigo;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.bultoneto;
-            line[6] = ret.neto;
-            line[7] = ret.bultolista;
-            line[8] = ret.lista;
-            line[9] = ret.sugerido;
-            line[10]= ret.reposicion;
-            line[11]= ret.margen;
-            line[12]= "Kg";
-            if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`
-          ,
-          `(line,idx,array) => {
-            if(!line[1]){
-              array[idx][1] = array[idx-1][1];
-              line[1] = array[idx-1][1];
-            }
-            return line;
-          }`
-        ]
-      },
-      "NG GATI":{
-        "input_fields": [
-          ,
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[1];
-            ret.codigo = line[2];
-            ret.bulto = line[3];
-            ret.contiene = line[4];
-            ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[1] = ret.nombre;
-            line[2] = ret.codigo;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.bultoneto;
-            line[6] = ret.neto;
-            line[7] = ret.bultolista;
-            line[8] = ret.lista;
-            line[9] = ret.sugerido;
-            line[10]= ret.reposicion;
-            line[11]= ret.margen;
-            line[12]= "Kg";
-            if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`
-          ,
-          `(line,idx,array) => {
-            if(!line[1]){
-              array[idx][1] = array[idx-1][1];
-              line[1] = array[idx-1][1];
-            }
-            return line;
-          }`
-        ]
-      },
-      "NG PRO PLAN CAT":{
-        "input_fields": [
-          ,
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[1];
-            ret.codigo = line[2];
-            ret.bulto = line[3];
-            ret.contiene = line[4];
-            ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[1] = ret.nombre;
-            line[2] = ret.codigo;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.bultoneto;
-            line[6] = ret.neto;
-            line[7] = ret.bultolista;
-            line[8] = ret.lista;
-            line[9] = ret.sugerido;
-            line[10]= ret.reposicion;
-            line[11]= ret.margen;
-            line[12]= "Kg";
-            if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`
-          ,
-          `(line,idx,array) => {
-            if(!line[1]){
-              array[idx][1] = array[idx-1][1];
-              line[1] = array[idx-1][1];
-            }
-            return line;
-          }`
-        ]
-      },
-      '"NG PRO PLAN DOG"':{
-        "input_fields": [
-          ,
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[1];
-            ret.codigo = line[2];
-            ret.bulto = line[3];
-            ret.contiene = line[4];
-            ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[1] = ret.nombre;
-            line[2] = ret.codigo;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.bultoneto;
-            line[6] = ret.neto;
-            line[7] = ret.bultolista;
-            line[8] = ret.lista;
-            line[9] = ret.sugerido;
-            line[10]= ret.reposicion;
-            line[11]= ret.margen;
-            line[12]= "Kg";
-            if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`
-          ,
-          `(line,idx,array) => {
-            if(!line[1]){
-              array[idx][1] = array[idx-1][1];
-              line[1] = array[idx-1][1];
-            }
-            return line;
-          }`
-        ]
-      },
-      'NG TIDY CATS':{
-        "input_fields": [
-          ,
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[1];
-            ret.codigo = line[2];
-            ret.bulto = line[3];
-            ret.contiene = line[4];
-            ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[1] = ret.nombre;
-            line[2] = ret.codigo;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.bultoneto;
-            line[6] = ret.neto;
-            line[7] = ret.bultolista;
-            line[8] = ret.lista;
-            line[9] = ret.sugerido;
-            line[10]= ret.reposicion;
-            line[11]= ret.margen;
-            line[12]= "Kg";
-            if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`
-          ,
-          `(line,idx,array) => {
-            if(!line[1]){
-              array[idx][1] = array[idx-1][1];
-              line[1] = array[idx-1][1];
-            }
-            return line;
-          }`
-        ]
-      },
-      "NG VETERINARY DIETS":{
-        "input_fields": [
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            if(line[0] && !line[1] && !line[2] && !line[3] && !line[4] && !line[5] && !line[6] && !line[7] && !line[8]){
-              console.log(line[0],array[idx])
-              array[idx][9] = line[0]
-            } else if(line[0] && line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && array[idx-1][9]) {
-              line[9] = array[idx-1][9];
-            }
-            return line;
-          }`,
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[0]+ ' ' + line[9];
-            ret.codigo = line[1];
-            ret.bulto = line[2];
-            ret.contiene = line[3];
-            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[0] = ret.nombre;
-            line[1] = ret.codigo;
-            line[2] = ret.bulto;
-            line[3] = ret.contiene;
-            line[4] = ret.bultoneto;
-            line[5] = ret.neto;
-            line[6] = ret.bultolista;
-            line[7] = ret.lista;
-            line[8] = ret.sugerido;
-            line[9] = ret.reposicion;
-            line[10]= ret.margen;
-            line[11]= "Kg";
-            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`
-          //,
-          //`(line,idx,array) => {
-          //  if(!line[0]){
-          //    array[idx][0] = array[idx-1][0];
-          //    line[0] = array[idx-1][0];
-          //  }
-          //  return line;
-          //}`
-        ]
-      },
-      'SUPERCOAT':{
-        "input_fields": [
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[0];
-            ret.codigo = line[1];
-            ret.bulto = line[2];
-            ret.contiene = line[3];
-            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[0] = ret.nombre;
-            line[1] = ret.codigo;
-            line[2] = ret.bulto;
-            line[3] = ret.contiene;
-            line[4] = ret.bultoneto;
-            line[5] = ret.neto;
-            line[6] = ret.bultolista;
-            line[7] = ret.lista;
-            line[8] = ret.sugerido;
-            line[9] = ret.reposicion;
-            line[10]= ret.margen;
-            line[11]= "Kg";
-            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`
-          ,
-          `(line,idx,array) => {
-            if(!line[0]){
-              array[idx][0] = array[idx-1][0];
-              line[0] = array[idx-1][0];
-            }
-            return line;
-          }`
-        ]
-      },
-      'Whole Earth Farms':{
-        "input_fields": [
-          "nombre",
-          "codigo",
-          "contiene",
-          "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugerido",
-          "reposicion",
-          "margen",
-          "unidad"
-        ]
-        ,
-        "filters":[
-          `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[0];
-            ret.codigo = line[1];
-            ret.bulto = line[2];
-            ret.contiene = line[3];
-            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-            ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
-            line[0] = ret.nombre;
-            line[1] = ret.codigo;
-            line[2] = ret.bulto;
-            line[3] = ret.contiene;
-            line[4] = ret.bultoneto;
-            line[5] = ret.neto;
-            line[6] = ret.bultolista;
-            line[7] = ret.lista;
-            line[8] = ret.sugerido;
-            line[9] = ret.reposicion;
-            line[10]= ret.margen;
-            line[11]= "Kg";
-            if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
-          }`
-          ,
-          `(line,idx,array) => {
-            if(!line[0]){
-              array[idx][0] = array[idx-1][0];
-              line[0] = array[idx-1][0];
-            }
-            return line;
-          }`
-        ]
-      },
-    },
-  },
+            } else line[0] = "error";
+          }
+          return line;
+        }`
+      ]
+    }
+  }
+},
   {
     "_id": '5f401a8f4e0d2b3e5371c664',
     "nombre": "Dumas",
@@ -1893,7 +1075,7 @@ export class ListasProveedoresService {
           const params = prov.input[key] || prov.input['*'];
           const hoja = JSON.parse(JSON.stringify(src[key]));
           let ret = src[key];
-
+          console.log(key)
           if(params['filters']){
             for (let f = 0; f < params['filters'].length; f++) {
               const func = eval(params['filters'][f]);
@@ -2020,3 +1202,1828 @@ export class ListasProveedoresService {
 //    return retData;
 //  }
 }
+
+//  {
+//    "_id": '607d7ad51600d70027d3b555',
+//    "nombre": "Agro Empresas",
+//    "type": "XLSX",
+//    "encode": "iso8859-3",
+//    "named": false,
+//    "input": {
+////      "DOG MENU":{
+//      //  "input_fields": [
+//      //    "nombre",
+//      //    "codigo",
+//      //    "contiene",
+//      //    "bulto",
+//      //    "bultoneto",
+//      //    "neto",
+//      //    "bultolista",
+//      //    "lista",
+//      //    "sugerido",
+//      //    "reposicion",
+//      //    "margen",
+//      //    "unidad"
+//      //  ]
+//      //  ,
+//      //  "filters":[
+//      //    `(line,idx,array) => {
+//      //      const ret = {};
+//      //      ret['nombre'] = line[0];
+//      //      ret.codigo = line[1];
+//      //      ret.bulto = line[2];
+//      //      ret.contiene = line[3];
+//      //      ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//      //      ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//      //      ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//      //      ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//      //      ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//      //      ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//      //      ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//      //      line[0] = ret.nombre;
+//      //      line[1] = ret.codigo + '';
+//      //      line[2] = ret.bulto;
+//      //      line[3] = ret.contiene;
+//      //      line[4] = ret.bultoneto;
+//      //      line[5] = ret.neto;
+//      //      line[6] = ret.bultolista;
+//      //      line[7] = ret.lista;
+//      //      line[8] = ret.sugerido;
+//      //      line[9] = ret.reposicion;
+//      //      line[10]= ret.margen;
+//      //      line[11]= "Kg";
+//      //      if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//      //    }`,
+//      //    `(line,idx,array) => {
+//      //      if(!line[0]){
+//      //        array[idx][0] = array[idx-1][0];
+//      //        line[0] = array[idx-1][0];
+//      //      }
+//      //      return line;
+//      //    }`
+//      //  ]
+////      },
+//      "NG CAT CHOW":{
+//        "input_fields": [
+//          "nombre",
+//          "codigo",
+//          "contiene",
+//          "bulto",
+//          "bultoneto",
+//          "neto",
+//          "bultolista",
+//          "lista",
+//          "sugeridobulto",
+//          "sugerido",
+//          "pesable",
+//          "reposicionbuto",
+//          "reposicion",
+//          "margen",
+//          "unidad",
+//          "vtabulto",
+//          "vtaunidad"
+//        ]
+//        ,
+//        "filters":[
+//          `(line,idx,array) => {
+//            const ret = {};
+//            ret['nombre'] = line[0];
+//            ret.codigo = line[1];
+//            ret.bulto = line[3];
+//            ret.contiene = line[2];
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.sugeridobulto = line[10];
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.pesable = line[11];
+//            ret.reposicionbulto = line[12];
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            line[0] = ret.nombre;
+//            line[1] = ret.codigo + '';
+//            line[2] = ret.bulto;
+//            line[3] = ret.contiene;
+//            line[4] = ret.bultoneto;
+//            line[5] = ret.neto;
+//            line[6] = ret.bultolista;
+//            line[7] = ret.lista;
+//            line[8] = ret.sugeridobulto;
+//            line[9] = ret.sugerido;
+//            line[10] = ret.pesable;
+//            line[11] = ret.reposicionbulto;
+//            line[12] = ret.reposicion;
+//            line[13]= ret.margen;
+//            line[14]= "Kg";
+//            line[15]= ret.vtabulto;
+//            line[16]= ret.vtaunidad;
+//            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[10] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+//              return line;
+//        }`,
+//        `(line,idx,array) => {
+//          console.log("segundo",line,idx,array);
+//          if(!line[0]){
+//            if(array[idx-1]){
+//              array[idx][0] =  array[idx-1][0];
+//              line[0] = array[idx-1][0];
+//            } else line[0] = "error";
+//          }
+//          console.log(line);
+//          return line;
+//        }`
+//      ]
+//        //"input_fields": [
+//        //  //,
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[1];
+//        //    ret.codigo = line[2];
+//        //    ret.bulto = line[3];
+//        //    ret.contiene = line[4];
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[1] = ret.nombre;
+//        //    line[2] = ret.codigo;
+//        //    line[3] = ret.bulto;
+//        //    line[4] = ret.contiene;
+//        //    line[5] = ret.bultoneto;
+//        //    line[6] = ret.neto;
+//        //    line[7] = ret.bultolista;
+//        //    line[8] = ret.lista;
+//        //    line[9] = ret.sugerido;
+//        //    line[10]= ret.reposicion;
+//        //    line[11]= ret.margen;
+//        //    line[12]= "Kg";
+//        //    if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//        //  }`
+//        //  ,
+//        //  `(line,idx,array) => {
+//        //    if(!line[1]){
+//        //      array[idx][1] = array[idx-1][1];
+//        //      line[1] = array[idx-1][1];
+//        //    }
+//        //    return line;
+//        //  }`
+////
+//        //]
+//      },
+//      //"NG CRIADORES":{
+//      //  "input_fields": [
+//      //    ,
+//      //    "nombre",
+//      //    "codigo",
+//      //    "contiene",
+//      //    "bulto",
+//      //    "bultoneto",
+//      //    "neto",
+//      //    "bultolista",
+//      //    "lista",
+//      //    "sugerido",
+//      //    "reposicion",
+//      //    "margen",
+//      //    "unidad"
+//      //  ]
+//      //  ,
+//      //  "filters":[
+//      //    `(line,idx,array) => {
+//      //      const ret = {};
+//      //      ret['nombre'] = line[1];
+//      //      ret.codigo = line[2];
+//      //      ret.bulto = line[3];
+//      //      ret.contiene = line[4];
+//      //      ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//      //      ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//      //      ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//      //      ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//      //      ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
+//      //      ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+////    //        ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//      //      line[1] = ret.nombre;
+//      //      line[2] = ret.codigo;
+//      //      line[3] = ret.bulto;
+//      //      line[4] = ret.contiene;
+//      //      line[5] = ret.bultoneto;
+//      //      line[6] = ret.neto;
+//      //      line[7] = ret.bultolista;
+//      //      line[8] = ret.lista;
+////    //        line[9] = ret.sugerido;
+//      //      line[10]= ret.reposicion;
+////    //        line[11]= ret.margen;
+//      //      line[12]= "Kg";
+//      //      if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] ) return line;
+//      //    }`
+//      //    //,
+//      //    //`(line,idx,array) => {
+//      //    //  if(!line[1]){
+//      //    //    console.log(line[1]);
+//      //    //    console.log(idx);
+//      //    //    array[idx][1] = array[idx-1][1];
+//      //    //    line[1] = array[idx-1][1];
+//      //    //  }
+//      //    //  return line;
+//      //    //}`
+//      //  ]
+//      //},
+//      "NG DOG CHOW":{
+//        "input_fields": [
+//          "nombre",
+//          "codigo",
+//          "contiene",
+//          "bulto",
+//          "bultoneto",
+//          "neto",
+//          "bultolista",
+//          "lista",
+//          "sugeridobulto",
+//          "sugerido",
+//          "pesable",
+//          "reposicionbuto",
+//          "reposicion",
+//          "margen",
+//          "unidad",
+//          "vtabulto",
+//          "vtaunidad"
+//        ]
+//        ,
+//        "filters":[
+//          `(line,idx,array) => {
+//            const ret = {};
+//            ret['nombre'] = line[0];
+//            ret.codigo = line[1];
+//            ret.bulto = line[3];
+//            ret.contiene = line[2];
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.sugeridobulto = line[10];
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.pesable = line[11];
+//            ret.reposicionbulto = line[12];
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            line[0] = ret.nombre;
+//            line[1] = ret.codigo + '';
+//            line[2] = ret.bulto;
+//            line[3] = ret.contiene;
+//            line[4] = ret.bultoneto;
+//            line[5] = ret.neto;
+//            line[6] = ret.bultolista;
+//            line[7] = ret.lista;
+//            line[8] = ret.sugeridobulto;
+//            line[9] = ret.sugerido;
+//            line[10] = ret.pesable;
+//            line[11] = ret.reposicionbulto;
+//            line[12] = ret.reposicion;
+//            line[13]= ret.margen;
+//            line[14]= "Kg";
+//            line[15]= ret.vtabulto;
+//            line[16]= ret.vtaunidad;
+//            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[10] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+//              return line;
+//        }`,
+//        `(line,idx,array) => {
+//          console.log("segundo",line,idx,array);
+//          if(!line[0]){
+//            if(array[idx-1]){
+//              array[idx][0] =  array[idx-1][0];
+//              line[0] = array[idx-1][0];
+//            }
+//          }
+//          console.log(line);
+//          return line;
+//        }`
+//      ]
+//        //"input_fields": [
+//        //  ,
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[1];
+//        //    ret.codigo = line[2];
+//        //    ret.bulto = line[3];
+//        //    ret.contiene = line[4];
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[1] = ret.nombre;
+//        //    line[2] = ret.codigo;
+//        //    line[3] = ret.bulto;
+//        //    line[4] = ret.contiene;
+//        //    line[5] = ret.bultoneto;
+//        //    line[6] = ret.neto;
+//        //    line[7] = ret.bultolista;
+//        //    line[8] = ret.lista;
+//        //    line[9] = ret.sugerido;
+//        //    line[10]= ret.reposicion;
+//        //    line[11]= ret.margen;
+//        //    line[12]= "Kg";
+//        //    if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] ) return line;
+//        //  }`
+//        //  ,
+//        //  `(line,idx,array) => {
+//        //    if(!line[1]){
+//        //      // dog chow
+//        //      //console.log(line[1]);
+//        //      //console.log(idx);
+//        //      array[idx][1] = array[idx-1][1];
+//        //      line[1] = array[idx-1][1];
+//        //    }
+//        //    return line;
+//        //  }`
+//        //]
+//      },
+//      "NG DOGUI":{
+//        "input_fields": [
+//          "nombre",
+//          "codigo",
+//          "contiene",
+//          "bulto",
+//          "bultoneto",
+//          "neto",
+//          "bultolista",
+//          "lista",
+//          "sugeridobulto",
+//          "sugerido",
+//          "pesable",
+//          "reposicionbuto",
+//          "reposicion",
+//          "margen",
+//          "unidad",
+//          "vtabulto",
+//          "vtaunidad"
+//        ]
+//        ,
+//        "filters":[
+//          `(line,idx,array) => {
+//            const ret = {};
+//            ret['nombre'] = line[0];
+//            ret.codigo = line[1];
+//            ret.bulto = line[3];
+//            ret.contiene = line[2];
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.sugeridobulto = line[10];
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.pesable = line[11];
+//            ret.reposicionbulto = line[12];
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            line[0] = ret.nombre;
+//            line[1] = ret.codigo + '';
+//            line[2] = ret.bulto;
+//            line[3] = ret.contiene;
+//            line[4] = ret.bultoneto;
+//            line[5] = ret.neto;
+//            line[6] = ret.bultolista;
+//            line[7] = ret.lista;
+//            line[8] = ret.sugeridobulto;
+//            line[9] = ret.sugerido;
+//            line[10] = ret.pesable;
+//            line[11] = ret.reposicionbulto;
+//            line[12] = ret.reposicion;
+//            line[13]= ret.margen;
+//            line[14]= "Kg";
+//            line[15]= ret.vtabulto;
+//            line[16]= ret.vtaunidad;
+//            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[10] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+//              return line;
+//        }`,
+//        `(line,idx,array) => {
+//          console.log("segundo",line,idx,array);
+//          if(!line[0]){
+//            if(array[idx-1]){
+//              array[idx][0] =  array[idx-1][0];
+//              line[0] = array[idx-1][0];
+//            }
+//          }
+//          console.log(line);
+//          return line;
+//        }`
+//      ]
+//        //"input_fields": [
+//        //  ,
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[1];
+//        //    ret.codigo = line[2];
+//        //    ret.bulto = line[3];
+//        //    ret.contiene = line[4];
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[1] = ret.nombre;
+//        //    line[2] = ret.codigo;
+//        //    line[3] = ret.bulto;
+//        //    line[4] = ret.contiene;
+//        //    line[5] = ret.bultoneto;
+//        //    line[6] = ret.neto;
+//        //    line[7] = ret.bultolista;
+//        //    line[8] = ret.lista;
+//        //    line[9] = ret.sugerido;
+//        //    line[10]= ret.reposicion;
+//        //    line[11]= ret.margen;
+//        //    line[12]= "Kg";
+//        //    if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//        //  }`
+//        //  ,
+//        //  `(line,idx,array) => {
+//        //    if(!line[1]){
+//        //      array[idx][1] = array[idx-1][1];
+//        //      line[1] = array[idx-1][1];
+//        //    }
+//        //    return line;
+//        //  }`
+//        //]
+//      },
+//      "NG EXCELLENT CAT":{
+//        "input_fields": [
+//          "nombre",
+//          "codigo",
+//          "contiene",
+//          "bulto",
+//          "bultoneto",
+//          "neto",
+//          "bultolista",
+//          "lista",
+//          "sugeridobulto",
+//          "sugerido",
+//          "pesable",
+//          "reposicionbuto",
+//          "reposicion",
+//          "margen",
+//          "unidad",
+//          "vtabulto",
+//          "vtaunidad"
+//        ]
+//        ,
+//        "filters":[
+//          `(line,idx,array) => {
+//            const ret = {};
+//            ret['nombre'] = line[0];
+//            ret.codigo = line[1];
+//            ret.bulto = line[3];
+//            ret.contiene = line[2];
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.sugeridobulto = line[10];
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.pesable = line[11];
+//            ret.reposicionbulto = line[12];
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            line[0] = ret.nombre;
+//            line[1] = ret.codigo + '';
+//            line[2] = ret.bulto;
+//            line[3] = ret.contiene;
+//            line[4] = ret.bultoneto;
+//            line[5] = ret.neto;
+//            line[6] = ret.bultolista;
+//            line[7] = ret.lista;
+//            line[8] = ret.sugeridobulto;
+//            line[9] = ret.sugerido;
+//            line[10] = ret.pesable;
+//            line[11] = ret.reposicionbulto;
+//            line[12] = ret.reposicion;
+//            line[13]= ret.margen;
+//            line[14]= "Kg";
+//            line[15]= ret.vtabulto;
+//            line[16]= ret.vtaunidad;
+//            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[10] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+//              return line;
+//        }`,
+//        `(line,idx,array) => {
+//          console.log("segundo",line,idx,array);
+//          if(!line[0]){
+//            if(array[idx-1]){
+//              array[idx][0] =  array[idx-1][0];
+//              line[0] = array[idx-1][0];
+//            }
+//          }
+//          console.log(line);
+//          return line;
+//        }`
+//      ]
+//        //"input_fields": [
+//        //  ,
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[1];
+//        //    ret.codigo = line[2];
+//        //    ret.bulto = line[3];
+//        //    ret.contiene = line[4];
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[1] = ret.nombre;
+//        //    line[2] = ret.codigo;
+//        //    line[3] = ret.bulto;
+//        //    line[4] = ret.contiene;
+//        //    line[5] = ret.bultoneto;
+//        //    line[6] = ret.neto;
+//        //    line[7] = ret.bultolista;
+//        //    line[8] = ret.lista;
+//        //    line[9] = ret.sugerido;
+//        //    line[10]= ret.reposicion;
+//        //    line[11]= ret.margen;
+//        //    line[12]= "Kg";
+//        //    if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//        //  }`
+//        //  ,
+//        //  `(line,idx,array) => {
+//        //    if(!line[1]){
+//        //      array[idx][1] = array[idx-1][1];
+//        //      line[1] = array[idx-1][1];
+//        //    }
+//        //    return line;
+//        //  }`
+//        //]
+//      },
+//      "NG EXCELLENT DOG":{
+//        "input_fields": [
+//          "nombre",
+//          "codigo",
+//          "contiene",
+//          "bulto",
+//          "bultoneto",
+//          "neto",
+//          "bultolista",
+//          "lista",
+//          "sugeridobulto",
+//          "sugerido",
+//          "pesable",
+//          "reposicionbuto",
+//          "reposicion",
+//          "margen",
+//          "unidad",
+//          "vtabulto",
+//          "vtaunidad"
+//        ]
+//        ,
+//        "filters":[
+//          `(line,idx,array) => {
+//            const ret = {};
+//            ret['nombre'] = line[0];
+//            ret.codigo = line[1];
+//            ret.bulto = line[3];
+//            ret.contiene = line[2];
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.sugeridobulto = line[10];
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.pesable = line[11];
+//            ret.reposicionbulto = line[12];
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            line[0] = ret.nombre;
+//            line[1] = ret.codigo + '';
+//            line[2] = ret.bulto;
+//            line[3] = ret.contiene;
+//            line[4] = ret.bultoneto;
+//            line[5] = ret.neto;
+//            line[6] = ret.bultolista;
+//            line[7] = ret.lista;
+//            line[8] = ret.sugeridobulto;
+//            line[9] = ret.sugerido;
+//            line[10] = ret.pesable;
+//            line[11] = ret.reposicionbulto;
+//            line[12] = ret.reposicion;
+//            line[13]= ret.margen;
+//            line[14]= "Kg";
+//            line[15]= ret.vtabulto;
+//            line[16]= ret.vtaunidad;
+//            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[10] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+//              return line;
+//        }`,
+//        `(line,idx,array) => {
+//          console.log("segundo",line,idx,array);
+//          if(!line[0]){
+//            if(array[idx-1]){
+//              array[idx][0] =  array[idx-1][0];
+//              line[0] = array[idx-1][0];
+//            }
+//          }
+//          console.log(line);
+//          return line;
+//        }`
+//      ]
+//        //"input_fields": [
+//        //  ,
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[1];
+//        //    ret.codigo = line[2];
+//        //    ret.bulto = line[3];
+//        //    ret.contiene = line[4];
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[1] = ret.nombre;
+//        //    line[2] = ret.codigo;
+//        //    line[3] = ret.bulto;
+//        //    line[4] = ret.contiene;
+//        //    line[5] = ret.bultoneto;
+//        //    line[6] = ret.neto;
+//        //    line[7] = ret.bultolista;
+//        //    line[8] = ret.lista;
+//        //    line[9] = ret.sugerido;
+//        //    line[10]= ret.reposicion;
+//        //    line[11]= ret.margen;
+//        //    line[12]= "Kg";
+//        //    if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//        //  }`
+//        //  ,
+//        //  `(line,idx,array) => {
+//        //    if(!line[1]){
+//        //      array[idx][1] = array[idx-1][1];
+//        //      line[1] = array[idx-1][1];
+//        //    }
+//        //    return line;
+//        //  }`
+//        //]
+//      },
+//      "NG FANCY FEAST":{
+//        "input_fields": [
+//          "nombre",
+//          "codigo",
+//          "contiene",
+//          "bulto",
+//          "bultoneto",
+//          "neto",
+//          "bultolista",
+//          "lista",
+//          "sugeridobulto",
+//          "sugerido",
+//          "pesable",
+//          "reposicionbuto",
+//          "reposicion",
+//          "margen",
+//          "unidad",
+//          "vtabulto",
+//          "vtaunidad"
+//        ]
+//        ,
+//        "filters":[
+//          `(line,idx,array) => {
+//            const ret = {};
+//            ret['nombre'] = line[0];
+//            ret.codigo = line[1];
+//            ret.bulto = line[3];
+//            ret.contiene = line[2];
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.sugeridobulto = line[10];
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.pesable = line[11];
+//            ret.reposicionbulto = line[12];
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            line[0] = ret.nombre;
+//            line[1] = ret.codigo + '';
+//            line[2] = ret.bulto;
+//            line[3] = ret.contiene;
+//            line[4] = ret.bultoneto;
+//            line[5] = ret.neto;
+//            line[6] = ret.bultolista;
+//            line[7] = ret.lista;
+//            line[8] = ret.sugeridobulto;
+//            line[9] = ret.sugerido;
+//            line[10] = ret.pesable;
+//            line[11] = ret.reposicionbulto;
+//            line[12] = ret.reposicion;
+//            line[13]= ret.margen;
+//            line[14]= "Kg";
+//            line[15]= ret.vtabulto;
+//            line[16]= ret.vtaunidad;
+//            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[10] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+//              return line;
+//        }`,
+//        `(line,idx,array) => {
+//          console.log("segundo",line,idx,array);
+//          if(!line[0]){
+//            if(array[idx-1]){
+//              array[idx][0] =  array[idx-1][0];
+//              line[0] = array[idx-1][0];
+//            }
+//          }
+//          console.log(line);
+//          return line;
+//        }`
+//      ]
+//        //"input_fields": [
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[0];
+//        //    ret.codigo = line[1];
+//        //    ret.bulto = line[2];
+//        //    ret.contiene = line[3];
+//        //    ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//        //    ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[0] = ret.nombre;
+//        //    line[1] = ret.codigo;
+//        //    line[2] = ret.bulto;
+//        //    line[3] = ret.contiene;
+//        //    line[4] = ret.bultoneto;
+//        //    line[5] = ret.neto;
+//        //    line[6] = ret.bultolista;
+//        //    line[7] = ret.lista;
+//        //    line[8] = ret.sugerido;
+//        //    line[9] = ret.reposicion;
+//        //    line[10]= ret.margen;
+//        //    line[11]= "Kg";
+//        //    if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//        //  }`
+//        //  ,
+//        //  `(line,idx,array) => {
+//        //    if(!line[0]){
+//        //      array[idx][0] = array[idx-1][0];
+//        //      line[0] = array[idx-1][0];
+//        //    }
+//        //    return line;
+//        //  }`
+//        //]
+//      },
+//      "NG FELIX":{
+//        "input_fields": [
+//          "nombre",
+//          "codigo",
+//          "contiene",
+//          "bulto",
+//          "bultoneto",
+//          "neto",
+//          "bultolista",
+//          "lista",
+//          "sugeridobulto",
+//          "sugerido",
+//          "pesable",
+//          "reposicionbuto",
+//          "reposicion",
+//          "margen",
+//          "unidad",
+//          "vtabulto",
+//          "vtaunidad"
+//        ]
+//        ,
+//        "filters":[
+//          `(line,idx,array) => {
+//            const ret = {};
+//            ret['nombre'] = line[0];
+//            ret.codigo = line[1];
+//            ret.bulto = line[3];
+//            ret.contiene = line[2];
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.sugeridobulto = line[10];
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.pesable = line[11];
+//            ret.reposicionbulto = line[12];
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            line[0] = ret.nombre;
+//            line[1] = ret.codigo + '';
+//            line[2] = ret.bulto;
+//            line[3] = ret.contiene;
+//            line[4] = ret.bultoneto;
+//            line[5] = ret.neto;
+//            line[6] = ret.bultolista;
+//            line[7] = ret.lista;
+//            line[8] = ret.sugeridobulto;
+//            line[9] = ret.sugerido;
+//            line[10] = ret.pesable;
+//            line[11] = ret.reposicionbulto;
+//            line[12] = ret.reposicion;
+//            line[13]= ret.margen;
+//            line[14]= "Kg";
+//            line[15]= ret.vtabulto;
+//            line[16]= ret.vtaunidad;
+//            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[10] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+//              return line;
+//        }`,
+//        `(line,idx,array) => {
+//          console.log("segundo",line,idx,array);
+//          if(!line[0]){
+//            if(array[idx-1]){
+//              array[idx][0] =  array[idx-1][0];
+//              line[0] = array[idx-1][0];
+//            }
+//          }
+//          console.log(line);
+//          return line;
+//        }`
+//      ]
+//        //"input_fields": [
+//        //  ,
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[1];
+//        //    ret.codigo = line[2];
+//        //    ret.bulto = line[3];
+//        //    ret.contiene = line[4];
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[1] = ret.nombre;
+//        //    line[2] = ret.codigo;
+//        //    line[3] = ret.bulto;
+//        //    line[4] = ret.contiene;
+//        //    line[5] = ret.bultoneto;
+//        //    line[6] = ret.neto;
+//        //    line[7] = ret.bultolista;
+//        //    line[8] = ret.lista;
+//        //    line[9] = ret.sugerido;
+//        //    line[10]= ret.reposicion;
+//        //    line[11]= ret.margen;
+//        //    line[12]= "Kg";
+//        //    if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//        //  }`
+//        //  ,
+//        //  `(line,idx,array) => {
+//        //    if(!line[1]){
+//        //      array[idx][1] = array[idx-1][1];
+//        //      line[1] = array[idx-1][1];
+//        //    }
+//        //    return line;
+//        //  }`
+//        //]
+//      },
+//      "NG GATI":{
+//        "input_fields": [
+//          "nombre",
+//          "codigo",
+//          "contiene",
+//          "bulto",
+//          "bultoneto",
+//          "neto",
+//          "bultolista",
+//          "lista",
+//          "sugeridobulto",
+//          "sugerido",
+//          "pesable",
+//          "reposicionbuto",
+//          "reposicion",
+//          "margen",
+//          "unidad",
+//          "vtabulto",
+//          "vtaunidad"
+//        ]
+//        ,
+//        "filters":[
+//          `(line,idx,array) => {
+//            const ret = {};
+//            ret['nombre'] = line[0];
+//            ret.codigo = line[1];
+//            ret.bulto = line[3];
+//            ret.contiene = line[2];
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.sugeridobulto = line[10];
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.pesable = line[11];
+//            ret.reposicionbulto = line[12];
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            line[0] = ret.nombre;
+//            line[1] = ret.codigo + '';
+//            line[2] = ret.bulto;
+//            line[3] = ret.contiene;
+//            line[4] = ret.bultoneto;
+//            line[5] = ret.neto;
+//            line[6] = ret.bultolista;
+//            line[7] = ret.lista;
+//            line[8] = ret.sugeridobulto;
+//            line[9] = ret.sugerido;
+//            line[10] = ret.pesable;
+//            line[11] = ret.reposicionbulto;
+//            line[12] = ret.reposicion;
+//            line[13]= ret.margen;
+//            line[14]= "Kg";
+//            line[15]= ret.vtabulto;
+//            line[16]= ret.vtaunidad;
+//            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[10] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+//              return line;
+//        }`,
+//        `(line,idx,array) => {
+//          console.log("segundo",line,idx,array);
+//          if(!line[0]){
+//            if(array[idx-1]){
+//              array[idx][0] =  array[idx-1][0];
+//              line[0] = array[idx-1][0];
+//            }
+//          }
+//          console.log(line);
+//          return line;
+//        }`
+//      ]
+//        //"input_fields": [
+//        //  ,
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[1];
+//        //    ret.codigo = line[2];
+//        //    ret.bulto = line[3];
+//        //    ret.contiene = line[4];
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[1] = ret.nombre;
+//        //    line[2] = ret.codigo;
+//        //    line[3] = ret.bulto;
+//        //    line[4] = ret.contiene;
+//        //    line[5] = ret.bultoneto;
+//        //    line[6] = ret.neto;
+//        //    line[7] = ret.bultolista;
+//        //    line[8] = ret.lista;
+//        //    line[9] = ret.sugerido;
+//        //    line[10]= ret.reposicion;
+//        //    line[11]= ret.margen;
+//        //    line[12]= "Kg";
+//        //    if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//        //  }`
+//        //  ,
+//        //  `(line,idx,array) => {
+//        //    if(!line[1]){
+//        //      array[idx][1] = array[idx-1][1];
+//        //      line[1] = array[idx-1][1];
+//        //    }
+//        //    return line;
+//        //  }`
+//        //]
+//      },
+//      "NG PRO PLAN CAT":{
+//        "input_fields": [
+//          "nombre",
+//          "codigo",
+//          "contiene",
+//          "bulto",
+//          "bultoneto",
+//          "neto",
+//          "bultolista",
+//          "lista",
+//          "sugeridobulto",
+//          "sugerido",
+//          "pesable",
+//          "reposicionbuto",
+//          "reposicion",
+//          "margen",
+//          "unidad",
+//          "vtabulto",
+//          "vtaunidad"
+//        ]
+//        ,
+//        "filters":[
+//          `(line,idx,array) => {
+//            console.log(line)
+//            const ret = {};
+//            ret['nombre'] = line[0];
+//            ret.codigo = line[1];
+//            ret.bulto = line[3];
+//            ret.contiene = line[2];
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.sugeridobulto = line[10];
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.pesable = line[11];
+//            ret.reposicionbulto = line[12];
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            line[0] = ret.nombre;
+//            line[1] = ret.codigo + '';
+//            line[2] = ret.bulto;
+//            line[3] = ret.contiene;
+//            line[4] = ret.bultoneto;
+//            line[5] = ret.neto;
+//            line[6] = ret.bultolista;
+//            line[7] = ret.lista;
+//            line[8] = ret.sugeridobulto;
+//            line[9] = ret.sugerido;
+//            line[10] = ret.pesable;
+//            line[11] = ret.reposicionbulto;
+//            line[12] = ret.reposicion;
+//            line[13]= ret.margen;
+//            line[14]= "Kg";
+//            line[15]= ret.vtabulto;
+//            line[16]= ret.vtaunidad;
+////            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[10] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+//            if( line[1] && line[2] && line[3] && line[4])
+//              return line;
+//        }`,
+//        `(line,idx,array) => {
+//          console.log("segundo",line,idx,array);
+//          if(!line[0]){
+//            if(array[idx-1]){
+//              array[idx][0] =  array[idx-1][0];
+//              line[0] = array[idx-1][0];
+//            }
+//          }
+//          console.log(line);
+//          return line;
+//        }`
+//      ]
+//        //"input_fields": [
+//        //  ,
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[1];
+//        //    ret.codigo = line[2];
+//        //    ret.bulto = line[3];
+//        //    ret.contiene = line[4];
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[1] = ret.nombre;
+//        //    line[2] = ret.codigo;
+//        //    line[3] = ret.bulto;
+//        //    line[4] = ret.contiene;
+//        //    line[5] = ret.bultoneto;
+//        //    line[6] = ret.neto;
+//        //    line[7] = ret.bultolista;
+//        //    line[8] = ret.lista;
+//        //    line[9] = ret.sugerido;
+//        //    line[10]= ret.reposicion;
+//        //    line[11]= ret.margen;
+//        //    line[12]= "Kg";
+//        //    if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//        //  }`
+//        //  ,
+//        //  `(line,idx,array) => {
+//        //    if(!line[1]){
+//        //      array[idx][1] = array[idx-1][1];
+//        //      line[1] = array[idx-1][1];
+//        //    }
+//        //    return line;
+//        //  }`
+//        //]
+//      },
+//      '"NG PRO PLAN DOG"':{
+//        "input_fields": [
+//          "nombre",
+//          "codigo",
+//          "contiene",
+//          "bulto",
+//          "bultoneto",
+//          "neto",
+//          "bultolista",
+//          "lista",
+//          "sugeridobulto",
+//          "sugerido",
+//          "pesable",
+//          "reposicionbuto",
+//          "reposicion",
+//          "margen",
+//          "unidad",
+//          "vtabulto",
+//          "vtaunidad"
+//        ]
+//        ,
+//        "filters":[
+//          `(line,idx,array) => {
+//            const ret = {};
+//            ret['nombre'] = line[0];
+//            ret.codigo = line[1];
+//            ret.bulto = line[3];
+//            ret.contiene = line[2];
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.sugeridobulto = line[10];
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.pesable = line[11];
+//            ret.reposicionbulto = line[12];
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            line[0] = ret.nombre;
+//            line[1] = ret.codigo + '';
+//            line[2] = ret.bulto;
+//            line[3] = ret.contiene;
+//            line[4] = ret.bultoneto;
+//            line[5] = ret.neto;
+//            line[6] = ret.bultolista;
+//            line[7] = ret.lista;
+//            line[8] = ret.sugeridobulto;
+//            line[9] = ret.sugerido;
+//            line[10] = ret.pesable;
+//            line[11] = ret.reposicionbulto;
+//            line[12] = ret.reposicion;
+//            line[13]= ret.margen;
+//            line[14]= "Kg";
+//            line[15]= ret.vtabulto;
+//            line[16]= ret.vtaunidad;
+//            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[10] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+//              return line;
+//        }`,
+//        `(line,idx,array) => {
+//          console.log("segundo",line,idx,array);
+//          if(!line[0]){
+//            if(array[idx-1]){
+//              array[idx][0] =  array[idx-1][0];
+//              line[0] = array[idx-1][0];
+//            }
+//          }
+//          console.log(line);
+//          return line;
+//        }`
+//      ]
+//        //"input_fields": [
+//        //  ,
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[1];
+//        //    ret.codigo = line[2];
+//        //    ret.bulto = line[3];
+//        //    ret.contiene = line[4];
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[1] = ret.nombre;
+//        //    line[2] = ret.codigo;
+//        //    line[3] = ret.bulto;
+//        //    line[4] = ret.contiene;
+//        //    line[5] = ret.bultoneto;
+//        //    line[6] = ret.neto;
+//        //    line[7] = ret.bultolista;
+//        //    line[8] = ret.lista;
+//        //    line[9] = ret.sugerido;
+//        //    line[10]= ret.reposicion;
+//        //    line[11]= ret.margen;
+//        //    line[12]= "Kg";
+//        //    if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//        //  }`
+//        //  ,
+//        //  `(line,idx,array) => {
+//        //    if(!line[1]){
+//        //      array[idx][1] = array[idx-1][1];
+//        //      line[1] = array[idx-1][1];
+//        //    }
+//        //    return line;
+//        //  }`
+//        //]
+//      },
+////      'NG TIDY CATS':{
+//        //"input_fields": [
+//        //  ,
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[1];
+//        //    ret.codigo = line[2];
+//        //    ret.bulto = line[3];
+//        //    ret.contiene = line[4];
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[1] = ret.nombre;
+//        //    line[2] = ret.codigo;
+//        //    line[3] = ret.bulto;
+//        //    line[4] = ret.contiene;
+//        //    line[5] = ret.bultoneto;
+//        //    line[6] = ret.neto;
+//        //    line[7] = ret.bultolista;
+//        //    line[8] = ret.lista;
+//        //    line[9] = ret.sugerido;
+//        //    line[10]= ret.reposicion;
+//        //    line[11]= ret.margen;
+//        //    line[12]= "Kg";
+//        //    if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//        //  }`
+//        //  ,
+//        //  `(line,idx,array) => {
+//        //    if(!line[1]){
+//        //      array[idx][1] = array[idx-1][1];
+//        //      line[1] = array[idx-1][1];
+//        //    }
+//        //    return line;
+//        //  }`
+//        //]
+////      },
+//      "NG VETERINARY DIETS":{
+//        "input_fields": [
+//          "nombre",
+//          "codigo",
+//          "contiene",
+//          "bulto",
+//          "bultoneto",
+//          "neto",
+//          "bultolista",
+//          "lista",
+//          "sugeridobulto",
+//          "sugerido",
+//          "pesable",
+//          "reposicionbuto",
+//          "reposicion",
+//          "margen",
+//          "unidad",
+//          "vtabulto",
+//          "vtaunidad"
+//        ]
+//        ,
+//        "filters":[
+//          `(line,idx,array) => {
+//            const ret = {};
+//            ret['nombre'] = line[0];
+//            ret.codigo = line[1];
+//            ret.bulto = line[3];
+//            ret.contiene = line[2];
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.sugeridobulto = line[10];
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.pesable = line[11];
+//            ret.reposicionbulto = line[12];
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            line[0] = ret.nombre;
+//            line[1] = ret.codigo + '';
+//            line[2] = ret.bulto;
+//            line[3] = ret.contiene;
+//            line[4] = ret.bultoneto;
+//            line[5] = ret.neto;
+//            line[6] = ret.bultolista;
+//            line[7] = ret.lista;
+//            line[8] = ret.sugeridobulto;
+//            line[9] = ret.sugerido;
+//            line[10] = ret.pesable;
+//            line[11] = ret.reposicionbulto;
+//            line[12] = ret.reposicion;
+//            line[13]= ret.margen;
+//            line[14]= "Kg";
+//            line[15]= ret.vtabulto;
+//            line[16]= ret.vtaunidad;
+//            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[10] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+//              return line;
+//        }`,
+//        `(line,idx,array) => {
+//          console.log("segundo",line,idx,array);
+//          if(!line[0]){
+//            if(array[idx-1]){
+//              array[idx][0] =  array[idx-1][0];
+//              line[0] = array[idx-1][0];
+//            }
+//          }
+//          console.log(line);
+//          return line;
+//        }`
+//      ]
+//        //"input_fields": [
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    if(line[0] && !line[1] && !line[2] && !line[3] && !line[4] && !line[5] && !line[6] && !line[7] && !line[8]){
+//        //      console.log(line[0],array[idx])
+//        //      array[idx][9] = line[0]
+//        //    } else if(line[0] && line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && array[idx-1][9]) {
+//        //      line[9] = array[idx-1][9];
+//        //    }
+//        //    return line;
+//        //  }`,
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[0]+ ' ' + line[9];
+//        //    ret.codigo = line[1];
+//        //    ret.bulto = line[2];
+//        //    ret.contiene = line[3];
+//        //    ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//        //    ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[0] = ret.nombre;
+//        //    line[1] = ret.codigo;
+//        //    line[2] = ret.bulto;
+//        //    line[3] = ret.contiene;
+//        //    line[4] = ret.bultoneto;
+//        //    line[5] = ret.neto;
+//        //    line[6] = ret.bultolista;
+//        //    line[7] = ret.lista;
+//        //    line[8] = ret.sugerido;
+//        //    line[9] = ret.reposicion;
+//        //    line[10]= ret.margen;
+//        //    line[11]= "Kg";
+//        //    if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//        //  }`
+//        //  //,
+//        //  //`(line,idx,array) => {
+//        //  //  if(!line[0]){
+//        //  //    array[idx][0] = array[idx-1][0];
+//        //  //    line[0] = array[idx-1][0];
+//        //  //  }
+//        //  //  return line;
+//        //  //}`
+//        //]
+//      },
+////      'SUPERCOAT':{
+//        //"input_fields": [
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[0];
+//        //    ret.codigo = line[1];
+//        //    ret.bulto = line[2];
+//        //    ret.contiene = line[3];
+//        //    ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//        //    ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[0] = ret.nombre;
+//        //    line[1] = ret.codigo;
+//        //    line[2] = ret.bulto;
+//        //    line[3] = ret.contiene;
+//        //    line[4] = ret.bultoneto;
+//        //    line[5] = ret.neto;
+//        //    line[6] = ret.bultolista;
+//        //    line[7] = ret.lista;
+//        //    line[8] = ret.sugerido;
+//        //    line[9] = ret.reposicion;
+//        //    line[10]= ret.margen;
+//        //    line[11]= "Kg";
+//        //    if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//        //  }`
+//        //  ,
+//        //  `(line,idx,array) => {
+//        //    if(!line[0]){
+//        //      array[idx][0] = array[idx-1][0];
+//        //      line[0] = array[idx-1][0];
+//        //    }
+//        //    return line;
+//        //  }`
+//        //]
+////      },
+//      'Whole Earth Farms':{
+//        "input_fields": [
+//          "nombre",
+//          "codigo",
+//          "contiene",
+//          "bulto",
+//          "bultoneto",
+//          "neto",
+//          "bultolista",
+//          "lista",
+//          "sugeridobulto",
+//          "sugerido",
+//          "pesable",
+//          "reposicionbuto",
+//          "reposicion",
+//          "margen",
+//          "unidad",
+//          "vtabulto",
+//          "vtaunidad"
+//        ]
+//        ,
+//        "filters":[
+//          `(line,idx,array) => {
+//            const ret = {};
+//            ret['nombre'] = line[0];
+//            ret.codigo = line[1];
+//            ret.bulto = line[3];
+//            ret.contiene = line[2];
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.sugeridobulto = line[10];
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.pesable = line[11];
+//            ret.reposicionbulto = line[12];
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            line[0] = ret.nombre;
+//            line[1] = ret.codigo + '';
+//            line[2] = ret.bulto;
+//            line[3] = ret.contiene;
+//            line[4] = ret.bultoneto;
+//            line[5] = ret.neto;
+//            line[6] = ret.bultolista;
+//            line[7] = ret.lista;
+//            line[8] = ret.sugerido;
+//            line[11] = ret.reposicionbulto;
+//            line[12] = ret.reposicion;
+//            line[13]= ret.margen;
+//            line[14]= "Kg";
+//            line[15]= ret.vtabulto;
+//            line[16]= ret.vtaunidad;
+//            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[10] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+//              return line;
+//        }`,
+//        `(line,idx,array) => {
+//          console.log("segundo",line,idx,array);
+//          if(!line[0]){
+//            if(array[idx-1]){
+//              array[idx][0] =  array[idx-1][0];
+//              line[0] = array[idx-1][0];
+//            }
+//          }
+//          console.log(line);
+//          return line;
+//        }`
+//      ]
+//        //"input_fields": [
+//        //  "nombre",
+//        //  "codigo",
+//        //  "contiene",
+//        //  "bulto",
+//        //  "bultoneto",
+//        //  "neto",
+//        //  "bultolista",
+//        //  "lista",
+//        //  "sugerido",
+//        //  "reposicion",
+//        //  "margen",
+//        //  "unidad"
+//        //]
+//        //,
+//        //"filters":[
+//        //  `(line,idx,array) => {
+//        //    const ret = {};
+//        //    ret['nombre'] = line[0];
+//        //    ret.codigo = line[1];
+//        //    ret.bulto = line[2];
+//        //    ret.contiene = line[3];
+//        //    ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//        //    ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//        //    ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//        //    ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//        //    ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    line[0] = ret.nombre;
+//        //    line[1] = ret.codigo;
+//        //    line[2] = ret.bulto;
+//        //    line[3] = ret.contiene;
+//        //    line[4] = ret.bultoneto;
+//        //    line[5] = ret.neto;
+//        //    line[6] = ret.bultolista;
+//        //    line[7] = ret.lista;
+//        //    line[8] = ret.sugerido;
+//        //    line[9] = ret.reposicion;
+//        //    line[10]= ret.margen;
+//        //    line[11]= "Kg";
+//        //    if( line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9]) return line;
+//        //  }`
+//        //  ,
+//        //  `(line,idx,array) => {
+//        //    if(!line[0]){
+//        //      array[idx][0] = array[idx-1][0];
+//        //      line[0] = array[idx-1][0];
+//        //    }
+//        //    return line;
+//        //  }`
+//        //]
+//      },
+//      'NG DENTALIFE':{
+//        "input_fields": [
+//          "nombre",
+//          "codigo",
+//          "contiene",
+//          "bulto",
+//          "bultoneto",
+//          "neto",
+//          "bultolista",
+//          "lista",
+//          "sugeridobulto",
+//          "sugerido",
+//          "pesable",
+//          "reposicionbuto",
+//          "reposicion",
+//          "margen",
+//          "unidad",
+//          "vtabulto",
+//          "vtaunidad"
+//        ]
+//        ,
+//        "filters":[
+//          `(line,idx,array) => {
+//            const ret = {};
+//            ret['nombre'] = line[0];
+//            ret.codigo = line[1];
+//            ret.bulto = line[3];
+//            ret.contiene = line[2];
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.sugeridobulto = line[10];
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.pesable = isNaN(line[11]) ? false : true;
+//            ret.reposicionbulto = line[12];
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            line[0] = ret.nombre;
+//            line[1] = ret.codigo + '';
+//            line[2] = ret.bulto;
+//            line[3] = ret.contiene;
+//            line[4] = ret.bultoneto;
+//            line[5] = ret.neto;
+//            line[6] = ret.bultolista;
+//            line[7] = ret.lista;
+//            line[8] = ret.sugeridobulto;
+//            line[9] = ret.sugerido;
+//            line[10] = ret.pesable;
+//            line[11] = ret.reposicionbulto;
+//            line[12] = ret.reposicion;
+//            line[13]= ret.margen;
+//            line[14]= "Kg";
+//            line[15]= ret.vtabulto;
+//            line[16]= ret.vtaunidad;
+//            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[10] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
+//              return line;
+//          }`,
+//          `(line,idx,array) => {
+//            console.log("segundo",line,idx,array);
+//            if(!line[0]){
+//              if(array[idx-1]){
+//                array[idx][0] =  array[idx-1][0];
+//                line[0] = array[idx-1][0];
+//              }
+//            }
+//            console.log(line);
+//            return line;
+//          }`
+//        ]
+//
+//      },
+//    },
+//  },

@@ -120,6 +120,7 @@ export class CargalistasComponent implements OnInit, OnChanges {
           this.loadedfile['lastModified'] = result.file.lastModified;
           this.loadedfile['proveedor_id'] = this.provSettings[this.proveedor]._id;
           this.newData = this.data;
+          console.log(this.newData);
           this.collectionSize = this.newData.length;
         }
       });

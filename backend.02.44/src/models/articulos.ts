@@ -19,7 +19,8 @@ export interface IArticulo extends Document {
   d_raza: boolean;
   private_web: boolean;
   image: string;
-  images: string;
+  images: [];
+  videos: [];
   url: string;
   iva: number;
   margen: number;
@@ -49,7 +50,8 @@ const articuloSchema = new Schema({
   d_raza: {type: Boolean, default: false},
   private_web: {type: Boolean, default: false, index: true },
   image: { type: String, trim: true, required: false },
-  images: [],
+  images: [{ type: String, trim: true, required: false }],
+  videos:[{ type: String, trim: true, required: false }],
   url: { type: String, trim: true, required: false, default:'' },
   iva: {type:Number, default: 0},
   margen: { type: Number, default: 35},
