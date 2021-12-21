@@ -15,27 +15,101 @@ export const proveedoresSettings = [
         "input_fields": [
           "codigo",
           "nombre",
-          "reposicion",
+          "vinput",
+          "vbulto",
+          "vunidad",
+          "fabricante",
+          "marca",
+          "name",
+          "especie",
+          "edad",
+          "rubro",
+          "linea",
+          "raza",
+          "nbulto",
+          "presentacion",
+          "unidad"
         ]
         ,
         "filters":[
           `(line,idx,array) => {
-            const ret = {};
-            ret.codigo = line[0];
-            ret['nombre'] = line[1];
-            if(line[2]){
-              line[2] = line[2].replace(/[,]/g,'.');
-              line[2] = line[2].replace(/[$ ]/g,'');
-              let reposicion = line[2] ? line[2].match(/(?<value>[0-9\.]*)/) : null;
-              if (reposicion){
-                reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
+            if(line[20] && line[20] === 1){
+              const ret = {};
+              if (!line[0]){
+                if(line[1])
+                  ret.codigo = line[0] ? line[0]+'' : (line[1]).replace(/[ ]/g,'');
+              } else {
+                ret.codigo = line[0]+'';
               }
-              ret['reposicion'] = reposicion;
+
+              ret.descripcion = line[1];
+              ret.input = {};
+              //if(line[15]){
+              //  line[15] = line[15].replace(/[,]/g,'.');
+              //  line[15] = line[15].replace(/[$ ]/g,'');
+              //  let reposicion = line[15] ? line[15].match(/(?<value>[0-9\.]*)/) : null;
+              //  if (reposicion){
+              //    reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
+              //  }
+              //  ret.input.lista = reposicion;
+              //}
+              ret.input.lista =  isNaN(line[15]) ? null : Math.round(line[15]*100)/100;
+              ret.input.reposicion = isNaN(line[21]) ? null : Math.round(line[21]*100)/100;
+              ret.input.promo = isNaN(line[22]) ? null : Math.round(line[22]*100)/100;
+              ret.input.base = isNaN(line[23]) ? null : Math.round(line[23]*100)/100;
+              ret.input.oferta = isNaN(line[24]) ? null : Math.round(line[24]*100)/100;
+              ret.input.sugerido = isNaN(line[25]) ? null : Math.round(line[25]*100)/100;
+              ret.input.peso = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+              ret.input.unidades = isNaN(line[27]) ? null : Math.round(line[27]*100)/100;
+              ret.input.pesable = isNaN(line[28]) ? null : Math.round(line[28]*100)/100;
+
+              ret.vbulto = {
+                margen:  isNaN(line[33]) ? array[4][36] : line[33],
+                tarjeta: isNaN(line[34]) ? null : Math.round(line[34]*100)/100,
+                debito: isNaN(line[35]) ? null : Math.round(line[35]*100)/100,
+                efectivo: isNaN(line[36]) ? null : Math.round(line[36]*100)/100,
+                descuento1: isNaN(line[37]) ? null : Math.round(line[37]*100)/100,
+                descuento2: isNaN(line[38]) ? null : Math.round(line[38]*100)/100
+              };
+              ret.vunidad = {
+                margen:  isNaN(line[40]) ? array[4][43] : line[40],
+                tarjeta: isNaN(line[41]) ? null : Math.round(line[41]*100)/100,
+                debito: isNaN(line[42]) ? null : Math.round(line[42]*100)/100,
+                efectivo: isNaN(line[43]) ? null : Math.round(line[43]*100)/100,
+                descuento1: isNaN(line[44]) ? null : Math.round(line[44]*100)/100,
+                descuento2: isNaN(line[45]) ? null : Math.round(line[45]*100)/100
+              };
+              ret.fabricante = line[52];
+              ret.marca = line[53];
+              ret.name = line[54];
+              ret.especie = line[55];
+              ret.edad = line[56];
+              ret.rubro = line[57];
+              ret.linea = line[58];
+              ret.raza = line[59];
+              ret.bulto = line[60];
+              ret.presentacion = line[61];
+              ret.unidad = line[62];
+
+              line[0] = ret.codigo;
+              line[1] = ret.descripcion;
+              line[2] = ret.input;
+              line[3] = ret.vbulto;
+              line[4] = ret.vunidad;
+              line[5] = ret.fabricante;
+              line[6] = ret.marca;
+              line[7] = ret.name;
+              line[8] = ret.especie;
+              line[9] = ret.edad;
+              line[10] = ret.rubro;
+              line[11] = ret.linea;
+              line[12] = ret.raza;
+              line[13] = ret.bulto;
+              line[14] = ret.presentacion;
+              line[15] = ret.unidad;
+              if( line[0] && line[1] && line[2] && line[3] )
+                return line;
             }
-            line[0] = ret.codigo;
-            line[1] = ret.nombre;
-            line[2] = ret.reposicion;
-            if( line[0] && line[1] && line[2]) return line;
           }`
         ]
       }
@@ -50,77 +124,103 @@ export const proveedoresSettings = [
     "input": {
       "*":{
         "input_fields": [
-          "nombre",
+          "descripcion",
           "codigo",
-          "contiene",
+          "vinput",
+          "vbulto",
+          "vunidad",
+          "fabricante",
+          "marca",
+          "name",
+          "especie",
+          "edad",
+          "rubro",
+          "linea",
+          "raza",
           "bulto",
-          "bultoneto",
-          "neto",
-          "bultolista",
-          "lista",
-          "sugeridobulto",
-          "sugerido",
-          "pesable",
-          "reposicionbuto",
-          "reposicion",
-          "margen",
-          "unidad",
-          "vtabulto",
-          "vtaunidad"
+          "presentacion",
+          "unidad"
         ]
         ,
         "filters":[
           `(line,idx,array) => {
-            const ret = {};
-            ret['nombre'] = line[0];
-            ret.codigo = line[1];
-            ret.bulto = line[3];
-            ret.contiene = line[2];
-            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-            ret.sugeridobulto = isNaN(line[10]) ? null : Math.round(line[10]*100)/100;;
-            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-            ret.pesable = isNaN(line[11]) ? 0 : line[11];
-            ret.reposicionbulto = isNaN(line[12]) ? null : Math.round(line[12]*100)/100;;
-            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-            ret.vtaunidad = isNaN(line[26]) ? null : line[26]; //Math.round(line[26]*100)/100;
-            line[0] = ret.nombre;
-            line[1] = ret.codigo + '';
-            line[3] = ret.bulto;
-            line[2] = ret.contiene;
-            line[4] = ret.bultoneto;
-            line[5] = ret.neto;
-            line[6] = ret.bultolista;
-            line[7] = ret.lista;
-            line[8] = ret.sugeridobulto;
-            line[9] = ret.sugerido;
-            line[10] = ret.pesable;
-            line[11] = ret.reposicionbulto;
-            line[12] = ret.reposicion;
-            line[13]= ret.margen;
-            line[14]= "Kg";
-            line[15]= ret.vtabulto;
-            line[16]= ret.vtaunidad;
-            if( line[1] && line[2] && line[3] && line[4] && line[5] && line[6] && line[7] && line[8] && line[9] && line[11] && line[12] && line[13] && line[14] && line[15] && line[16])
-              return line;
-        }`,
-        `(line,idx,array) => {
-          if(!line[0]){
-            if(array[idx-1]){
-              array[idx][0] =  array[idx-1][0];
-              line[0] = array[idx-1][0];
-            } else line[0] = "error";
-          }
-          return line;
-        }`
-      ]
+            if(line[20] && line[20] === 1){
+              const ret = {};
+              ret.codigo = line[1]+'';
+
+              ret.descripcion = line[0];
+              ret.input = {};
+              ret.input.lista =  isNaN(line[15]) ? null : Math.round(line[15]*100)/100;
+              ret.input.reposicion = isNaN(line[21]) ? null : Math.round(line[21]*100)/100;
+              ret.input.promo = isNaN(line[22]) ? null : Math.round(line[22]*100)/100;
+              ret.input.base = isNaN(line[23]) ? null : Math.round(line[23]*100)/100;
+              ret.input.oferta = isNaN(line[24]) ? null : Math.round(line[24]*100)/100;
+              ret.input.sugerido = isNaN(line[25]) ? null : Math.round(line[25]*100)/100;
+              ret.input.peso = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+              ret.input.unidades = isNaN(line[27]) ? null : Math.round(line[27]*100)/100;
+              ret.input.pesable = isNaN(line[28]) ? null : Math.round(line[28]*100)/100;
+
+              ret.vbulto = {
+                margen:  isNaN(line[33]) ? array[4][36] : line[33],
+                tarjeta: isNaN(line[34]) ? null : Math.round(line[34]*100)/100,
+                debito: isNaN(line[35]) ? null : Math.round(line[35]*100)/100,
+                efectivo: isNaN(line[36]) ? null : Math.round(line[36]*100)/100,
+                descuento1: isNaN(line[37]) ? null : Math.round(line[37]*100)/100,
+                descuento2: isNaN(line[38]) ? null : Math.round(line[38]*100)/100
+              };
+              ret.vunidad = {
+                margen:  isNaN(line[40]) ? array[4][43] : line[40],
+                tarjeta: isNaN(line[41]) ? null : Math.round(line[41]*100)/100,
+                debito: isNaN(line[42]) ? null : Math.round(line[42]*100)/100,
+                efectivo: isNaN(line[43]) ? null : Math.round(line[43]*100)/100,
+                descuento1: isNaN(line[44]) ? null : Math.round(line[44]*100)/100,
+                descuento2: isNaN(line[45]) ? null : Math.round(line[45]*100)/100
+              };
+              ret.fabricante = line[52];
+              ret.marca = line[53];
+              ret.name = line[54];
+              ret.especie = line[55];
+              ret.edad = line[56];
+              ret.rubro = line[57];
+              ret.linea = line[58];
+              ret.raza = line[59];
+              ret.bulto = line[60];
+              ret.presentacion = line[61];
+              ret.unidad = line[62];
+              const pattern = new RegExp(/^\\s+|\\s+$/,'gm');
+              line[1] = ret.codigo;
+              line[0] = ret.descripcion ? ret.descripcion.replace(pattern,'') : ret.descripcion;
+              line[2] = ret.input;
+              line[3] = ret.vbulto;
+              line[4] = ret.vunidad;
+              line[5] = ret.fabricante;
+              line[6] = ret.marca;
+              line[7] = ret.name;
+              line[8] = ret.especie;
+              line[9] = ret.edad;
+              line[10] = ret.rubro;
+              line[11] = ret.linea;
+              line[12] = ret.raza;
+              line[13] = ret.bulto;
+              line[14] = ret.presentacion;
+              line[15] = ret.unidad;
+              if( line[0] && line[1] && line[2] && line[3] )
+                return line;
+            }
+          }`,
+          `(line,idx,array) => {
+            if(!line[0]){
+              if(array[idx-1]){
+                array[idx][0] =  array[idx-1][0];
+                line[0] = array[idx-1][0];
+              } else line[0] = "error";
+            }
+            return line;
+          }`
+        ]
+      }
     }
-  }
-},
+  },
   {
     "_id": '5f401a8f4e0d2b3e5371c664',
     "nombre": "Dumas",
@@ -164,7 +264,6 @@ export const proveedoresSettings = [
             if(line[0] && line[1] && line[9]) return line;
           }`
         ]
-
       },
       "ALIMENTOS":{
         "input_fields":[

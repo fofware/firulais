@@ -5,7 +5,7 @@ export interface IProveedoresArticulos extends Document {
   codigo: string;
   ean?: string;
   producto?: object;
-  hojo: string;
+  hoja: string;
   nombre: string;
   bulto?: number;
   contiene?: number;

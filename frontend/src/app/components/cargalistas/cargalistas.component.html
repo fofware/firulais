@@ -134,7 +134,7 @@
                     <div class="input-group-prepend">
                       <div class="input-group-text">Nombre</div>
                     </div>
-                    <input type="text" class="form-control" id="nombre_{{i}}" placeholder="Nombre" [(ngModel)]="item.nombre">
+                    <input type="text" class="form-control" id="nombre_{{i}}" placeholder="Nombre" [(ngModel)]="item.descripcion">
                   </div>
                 </div>
               </div>
@@ -145,7 +145,7 @@
                       <div class="input-group-text">Bulto</div>
                     </div>
                     <input type="text" class="form-control text-right" id="bulto_{{i}}" placeholder="Bulto"
-                      [(ngModel)]="item.bulto">
+                      [(ngModel)]="item.vinput.unidades">
                   </div>
                 </div>
                 <div class="col-sm-4 col-md-3 col-lg-2 col-xl-3">
@@ -154,7 +154,7 @@
                       <div class="input-group-text">Contiene</div>
                     </div>
                     <input type="text" class="form-control text-right" id="contiene_{{i}}" placeholder="Contiene"
-                      [(ngModel)]="item.contiene">
+                      [(ngModel)]="item.vinput.peso">
                   </div>
                 </div>
                 <div class="col-sm-4 col-md-2 col-lg-2 col-xl-3">
