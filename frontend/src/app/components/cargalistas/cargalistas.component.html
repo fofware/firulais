@@ -44,6 +44,7 @@
 </header>
 <div id='main'>
   <article>
+    <!--
     <ngb-accordion #a="ngbAccordion" activeIds="custom-panel-1">
       <ngb-panel id="custom-panel-1">
         <ng-template ngbPanelHeader let-opened="opened">
@@ -107,9 +108,11 @@
           </div>
         </ng-template>
         <ng-template ngbPanelContent>
+        -->
           <div class="card-container">
             <div class="card  pt-2 pl-2 pr-2 mb-2 mycolor1 col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 no-gutters"
-              *ngFor="let item of newData | slice: (page-1) * pageSize : page * pageSize; index as i">
+              *ngFor="let item of newData; index as i">
+              <!--*ngFor="let item of newData | slice: (page-1) * pageSize : page * pageSize; index as i"-->
               <div class="form-row align-items-center">
                 <div class="col">
                   <div class="input-group mb-2">
@@ -134,11 +137,11 @@
                     <div class="input-group-prepend">
                       <div class="input-group-text">Nombre</div>
                     </div>
-                    <input type="text" class="form-control" id="nombre_{{i}}" placeholder="Nombre" [(ngModel)]="item.descripcion">
+                    <input type="text" class="form-control" id="nombre_{{i}}" placeholder="Nombre" [(ngModel)]="item.nombre">
                   </div>
                 </div>
               </div>
-              <div class="form-row align-items-center justify-content-end">
+              <!--div class="form-row align-items-center justify-content-end">
                 <div class="col-sm-3 col-md-2 col-lg-2 col-xl-3">
                   <div class="input-group mb-2">
                     <div class="input-group-prepend">
@@ -171,24 +174,49 @@
                       <div class="input-group-text">Reposición</div>
                     </div>
                     <input type="text" class="form-control text-right" id="reposicion_{{i}}" placeholder="Reposición"
-                      [(ngModel)]="item.reposicion">
+                      [(ngModel)]="item.vinput.reposicion">
                   </div>
                 </div>
                 <div class="col-sm-5 col-md-4 col-lg-3 col-xl-5">
                   <div class="input-group mb-2">
                     <div class="input-group-prepend">
-                      <div class="input-group-text">Sugerido  </div>
+                      <div class="input-group-text">Precio  </div>
                     </div>
                     <input type="text" class="form-control text-right" id="sugerido_{{i}}" placeholder="Sugerido"
-                      [(ngModel)]="item.sugerido">
+                      [(ngModel)]="item.vbulto.efectivo">
                   </div>
                 </div>
-              </div>
+              </div-->
+              <table>
+                <tr *ngFor="let prod of item.productos">
+                  <td>
+                    <span *ngIf="item.fabricante">{{item.fabricante}} </span>
+                    <span *ngIf="item.marca">{{item.marca}} </span>
+                    <span *ngIf="item.name">{{item.name}} </span>
+                    <span *ngIf="item.especie">{{item.especie}} </span>
+                    <span *ngIf="item.edad">{{item.edad}} </span>
+                    <span *ngIf="item.raza">Mord.{{item.raza}} </span>
+                    <span > {{prod.name}} </span>
+                    <span > {{prod.contiene}} </span>
+                    <span > {{prod.unidad}} </span>
+                    <span *ngIf="item.rubro"> {{item.rubro}} </span>
+                    <span *ngIf="item.linea"> {{item.linea}} </span>
+                  </td>
+                  <td align="right"> {{prod.tarjeta}} </td>
+                  <td align="right"> {{prod.debito}} </td>
+                  <td align="right" *ngIf="prod.oferta" class="oferta-color"> {{prod.efectivo}} </td>
+                  <td align="right" *ngIf="!prod.oferta"> {{prod.efectivo}} </td>
+                  <td align="right"> {{prod.descuento1}} </td>
+                  <td align="right"> {{prod.descuento2}} </td>
+                </tr>
+              </table>
             </div>
           </div>
+        <!--
         </ng-template>
       </ngb-panel>
     </ngb-accordion>
+  -->
   </article>
   <!--nav>
     nav menu

@@ -82,6 +82,9 @@ import { ProdCardViewKartComponent } from './components/prod-card-view-kart/prod
 import { ProveedorProductoFilterPipe } from './pipes/proveedor-producto-filter.pipe';
 import { ProductoLinkSetComponent } from './components/producto-link-set/producto-link-set.component';
 import { MarcasComponent } from './components/marcas/marcas.component';
+import { ProveedoresComponent } from './components/proveedores/proveedores.component';
+import { ProveedoresModalFormComponent } from './components/proveedores-modal-form/proveedores-modal-form.component';
+import { ArticuloLinkProductoComponent } from './components/articulo-link-producto/articulo-link-producto.component';
 
 @NgModule({
   declarations: [
@@ -160,6 +163,9 @@ import { MarcasComponent } from './components/marcas/marcas.component';
     ProveedorProductoFilterPipe,
     ProductoLinkSetComponent,
     MarcasComponent,
+    ProveedoresComponent,
+    ProveedoresModalFormComponent,
+    ArticuloLinkProductoComponent,
   ],
   imports: [
     BrowserModule,

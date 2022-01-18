@@ -7,22 +7,32 @@ export interface IProveedoresArticulos extends Document {
   producto?: object;
   hoja: string;
   nombre: string;
-  bulto?: number;
-  contiene?: number;
+  vinput: object;
+  vbulto: object;
+  vunidad: object;
+  nbulto?: string;
+  presentacion?: string;
+  fabricante?: string;
+  marca?: string;
+  neme?: string;
+  especie?: string;
+  rubro?: string;
+  linea?: string;
+  raza?: string;
   unidad?: string;
 }
 
 const ProveedoresArticulosSchema = new Schema({
   proveedor: {                        // id del proveedor
     type: Schema.Types.ObjectId
-    ,ref: "Persona"
+    ,ref: "Proveedores"
     ,$id: '_id'
     ,required: true
   }
   ,codigo: {                          // codigo del producto en el proveedor
     type: String
     , trim: true
-    , required: true 
+    , required: true
     , index: true
   }
   ,ean: {                             // codigo EAN (código de barras)
@@ -47,27 +57,40 @@ const ProveedoresArticulosSchema = new Schema({
   }
   , hoja: { type: String, trim: true, requierd: false, default: null }
   , nombre: { type: String, trim: true, requierd: false }
-  , bulto: { 
-    type: Number
-    , default: null 
-    , index: true
-  }
-  , contiene: { 
-    type: Number
-    , default: null 
-    , index: true
-  }
-  , unidad: { 
-    type: String
-    , default: null 
-  }
+  , vinput: {}
+  , vbulto: {}
+  , vunidad: {}
+  , nbulto: { type: String, default: null, index: true }
+  , presentacion: { type: String, default: null, index: true }
+  , unidad: { type: String, default: null, index: true  }
+  , fabricante: { type: String, default: null, index: true  }
+  , marca: { type: String, default: null, index: true  }
+  , name: { type: String, default: null, index: true  }
+  , especie: { type: String, default: null, index: true  }
+  , edad: { type: String, default: null, index: true  }
+  , rubro: { type: String, default: null, index: true  }
+  , linea: { type: String, default: null, index: true  }
+  , raza: { type: String, default: null, index: true  }
+  , clase: { type: Number, default: null, index: true  }
 },{
   timestamps: true,
-  versionKey: false
+  versionKey: false,
+  strict: false
 });
 
 ProveedoresArticulosSchema.index(
-  { nombre : "text" },
+  { 
+    nombre : "text",
+    fabricante: "text",
+    marca: "text",
+    rubro: "text",
+    linea: "text",
+    especie: "text",
+    edad: "text",
+    raza: "text",
+    name: "text",
+    tags: "text"
+  },
   { default_language: "spanish" }
 )
 

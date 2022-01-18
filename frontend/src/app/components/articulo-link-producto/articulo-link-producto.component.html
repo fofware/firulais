@@ -1,0 +1,41 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{articulo.fullName}} {{producto.name}} {{producto.contiene}} {{producto.unidad}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="">
+  <input type="text" name="marca" (input)="filter()" [(ngModel)]="filtro.fabricante" placeholder="Fabricante">
+  <input type="text" name="marca" (input)="filter()" [(ngModel)]="filtro.marca" placeholder="Marca">
+  <input type="text" name="name" (input)="filter()" [(ngModel)]="filtro.name" placeholder="Nombre">
+  <input type="text" name="especie" (input)="filter()" [(ngModel)]="filtro.especie" placeholder="Especie">
+  <input type="text" name="edad" (input)="filter()" [(ngModel)]="filtro.edad" placeholder="Edad">
+  <input type="text" name="raza" (input)="filter()" [(ngModel)]="filtro.raza" placeholder="Mordida">
+  <input type="text" name="rubro" (input)="filter()" [(ngModel)]="filtro.rubro" placeholder="Rubro">
+  <input type="text" name="linea" (input)="filter()" [(ngModel)]="filtro.linea" placeholder="Linea">
+  <input type="text" name="unidades" (input)="filter()" [(ngModel)]="filtro.unidades" placeholder="Unidades">
+  <input type="text" name="peso" (input)="filter()" [(ngModel)]="filtro.peso" placeholder="Peso">
+  <input type="checkbox" value="" id="flexCheckDefault" (change)="filter()" [(ngModel)]="filtro.link">
+  <label class="form-check-label" for="flexCheckDefault">Sin link</label>
+  <input type="text" name="provItem" (input)="filter()" [(ngModel)]="filtro.itemSearchProdProv" placeholder="Descripción Proveedor">
+</div>
+<div class="modal-body">
+  <table border="1" width="100%">
+    <!--tr class="{{reg.class}}" *ngFor="let reg of dbProvProd | proveedorProductoFilter: itemSearchProdProv;index as i;"-->
+    <tbody>
+      <tr *ngFor="let reg of dbProvProd;index as i;" class="{{reg.class}}" >
+        <td>
+          <input type="checkbox" value='{{i}}' (change)='toggleCheck($event,reg)'>
+        </td>
+        <td>{{reg.nombre}}</td>
+        <td>{{reg.productos.name}}</td>
+        <td>{{reg.productos.contiene}}</td>
+        <td>{{reg.productos.unidad}}</td>
+        <td>{{reg.proveedor.nombre}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-light" (click)="activeModal.close('Close click')">Close</button>
+</div>

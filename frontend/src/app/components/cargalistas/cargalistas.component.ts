@@ -1,4 +1,5 @@
 import { HttpClient } from '@angular/common/http';
+import { ClassMethod } from '@angular/compiler';
 import { Component, OnChanges, OnInit, ViewEncapsulation } from '@angular/core';
 import { NgbAccordionConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { isString } from '@ng-bootstrap/ng-bootstrap/util/util';
@@ -28,7 +29,16 @@ export class CargalistasComponent implements OnInit, OnChanges {
   ApiUri = API_URI;
   wait = false;
   searchItem = '';
-
+  options: {
+    fabricante: [],
+    marca: [],
+    name: [],
+    edad: [],
+    especie: [],
+    raza: [],
+    rubro: [],
+    linea: []
+  }
   selectedIdx: number = null;
   selectedReg: any = {};
   articuloList: any[] = [];
@@ -119,51 +129,167 @@ export class CargalistasComponent implements OnInit, OnChanges {
           this.loadedfile['filename'] = result.file.name;
           this.loadedfile['lastModified'] = result.file.lastModified;
           this.loadedfile['proveedor_id'] = this.provSettings[this.proveedor]._id;
-          this.newData = this.data;
-          console.log(this.newData);
+          await this.transformData();
+          //this.newData = this.data;
+          console.log("New Data",this.newData);
           this.collectionSize = this.newData.length;
         }
       });
-
     }
+  }
+
+  async transformData(){
+    console.log("Source Data",this.data);
+    this.newData = [];
+    const tempData = [];
+
+    for (let i = 0; i < this.data.length; i++) {
+      const e = this.data[i];
+      const art = {};
+      art['codigo'] = e.codigo;
+      art['proveedor'] = e.proveedor;
+      art['hoja'] = e.hoja;
+      art['nombre'] = e.nombre;
+      art['fabricante'] = e.fabricante;
+      art['marca'] = e.marca;
+      art['name'] = e.name;
+      art['especie'] = e.especie;
+      art['edad'] = e.edad;
+      art['raza'] = e.raza;
+      art['rubro'] = e.rubro;
+      art['linea'] = e.linea;
+      art['unidades'] = e.unidades;
+      art['peso'] = e.peso;
+      art['pesable'] = e.pesable;
+      art['ean'] = e.ean ? e.ean : null;
+
+      const productos = [];
+
+      if(e.unidades > 1){
+        const prod = {};
+        prod['codigo'] = e.codigo;
+        prod['ean'] = e.ean ? e.ean : null;
+        prod['name'] = e.nbulto;
+        prod['contiene'] = e.unidades;
+        prod['unidad'] = e.presentacion+" "+ e.peso + ' ' + e.unidad;
+        prod['margen'] = e.vbulto.margen;
+        prod['tarjeta'] = e.vbulto.tarjeta;
+        prod['debito'] = e.vbulto.debito;
+        prod['efectivo'] = e.vbulto.efectivo;
+        prod['descuento1'] = e.vbulto.descuento1;
+        prod['descuento2'] = e.vbulto.descuento2;
+        prod['base'] = e.vinput.base;
+        prod['lista'] = e.vinput.lista;
+        prod['oferta'] = e.vinput.oferta;
+        prod['promo'] = e.vinput.promo;
+        prod['reposicion'] = e.vinput.reposicion;
+        prod['sugerido'] = e.vinput.sugerido*e.unidades;
+        prod['unidades'] = e.unidades;
+        prod['pesable'] = 0
+        prod['coeficiente'] = 1;
+        prod['unidades'] = e.unidades
+        productos.push(prod);
+        const prod1 = {};
+        prod1['codigo'] = e.codigo;
+        prod1['ean'] = e.ean ? e.ean : null;
+        prod1['name'] = e.presentacion;
+        prod1['contiene'] = e.peso;
+        prod1['unidad'] = e.unidad;
+        prod1['margen'] = e.vunidad.margen;
+        prod1['tarjeta'] = e.vunidad.tarjeta;
+        prod1['debito'] = e.vunidad.debito;
+        prod1['efectivo'] = e.vunidad.efectivo;
+        prod1['descuento1'] = e.vunidad.descuento1;
+        prod1['descuento2'] = e.vunidad.descuento2;
+        prod1['base'] = Math.ceil(e.vinput.base/e.unidades);
+        prod1['lista'] = Math.ceil(e.vinput.lista/e.unidades);
+        prod1['oferta'] = e.vinput.oferta;
+        prod1['reposicion'] = Math.ceil(e.vinput.reposicion/e.unidades);
+        prod1['sugerido'] = e.vinput.sugerido;
+        prod1['pesable'] = 0
+        prod1['coeficiente'] = 1;
+        prod1['unidades'] = 1
+        productos.push(prod1);
+      } else {
+        const prod = {};
+        prod['codigo'] = e.codigo;
+        prod['ean'] = e.ean ? e.ean : null;
+        prod['name'] = e.presentacion;
+        prod['contiene'] = e.peso;
+        prod['unidad'] = e.unidad;
+        prod['margen'] = e.vbulto.margen;
+        prod['tarjeta'] = e.vbulto.tarjeta;
+        prod['debito'] = e.vbulto.debito;
+        prod['efectivo'] = e.vbulto.efectivo;
+        prod['descuento1'] = e.vbulto.descuento1;
+        prod['descuento2'] = e.vbulto.descuento2;
+        prod['base'] = Math.ceil(e.vinput.base/e.unidades);
+        prod['lista'] = Math.ceil(e.vinput.lista/e.unidades);
+        prod['oferta'] = e.vinput.oferta;
+        prod['reposicion'] = Math.ceil(e.vinput.reposicion/e.unidades);
+        prod['sugerido'] = e.vinput.sugerido;
+        prod['pesable'] = 0
+        prod['coeficiente'] = 1;
+        prod['unidades'] = 1
+        productos.push(prod);
+      }
+      if(e.pesable === 1){
+        const prod = {};
+        prod['codigo'] = e.codigo;
+        prod['ean'] = e.ean ? e.ean : null;
+        prod['name'] = "x";
+        prod['contiene'] = 1;
+        prod['unidad'] = e.unidad;
+        prod['margen'] = e.vunidad.margen;
+        prod['tarjeta'] = e.vunidad.tarjeta;
+        prod['debito'] = e.vunidad.debito;
+        prod['efectivo'] = e.vunidad.efectivo;
+        prod['descuento1'] = e.vunidad.descuento1;
+        prod['descuento2'] = e.vunidad.descuento2;
+        prod['base'] = Math.ceil(e.vinput.base/e.unidades/e.peso);
+        prod['lista'] = Math.ceil(e.vinput.lista/e.unidades/e.peso);
+        prod['reposicion'] = Math.ceil(e.vinput.reposicion/e.unidades/e.peso);
+        prod['pesable'] = 1
+        prod['coeficiente'] = 1/e.peso;
+        prod['unidades'] = 1
+        productos.push(prod);
+      }
+      art['productos'] = productos;
+      tempData.push(art);
+    }
+    this.newData = tempData;
   }
 
   async importArticulos(){
     let promesas = [];
     try {
-      const lista:any = await this.procesaLista.checkLista(this.loadedfile);
+      //const lista:any = await this.procesaLista.checkLista(this.loadedfile);
+      //console.log(lista);
       let productoNuevo = 0;
       let precioNuevo = 0;
       for (const reg of this.newData) {
         const producto:any = await this.procesaLista.addProducto(reg);
-        if( producto.new )
-          productoNuevo++;
+        if( producto.lastErrorObject.updatedExisting === false ) productoNuevo++;
 
-        console.log( producto );
+        //console.log(producto);
+        /*
         const setPrecio = {
-          proveedor_lista_id: lista._id,
+          proveedor_lista_id: lista.value._id,
           proveedor_id: reg.proveedor,
-          proveedor_articulo: producto._id,
+          proveedor_articulo: producto.value._id,
           producto_id: reg.producto,
-          lista: reg.lista,
-          reposicion: reg.reposicion,
+          vinput: reg.vinput,
+          vbulto: reg.vbulto,
+          vunidad: reg.vunidad,
         }
         const precioStatus = await this.procesaLista.setprecio(setPrecio);
-        console.log( precioStatus );
+        //console.log( precioStatus );
+        */
       }
       console.log(`Productos en Lista: ${this.newData.length} - Nuevos: ${productoNuevo}`)
-
     } catch (error) {
       console.log(error);
     }
-    /*
-    try {
-      const result = Promise.all(promesas);
-      console.log(result);
-    } catch (error) {
-      console.error(error);
-    }
-    */
   }
 
   async initData() {

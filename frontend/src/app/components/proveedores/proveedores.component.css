@@ -1,0 +1,17 @@
+header{
+  display: block;
+  margin: 0px;
+  padding: 5px;
+  min-height: 50px;
+  max-height: fit-content;
+  border: 1px solid #222222;
+/*
+  border-radius: 7pt;
+  border-start-start-radius: 7pt;
+*/
+  background: #444444;
+  -webkit-flex: 3 1 -1%;
+          flex: 3 1 -1%;
+  -webkit-order: 1;
+          order: 1;
+}

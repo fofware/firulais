@@ -2,14 +2,25 @@
   <app-top-menu></app-top-menu>
   <div class="row" [hidden]='stage !== 0'>
     <div class="col-6">
-      <select name="proveedor"  [(ngModel)]="proveedor">
+      <select name="proveedor"  [(ngModel)]="filtro.proveedor" (change)="filter()">
         <option value=""></option>
         <option *ngFor="let val of provSettings; index as i"  value="{{val._id}}" >{{val.nombre}}</option>
       </select>
+      <input type="text" name="marca" (input)="filter()" [(ngModel)]="filtro.marca" placeholder="Marca">
+      <input type="text" name="name" (input)="filter()" [(ngModel)]="filtro.name" placeholder="Nombre">
+      <input type="text" name="especie" (input)="filter()" [(ngModel)]="filtro.especie" placeholder="Especie">
+      <input type="text" name="edad" (input)="filter()" [(ngModel)]="filtro.edad" placeholder="Edad">
+      <input type="text" name="raza" (input)="filter()" [(ngModel)]="filtro.raza" placeholder="Mordida">
+      <input type="text" name="rubro" (input)="filter()" [(ngModel)]="filtro.rubro" placeholder="Rubro">
+      <input type="text" name="linea" (input)="filter()" [(ngModel)]="filtro.linea" placeholder="Linea">
+      <input type="text" name="unidades" (input)="filter()" [(ngModel)]="filtro.unidades" placeholder="Unidades">
+      <input type="text" name="peso" (input)="filter()" [(ngModel)]="filtro.peso" placeholder="Peso">
+      <input type="checkbox" value="" id="flexCheckDefault" (change)="filter()" [(ngModel)]="filtro.link">
+      <label class="form-check-label" for="flexCheckDefault">Sin link</label>
+      <button (click)="mezclar">Mezclar</button>
       <div>
-        <input type="text" name="searchProveedoProducto" (input)="provProdSearch()" [(ngModel)]="itemSearchProdProv">
+        <input type="text" name="searchProveedoProducto" (input)="filter()" [(ngModel)]="filtro.itemSearchProdProv" placeholder="Buscar por descripción">
       </div>
-
     </div>
     <div class="col-6">
       <div class="form-control">
@@ -36,17 +47,39 @@
 </header>
 <div id='main' (window:resize)="onResize($event)">
   <article>
-    <table>
-      <tr class="{{reg.class}}" *ngFor="let reg of dbProvProd | proveedorProductoFilter: itemSearchProdProv;index as i;">
-      <!--tr class="{{reg.class}}" *ngFor="let reg of dbProvProd;index as i;"-->
-        <td>
-          <input type="checkbox" value='{{i}}' (change)='toggleCheck($event,reg)'>
-        </td>
-        <td >{{reg.nombre}}</td>
-        <td style="width: 50px; text-align: right;">{{reg.bulto}}</td>
-        <td style="width: 50px; text-align: right;">{{reg.contiene}}</td>
-        <td style="width: 50px; text-align: right;">{{reg.unidad}}</td>
-      </tr>
+    <table border="1" width="100%">
+      <!--tr class="{{reg.class}}" *ngFor="let reg of dbProvProd | proveedorProductoFilter: itemSearchProdProv;index as i;"-->
+        <tr *ngFor="let reg of dbProvProd;index as i;" class="{{reg.class}}" >
+          <td>
+            <input type="checkbox" value='{{i}}' (change)='toggleCheck($event,reg)'>
+          </td>
+          <td>
+            <table width="100%">
+              <tr>
+                <td style="width: 60%;">{{reg.nombre}}</td>
+                <td>{{reg.proveedor.nombre}}</td>
+              </tr>
+              <tr>
+                <td>
+                  <table width="100%">
+                    <tr class="" *ngFor="let prod of reg.productos">
+                      <td>
+                        <!--input type="checkbox" value='{{i}}' (change)='toggleCheck1($event,prod)'-->
+                      </td>
+                      <td style="width: 50px;"></td>
+                      <td>{{prod.name}} {{prod.contiene}} {{prod.unidad}}</td>
+                      <!--td style="width: 50px; text-align: right;">{{prod.lista}}</td-->
+                      <td style="width: 50px; text-align: right;">{{prod.base}}</td>
+                      <td style="width: 50px; text-align: right;">{{prod.margen}}</td>
+                      <td style="width: 50px; text-align: right;">{{prod.efectivo}}</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
     </table>
   </article>
   <!--nav>

@@ -7,7 +7,12 @@
 .card.disabled {
   opacity: 0.5;
 }
-
+.oferta-color {
+  color: red;
+  font-weight:bolder;
+  text-decoration-color: darkturquoise;
+  -moz-text-decoration-color: darkturquoise;
+}
  #main {
   margin: 0px;
   padding: 0px;

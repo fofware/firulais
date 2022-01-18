@@ -3,9 +3,116 @@ import { round } from '../shared/toolbox';
 import { HttpClient } from '@angular/common/http';
 import { API_URI } from '../shared/uris';
 
+export enum col {
+  A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,
+  AA,AB,AC,AD,AE,AF,AG,AH,AI,AJ,AK,AL,AM,AN,AO,AP,AQ,AR,AS,AT,AU,AV,AW,AX,AY,AZ,
+  BA,BB,BC,BD,BE,BF,BG,BH,BI,BJ,BK,BL,BM,BN,BO,BP,BQ,BR,BS,BT,BU,BV,BW,BX,BY,BZ,
+  CA,CB,CC,CD,CE,CF,CG,CH,CI,CJ,CK,CL,CM,CN,CO,CP,CQ,CR,CS,CT,CU,CV,CW,CX,CY,CZ
+}
+
+const fieldsNames = [
+  "codigo",
+  "nombre",
+  "vinput",
+  "vbulto",
+  "vunidad",
+  "fabricante",
+  "marca",
+  "name",
+  "especie",
+  "edad",
+  "rubro",
+  "linea",
+  "raza",
+  "nbulto",
+  "presentacion",
+  "unidad",
+  "clase",
+  "ean",
+  "peso",
+  "pesable",
+  "unidades"
+];
+const commonFilter = `(line,idx,array) => {
+  if(line[col.U] && line[col.U] === 1){
+    const ret = {};
+    if (!line[col.A]){
+      if(line[col.B])
+        ret.codigo = line[col.A] ? line[col.A]+'' : (line[col.B]).replace(/[ ]/g,'');
+    } else {
+      ret.codigo = line[col.A]+'';
+    }
+
+    ret.descripcion = line[col.B];
+    ret.clase = isNaN(line[col.T]) ? 0 : line[col.T];
+    ret.peso = isNaN(line[col.AA]) ? null : Math.round(line[col.AA]*10000)/10000;
+    ret.unidades = isNaN(line[col.AB]) ? null : Math.round(line[col.AB]*10000)/10000;
+    ret.pesable = isNaN(line[col.AC]) ? null : Math.round(line[col.AC]*10000)/10000;
+
+    ret.input = {};
+    ret.input.lista =  isNaN(line[col.P]) ? null : Math.round(line[col.P]*10000)/10000;
+    ret.input.reposicion = isNaN(line[col.V]) ? null : Math.round(line[col.V]*10000)/10000;
+    ret.input.promo = isNaN(line[col.W]) ? null : Math.round(line[col.W]*10000)/10000;
+    ret.input.base = isNaN(line[col.X]) ? null : Math.round(line[col.X]*10000)/10000;
+    ret.input.oferta = isNaN(line[col.Y]) ? null : Math.round(line[col.Y]*10000)/10000;
+    ret.input.sugerido = isNaN(line[col.Z]) ? null : Math.round(line[col.Z]*10000)/10000;
+
+    ret.vbulto = {
+      margen:  isNaN(line[col.AH]) ? array[4][col.AK] : line[col.AH],
+      tarjeta: isNaN(line[col.AI]) ? null : Math.round(line[col.AI]*10000)/10000,
+      debito: isNaN(line[col.AJ]) ? null : Math.round(line[col.AJ]*10000)/10000,
+      efectivo: isNaN(line[col.AK]) ? null : Math.round(line[col.AK]*10000)/10000,
+      descuento1: isNaN(line[col.AL]) ? null : Math.round(line[col.AL]*10000)/10000,
+      descuento2: isNaN(line[col.AM]) ? null : Math.round(line[col.AM]*10000)/10000
+    };
+    ret.vunidad = {
+      margen:  isNaN(line[col.AO]) ? array[4][col.AR] : line[col.AO],
+      tarjeta: isNaN(line[col.AP]) ? null : Math.round(line[col.AP]*10000)/10000,
+      debito: isNaN(line[col.AQ]) ? null : Math.round(line[col.AQ]*10000)/10000,
+      efectivo: isNaN(line[col.AR]) ? null : Math.round(line[col.AR]*10000)/10000,
+      descuento1: isNaN(line[col.AS]) ? null : Math.round(line[col.AS]*10000)/10000,
+      descuento2: isNaN(line[col.AT]) ? null : Math.round(line[col.AT]*10000)/10000
+    };
+    ret.fabricante = line[col.BA];
+    ret.marca = line[col.BB];
+    ret.name = line[col.BC];
+    ret.especie = line[col.BD];
+    ret.edad = line[col.BE];
+    ret.rubro = line[col.BF];
+    ret.linea = line[col.BG];
+    ret.raza = line[col.BH];
+    ret.bulto = line[col.BI];
+    ret.presentacion = line[col.BJ];
+    ret.unidad = line[col.BK];
+
+    line[col.A] = ret.codigo;
+    line[col.B] = ret.descripcion;
+    line[col.C] = ret.input;
+    line[col.D] = ret.vbulto;
+    line[col.E] = ret.vunidad;
+    line[col.F] = ret.fabricante;
+    line[col.G] = ret.marca;
+    line[col.H] = ret.name;
+    line[col.I] = ret.especie;
+    line[col.J] = ret.edad;
+    line[col.K] = ret.rubro;
+    line[col.L] = ret.linea;
+    line[col.M] = ret.raza;
+    line[col.N] = ret.bulto;
+    line[col.O] = ret.presentacion;
+    line[col.P] = ret.unidad;
+    line[col.Q] = ret.clase;
+    line[col.R] = ret.ean;
+    line[col.S] = ret.peso;
+    line[col.T] = ret.pesable;
+    line[col.U] = ret.unidades;
+    if( line[col.A] && line[col.B] && line[col.C] && line[col.D] )
+      return line;
+  }
+}`;
 export const proveedoresSettings = [
   {
-    "_id": "61413fc2dab04eeaa5a59a38",
+    "_id": "61ccba5eac0a1e5674aa807d",
     "nombre": "Servicios Veterinarios",
     "type": "XLSX",
     "encode": "utf-8",
@@ -28,86 +135,84 @@ export const proveedoresSettings = [
           "raza",
           "nbulto",
           "presentacion",
-          "unidad"
-        ]
-        ,
+          "unidad",
+          "clase",
+          "ean",
+          "peso",
+          "pesable",
+          "unidades"
+        ],
         "filters":[
           `(line,idx,array) => {
-            if(line[20] && line[20] === 1){
+            if(line[col.U] && line[col.U] === 1){
               const ret = {};
-              if (!line[0]){
-                if(line[1])
-                  ret.codigo = line[0] ? line[0]+'' : (line[1]).replace(/[ ]/g,'');
-              } else {
-                ret.codigo = line[0]+'';
-              }
+              ret.codigo = line[col.A]+'';
+              ret.descripcion = line[col.B];
+              ret.clase = isNaN(line[col.T]) ? 0 : line[col.T];
 
-              ret.descripcion = line[1];
               ret.input = {};
-              //if(line[15]){
-              //  line[15] = line[15].replace(/[,]/g,'.');
-              //  line[15] = line[15].replace(/[$ ]/g,'');
-              //  let reposicion = line[15] ? line[15].match(/(?<value>[0-9\.]*)/) : null;
-              //  if (reposicion){
-              //    reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
-              //  }
-              //  ret.input.lista = reposicion;
-              //}
-              ret.input.lista =  isNaN(line[15]) ? null : Math.round(line[15]*100)/100;
-              ret.input.reposicion = isNaN(line[21]) ? null : Math.round(line[21]*100)/100;
-              ret.input.promo = isNaN(line[22]) ? null : Math.round(line[22]*100)/100;
-              ret.input.base = isNaN(line[23]) ? null : Math.round(line[23]*100)/100;
-              ret.input.oferta = isNaN(line[24]) ? null : Math.round(line[24]*100)/100;
-              ret.input.sugerido = isNaN(line[25]) ? null : Math.round(line[25]*100)/100;
-              ret.input.peso = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
-              ret.input.unidades = isNaN(line[27]) ? null : Math.round(line[27]*100)/100;
-              ret.input.pesable = isNaN(line[28]) ? null : Math.round(line[28]*100)/100;
-
+              ret.input.lista =  isNaN(line[col.P]) ? null : Math.round(line[col.P]*10000)/10000;
+              ret.input.reposicion = isNaN(line[col.V]) ? null : Math.round(line[col.V]*10000)/10000;
+              ret.input.promo = isNaN(line[col.W]) ? null : Math.round(line[col.W]*10000)/10000;
+              ret.input.base = isNaN(line[col.X]) ? null : Math.round(line[col.X]*10000)/10000;
+              ret.input.oferta = isNaN(line[col.Y]) ? null : Math.round(line[col.Y]*10000)/10000;
+              ret.input.sugerido = isNaN(line[col.Z]) ? null : Math.round(line[col.Z]*10000)/10000;
+              ret.peso = isNaN(line[col.AA]) ? null : Math.round(line[col.AA]*10000)/10000;
+              ret.unidades = isNaN(line[col.AB]) ? null : Math.round(line[col.AB]*10000)/10000;
+              ret.pesable = isNaN(line[col.AC]) ? null : Math.round(line[col.AC]*10000)/10000;
+              ret.clase = isNaN(line[col.I]) ? 0 : line[col.I];
               ret.vbulto = {
-                margen:  isNaN(line[33]) ? array[4][36] : line[33],
-                tarjeta: isNaN(line[34]) ? null : Math.round(line[34]*100)/100,
-                debito: isNaN(line[35]) ? null : Math.round(line[35]*100)/100,
-                efectivo: isNaN(line[36]) ? null : Math.round(line[36]*100)/100,
-                descuento1: isNaN(line[37]) ? null : Math.round(line[37]*100)/100,
-                descuento2: isNaN(line[38]) ? null : Math.round(line[38]*100)/100
+                margen:  isNaN(line[col.AH]) ? array[4][col.AK] : line[col.AH],
+                tarjeta: isNaN(line[col.AI]) ? null : Math.round(line[col.AI]*10000)/10000,
+                debito: isNaN(line[col.AJ]) ? null : Math.round(line[col.AJ]*10000)/10000,
+                efectivo: isNaN(line[col.AK]) ? null : Math.round(line[col.AK]*10000)/10000,
+                descuento1: isNaN(line[col.AL]) ? null : Math.round(line[col.AL]*10000)/10000,
+                descuento2: isNaN(line[col.AM]) ? null : Math.round(line[col.AM]*10000)/10000
               };
-              ret.vunidad = {
-                margen:  isNaN(line[40]) ? array[4][43] : line[40],
-                tarjeta: isNaN(line[41]) ? null : Math.round(line[41]*100)/100,
-                debito: isNaN(line[42]) ? null : Math.round(line[42]*100)/100,
-                efectivo: isNaN(line[43]) ? null : Math.round(line[43]*100)/100,
-                descuento1: isNaN(line[44]) ? null : Math.round(line[44]*100)/100,
-                descuento2: isNaN(line[45]) ? null : Math.round(line[45]*100)/100
-              };
-              ret.fabricante = line[52];
-              ret.marca = line[53];
-              ret.name = line[54];
-              ret.especie = line[55];
-              ret.edad = line[56];
-              ret.rubro = line[57];
-              ret.linea = line[58];
-              ret.raza = line[59];
-              ret.bulto = line[60];
-              ret.presentacion = line[61];
-              ret.unidad = line[62];
 
-              line[0] = ret.codigo;
-              line[1] = ret.descripcion;
-              line[2] = ret.input;
-              line[3] = ret.vbulto;
-              line[4] = ret.vunidad;
-              line[5] = ret.fabricante;
-              line[6] = ret.marca;
-              line[7] = ret.name;
-              line[8] = ret.especie;
-              line[9] = ret.edad;
-              line[10] = ret.rubro;
-              line[11] = ret.linea;
-              line[12] = ret.raza;
-              line[13] = ret.bulto;
-              line[14] = ret.presentacion;
-              line[15] = ret.unidad;
-              if( line[0] && line[1] && line[2] && line[3] )
+              ret.vunidad = {
+                margen:  isNaN(line[col.AO]) ? array[4][col.AR] : line[col.AO],
+                tarjeta: isNaN(line[col.AP]) ? null : Math.round(line[col.AP]*10000)/10000,
+                debito: isNaN(line[col.AQ]) ? null : Math.round(line[col.AQ]*10000)/10000,
+                efectivo: isNaN(line[col.AR]) ? null : Math.round(line[col.AR]*10000)/10000,
+                descuento1: isNaN(line[col.AS]) ? null : Math.round(line[col.AS]*10000)/10000,
+                descuento2: isNaN(line[col.AT]) ? null : Math.round(line[col.AT]*10000)/10000
+              };
+
+              ret.fabricante = line[col.BA];
+              ret.marca = line[col.BB];
+              ret.name = line[col.BC];
+              ret.especie = line[col.BD];
+              ret.edad = line[col.BE];
+              ret.rubro = line[col.BF];
+              ret.linea = line[col.BG];
+              ret.raza = line[col.BH];
+              ret.bulto = line[col.BI];
+              ret.presentacion = line[col.BJ];
+              ret.unidad = line[col.BK];
+
+              line[col.A] = ret.codigo;
+              line[col.B] = ret.descripcion;
+              line[col.C] = ret.input;
+              line[col.D] = ret.vbulto;
+              line[col.E] = ret.vunidad;
+              line[col.F] = ret.fabricante;
+              line[col.G] = ret.marca;
+              line[col.H] = ret.name;
+              line[col.I] = ret.especie;
+              line[col.J] = ret.edad;
+              line[col.K] = ret.rubro;
+              line[col.L] = ret.linea;
+              line[col.M] = ret.raza;
+              line[col.N] = ret.bulto;
+              line[col.O] = ret.presentacion;
+              line[col.P] = ret.unidad;
+              line[col.Q] = ret.clase;
+              //line[col.R] = ret.ean;
+              line[col.S] = ret.peso;
+              line[col.T] = ret.pesable;
+              line[col.U] = ret.unidades;
+              if( line[col.A] && line[col.B] && line[col.C] && line[col.D] )
                 return line;
             }
           }`
@@ -116,7 +221,108 @@ export const proveedoresSettings = [
     }
   },
   {
-    "_id": '607d7ad51600d70027d3b555',
+    "_id": "61cc9a4e7c6390fcb15414c2",
+    "nombre": "Nutripet",
+    "type": "XLSX",
+    "encode": "utf-8",
+    "named": false,
+    "input": {
+      "*":{
+        "input_fields": fieldsNames,
+        "filters":[ commonFilter ]
+      }
+    }
+  },
+  {
+    "_id": "61ccba1dac0a1e5674aa805c",
+    "nombre": "FyP",
+    "type": "XLSX",
+    "encode": "utf-8",
+    "named": false,
+    "input": {
+      "*":{
+        "input_fields": fieldsNames,
+        "filters":[
+          `(line,idx,array) => {
+            if(line[col.U] && line[col.U] === 1){
+              const ret = {};
+              //if(line[col.A])
+              //  ret.codigo = (line[col.A]).replace(/[ ]/g,'');
+              ret.codigo = line[col.A];
+              ret.descripcion = line[col.B];
+              ret.clase = isNaN(line[col.T]) ? 0 : line[col.T];
+              ret.peso = isNaN(line[col.AA]) ? null : Math.round(line[col.AA]*10000)/10000;
+              ret.unidades = isNaN(line[col.AB]) ? null : Math.round(line[col.AB]*10000)/10000;
+              ret.pesable = isNaN(line[col.AC]) ? null : Math.round(line[col.AC]*10000)/10000;
+
+              ret.input = {};
+              ret.input.lista =  isNaN(line[col.P]) ? null : Math.round(line[col.P]*10000)/10000;
+              ret.input.reposicion = isNaN(line[col.V]) ? null : Math.round(line[col.V]*10000)/10000;
+              ret.input.promo = isNaN(line[col.W]) ? null : Math.round(line[col.W]*10000)/10000;
+              ret.input.base = isNaN(line[col.X]) ? null : Math.round(line[col.X]*10000)/10000;
+              ret.input.oferta = isNaN(line[col.Y]) ? null : Math.round(line[col.Y]*10000)/10000;
+              ret.input.sugerido = isNaN(line[col.Z]) ? null : Math.round(line[col.Z]*10000)/10000;
+
+              ret.vbulto = {
+                margen:  isNaN(line[col.AH]) ? array[4][col.AK] : line[col.AH],
+                tarjeta: isNaN(line[col.AI]) ? null : Math.round(line[col.AI]*10000)/10000,
+                debito: isNaN(line[col.AJ]) ? null : Math.round(line[col.AJ]*10000)/10000,
+                efectivo: isNaN(line[col.AK]) ? null : Math.round(line[col.AK]*10000)/10000,
+                descuento1: isNaN(line[col.AL]) ? null : Math.round(line[col.AL]*10000)/10000,
+                descuento2: isNaN(line[col.AM]) ? null : Math.round(line[col.AM]*10000)/10000
+              };
+              ret.vunidad = {
+                margen:  isNaN(line[col.AO]) ? array[4][col.AR] : line[col.AO],
+                tarjeta: isNaN(line[col.AP]) ? null : Math.round(line[col.AP]*10000)/10000,
+                debito: isNaN(line[col.AQ]) ? null : Math.round(line[col.AQ]*10000)/10000,
+                efectivo: isNaN(line[col.AR]) ? null : Math.round(line[col.AR]*10000)/10000,
+                descuento1: isNaN(line[col.AS]) ? null : Math.round(line[col.AS]*10000)/10000,
+                descuento2: isNaN(line[col.AT]) ? null : Math.round(line[col.AT]*10000)/10000
+              };
+              ret.fabricante = line[col.BA];
+              ret.marca = line[col.BB];
+              ret.name = line[col.BC];
+              ret.especie = line[col.BD];
+              ret.edad = line[col.BE];
+              ret.rubro = line[col.BF];
+              ret.linea = line[col.BG];
+              ret.raza = line[col.BH];
+              ret.bulto = line[col.BI];
+              ret.presentacion = line[col.BJ];
+              ret.unidad = line[col.BK];
+
+              line[col.A] = ret.codigo;
+              line[col.B] = ret.descripcion;
+              line[col.C] = ret.input;
+              line[col.D] = ret.vbulto;
+              line[col.E] = ret.vunidad;
+              line[col.F] = ret.fabricante;
+              line[col.G] = ret.marca;
+              line[col.H] = ret.name;
+              line[col.I] = ret.especie;
+              line[col.J] = ret.edad;
+              line[col.K] = ret.rubro;
+              line[col.L] = ret.linea;
+              line[col.M] = ret.raza;
+              line[col.N] = ret.bulto;
+              line[col.O] = ret.presentacion;
+              line[col.P] = ret.unidad;
+              line[col.Q] = ret.clase;
+              //line[col.R] = ret.ean;
+              line[col.S] = ret.peso;
+              line[col.T] = ret.pesable;
+              line[col.U] = ret.unidades;
+              if( line[col.A] && line[col.B] && line[col.C] && line[col.D] )
+                return line;
+            }
+          }`
+        ]
+      }
+    }
+  }
+  ,
+  {
+    "_id": '61cc9b7a7c6390fcb1541543',
     "nombre": "Agro Empresas",
     "type": "XLSX",
     "encode": "iso8859-3",
@@ -124,8 +330,8 @@ export const proveedoresSettings = [
     "input": {
       "*":{
         "input_fields": [
-          "descripcion",
           "codigo",
+          "nombre",
           "vinput",
           "vbulto",
           "vunidad",
@@ -137,84 +343,99 @@ export const proveedoresSettings = [
           "rubro",
           "linea",
           "raza",
-          "bulto",
+          "nbulto",
           "presentacion",
-          "unidad"
+          "unidad",
+          "clase",
+          "ean",
+          "peso",
+          "pesable",
+          "unidades"
         ]
         ,
         "filters":[
           `(line,idx,array) => {
-            if(line[20] && line[20] === 1){
+            if(line[col.U] && line[col.U] === 1){
               const ret = {};
-              ret.codigo = line[1]+'';
+              ret.codigo = line[col.B] ? line[col.B]+'' : null;
 
-              ret.descripcion = line[0];
+              ret.descripcion = line[col.A];
+              ret.clase = isNaN(line[col.T]) ? 0 : line[col.T];
+              ret.productos = [];
+              ret.peso = isNaN(line[col.AA]) ? null : Math.round(line[col.AA]*10000)/10000;
+              ret.unidades = isNaN(line[col.AB]) ? null : Math.round(line[col.AB]*10000)/10000;
+              ret.pesable = isNaN(line[col.AC]) ? null : Math.round(line[col.AC]*10000)/10000;
               ret.input = {};
-              ret.input.lista =  isNaN(line[15]) ? null : Math.round(line[15]*100)/100;
-              ret.input.reposicion = isNaN(line[21]) ? null : Math.round(line[21]*100)/100;
-              ret.input.promo = isNaN(line[22]) ? null : Math.round(line[22]*100)/100;
-              ret.input.base = isNaN(line[23]) ? null : Math.round(line[23]*100)/100;
-              ret.input.oferta = isNaN(line[24]) ? null : Math.round(line[24]*100)/100;
-              ret.input.sugerido = isNaN(line[25]) ? null : Math.round(line[25]*100)/100;
-              ret.input.peso = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
-              ret.input.unidades = isNaN(line[27]) ? null : Math.round(line[27]*100)/100;
-              ret.input.pesable = isNaN(line[28]) ? null : Math.round(line[28]*100)/100;
+              ret.input.lista =  isNaN(line[col.P]) ? null : Math.round(line[col.P]*10000)/10000;
+              ret.input.reposicion = isNaN(line[col.V]) ? null : Math.round(line[col.V]*10000)/10000;
+              ret.input.promo = isNaN(line[col.W]) ? null : Math.round(line[col.W]*10000)/10000;
+              ret.input.base = isNaN(line[col.X]) ? null : Math.round(line[col.X]*10000)/10000;
+              ret.input.oferta = isNaN(line[col.Y]) ? null : Math.round(line[col.Y]*10000)/10000;
+              ret.input.sugerido = isNaN(line[col.Z]) ? null : Math.round(line[col.Z]*10000)/10000;
 
               ret.vbulto = {
-                margen:  isNaN(line[33]) ? array[4][36] : line[33],
-                tarjeta: isNaN(line[34]) ? null : Math.round(line[34]*100)/100,
-                debito: isNaN(line[35]) ? null : Math.round(line[35]*100)/100,
-                efectivo: isNaN(line[36]) ? null : Math.round(line[36]*100)/100,
-                descuento1: isNaN(line[37]) ? null : Math.round(line[37]*100)/100,
-                descuento2: isNaN(line[38]) ? null : Math.round(line[38]*100)/100
+                margen:  isNaN(line[col.AH]) ? array[4][col.AK] : line[col.AH],
+                tarjeta: isNaN(line[col.AI]) ? null : Math.round(line[col.AI]*10000)/10000,
+                debito: isNaN(line[col.AJ]) ? null : Math.round(line[col.AJ]*10000)/10000,
+                efectivo: isNaN(line[col.AK]) ? null : Math.round(line[col.AK]*10000)/10000,
+                descuento1: isNaN(line[col.AL]) ? null : Math.round(line[col.AL]*10000)/10000,
+                descuento2: isNaN(line[col.AM]) ? null : Math.round(line[col.AM]*10000)/10000
               };
               ret.vunidad = {
-                margen:  isNaN(line[40]) ? array[4][43] : line[40],
-                tarjeta: isNaN(line[41]) ? null : Math.round(line[41]*100)/100,
-                debito: isNaN(line[42]) ? null : Math.round(line[42]*100)/100,
-                efectivo: isNaN(line[43]) ? null : Math.round(line[43]*100)/100,
-                descuento1: isNaN(line[44]) ? null : Math.round(line[44]*100)/100,
-                descuento2: isNaN(line[45]) ? null : Math.round(line[45]*100)/100
+                margen:  isNaN(line[col.AO]) ? array[4][col.AR] : line[col.AO],
+                tarjeta: isNaN(line[col.AP]) ? null : Math.round(line[col.AP]*10000)/10000,
+                debito: isNaN(line[col.AQ]) ? null : Math.round(line[col.AQ]*10000)/10000,
+                efectivo: isNaN(line[col.AR]) ? null : Math.round(line[col.AR]*10000)/10000,
+                descuento1: isNaN(line[col.AS]) ? null : Math.round(line[col.AS]*10000)/10000,
+                descuento2: isNaN(line[col.AT]) ? null : Math.round(line[col.AT]*10000)/10000
               };
-              ret.fabricante = line[52];
-              ret.marca = line[53];
-              ret.name = line[54];
-              ret.especie = line[55];
-              ret.edad = line[56];
-              ret.rubro = line[57];
-              ret.linea = line[58];
-              ret.raza = line[59];
-              ret.bulto = line[60];
-              ret.presentacion = line[61];
-              ret.unidad = line[62];
-              const pattern = new RegExp(/^\\s+|\\s+$/,'gm');
-              line[1] = ret.codigo;
-              line[0] = ret.descripcion ? ret.descripcion.replace(pattern,'') : ret.descripcion;
-              line[2] = ret.input;
-              line[3] = ret.vbulto;
-              line[4] = ret.vunidad;
-              line[5] = ret.fabricante;
-              line[6] = ret.marca;
-              line[7] = ret.name;
-              line[8] = ret.especie;
-              line[9] = ret.edad;
-              line[10] = ret.rubro;
-              line[11] = ret.linea;
-              line[12] = ret.raza;
-              line[13] = ret.bulto;
-              line[14] = ret.presentacion;
-              line[15] = ret.unidad;
-              if( line[0] && line[1] && line[2] && line[3] )
+              ret.fabricante = line[col.BA];
+              ret.marca = line[col.BB];
+              ret.name = line[col.BC];
+              ret.especie = line[col.BD];
+              ret.edad = line[col.BE];
+              ret.rubro = line[col.BF];
+              ret.linea = line[col.BG];
+              ret.raza = line[col.BH];
+              ret.bulto = line[col.BI];
+              ret.presentacion = line[col.BJ];
+              ret.unidad = line[col.BK];
+
+              line[col.A] = ret.codigo;
+              line[col.B] = ret.descripcion;
+              line[col.C] = ret.input;
+              line[col.D] = ret.vbulto;
+              line[col.E] = ret.vunidad;
+              line[col.F] = ret.fabricante;
+              line[col.G] = ret.marca;
+              line[col.H] = ret.name;
+              line[col.I] = ret.especie;
+              line[col.J] = ret.edad;
+              line[col.K] = ret.rubro;
+              line[col.L] = ret.linea;
+              line[col.M] = ret.raza;
+              line[col.N] = ret.bulto;
+              line[col.O] = ret.presentacion;
+              line[col.P] = ret.unidad;
+              line[col.Q] = ret.clase;
+              //line[col.R] = ret.ean;
+              line[col.S] = ret.peso;
+              line[col.T] = ret.pesable;
+              line[col.U] = ret.unidades;
+
+              if( line[col.A] && line[col.C] && line[col.D] )
                 return line;
             }
+
           }`,
           `(line,idx,array) => {
-            if(!line[0]){
+            if(!line[col.B]){
               if(array[idx-1]){
-                array[idx][0] =  array[idx-1][0];
-                line[0] = array[idx-1][0];
-              } else line[0] = "error";
+                array[idx][col.B] =  array[idx-1][col.B];
+                line[col.B] = array[idx-1][col.B];
+              } else line[col.B] = "error";
             }
+            if( line[col.A] && line[col.B] && line[col.C] && line[col.D] )
             return line;
           }`
         ]
@@ -222,284 +443,15 @@ export const proveedoresSettings = [
     }
   },
   {
-    "_id": '5f401a8f4e0d2b3e5371c664',
+    "_id": '61ccb9cdac0a1e5674aa8035',
     "nombre": "Dumas",
     "type": "XLSX",
     "encode": "utf-8",
     "named": false,
     "input": {
-      "ACCESORIOS":{
-        "input_fields": [
-          "codigo",
-          "nombre",
-          "marca",
-          "bulto",
-          "contiene",
-          "unidad",
-          "lista",
-          "porcentage",
-          "descuento",
-          "reposicion"
-        ],
-        "filters":[
-          `(line) => {
-            const ret = {};
-            ret.codigo = line[0];
-            ret['nombre'] = line[1];
-            ret.marca = line[2];
-            ret.reposicion = isNaN(line[3]) ? null : line[3];
-
-            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
-              ret.codigo = ret.nombre.replace(/[ ]/g);
-            line[0] = ret.codigo;
-            line[1] = ret.nombre;
-            line[2] = ret.marca;
-            line[3] = 1;
-            line[4] = 1;
-            line[5] = "Un";
-            line[6] = ret.reposicion;
-            line[7] = 0;
-            line[8] = 0;
-            line[9] = ret.reposicion;
-            if(line[0] && line[1] && line[9]) return line;
-          }`
-        ]
-      },
-      "ALIMENTOS":{
-        "input_fields":[
-          "codigo",
-          "nombre",
-          "marca",
-          "bulto",
-          "contiene",
-          "unidad",
-          "lista",
-          "porcentage",
-          "descuento",
-          "reposicion"
-        ],
-        "filters":[
-          `(line) => {
-            const ret = {};
-            ret.codigo = line[0];
-            ret['nombre'] = line[1];
-            ret.marca = line[2];
-            ret.lista = isNaN(line[3]) ? null : Math.round(line[3]*100)/100;
-            ret.porcentage = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-            ret.descuento = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.reposicion = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
-              ret.codigo = ret.nombre.replace(/[ ]/g);
-            line[1] = ret.nombre;
-            line[2] = ret.marca;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.unidad;
-            line[6] = ret.lista;
-            line[7] = ret.porcentage;
-            line[8] = ret.descuento;
-            line[9] = ret.reposicion;
-            if(line[0] && line[1] && line[9]) return line;
-          }`
-        ]
-      },
-      "FARMACOS":{
-        "input_fields": [
-          "codigo",
-          "nombre",
-          "marca",
-          "bulto",
-          "contiene",
-          "unidad",
-          "lista",
-          "porcentage",
-          "descuento",
-          "reposicion"
-        ]
-        ,
-        "filters":[
-          `(line) => {
-            const ret = {};
-            ret.codigo = line[0];
-            ret['nombre'] = line[1];
-            ret.marca = line[2];
-            ret.lista = isNaN(line[3]) ? null : Math.round(line[3]*100)/100;
-            ret.porcentage = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-            ret.descuento = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.reposicion = ret.lista; //isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
-              ret.codigo = ret.nombre.replace(/[ ]/g);
-            line[1] = ret.nombre;
-            line[2] = ret.marca;
-            line[3] = 1; //ret.bulto;
-            line[4] = 1; //ret.contiene;
-            line[5] = 'Un'; //ret.unidad;
-            line[6] = ret.lista;
-            line[7] = ret.porcentage;
-            line[8] = ret.descuento;
-            line[9] = ret.reposicion;
-            if(line[0] && line[1] && line[9]) return line;
-          }`
-        ]
-      },
-      "PIEDRAS":{
-        "input_fields": [
-          "codigo",
-          "nombre",
-          "marca",
-          "bulto",
-          "contiene",
-          "unidad",
-          "lista",
-          "porcentage",
-          "descuento",
-          "reposicion"
-        ]
-        ,
-        "filters":[
-          `(line) => {
-            const ret = {};
-            ret.codigo = line[0];
-            ret['nombre'] = line[1];
-            ret.lista = isNaN(line[2]) ? null : Math.round(line[2]*100)/100;
-            ret.porcentage = isNaN(line[3]) ? null : Math.round(line[3]*100)/100;
-            ret.descuento = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-            ret.reposicion = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
-              ret.codigo = ret.nombre.replace(/[ ]/g);
-
-            line[1] = ret.nombre;
-            line[2] = ret.marca;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.unidad;
-            line[6] = ret.lista;
-            line[7] = ret.porcentage;
-            line[8] = ret.descuento;
-            line[9] = ret.reposicion;
-            if(line[0] && line[1] && line[9]) return line;
-          }`
-        ]
-      },
-      "SANEAMIENTO":{
-        "input_fields": [
-          "codigo",
-          "nombre",
-          "marca",
-          "bulto",
-          "contiene",
-          "unidad",
-          "lista",
-          "porcentage",
-          "descuento",
-          "reposicion"
-        ]
-        ,
-        "filters":[
-          `(line) => {
-            const ret = {};
-            ret.codigo = line[0];
-            ret['nombre'] = line[1];
-            ret.marca = line[2];
-            ret.lista = isNaN(line[3]) ? null : Math.round(line[3]*100)/100;
-            ret.porcentage = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-            ret.descuento = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.reposicion = ret.lista; //isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
-              ret.codigo = ret.nombre.replace(/[ ]/g);
-
-            line[1] = ret.nombre;
-            line[2] = ret.marca;
-            line[3] = 1; //ret.bulto;
-            line[4] = 1; //ret.contiene;
-            line[5] = 'Un'; //ret.unidad;
-            line[6] = ret.lista;
-            line[7] = ret.porcentage;
-            line[8] = ret.descuento;
-            line[9] = ret.reposicion;
-            if(line[0] && line[1] && line[9]) return line;
-          }`
-        ]
-      },
-      "SHAMPOO":{
-        "input_fields": [
-          "codigo",
-          "nombre",
-          "marca",
-          "bulto",
-          "contiene",
-          "unidad",
-          "lista",
-          "porcentage",
-          "descuento",
-          "reposicion"
-        ]
-        ,
-        "filters":[
-          `(line) => {
-            const ret = {};
-            ret.codigo = line[0];
-            ret['nombre'] = line[1];
-            ret.marca = line[2];
-            ret.lista = isNaN(line[3]) ? null : Math.round(line[3]*100)/100;
-            ret.porcentage = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-            ret.descuento = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            ret.reposicion = ret.lista; //isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
-              ret.codigo = ret.nombre.replace(/[ ]/g);
-
-            line[1] = ret.nombre;
-            line[2] = ret.marca;
-            line[3] = 1; //ret.bulto;
-            line[4] = 1; //ret.contiene;
-            line[5] = 'Un'; //ret.unidad;
-            line[6] = ret.lista;
-            line[7] = ret.porcentage;
-            line[8] = ret.descuento;
-            line[9] = ret.reposicion;
-            if(line[0] && line[1] && line[9]) return line;
-          }`
-        ]
-      },
-      "VARIOS":{
-        "input_fields": [
-          "codigo",
-          "nombre",
-          "marca",
-          "bulto",
-          "contiene",
-          "unidad",
-          "lista",
-          "porcentage",
-          "descuento",
-          "reposicion"
-        ]
-        ,
-        "filters":[
-          `(line) => {
-            const ret = {};
-            ret.codigo = line[0];
-            ret['nombre'] = line[1];
-            ret.marca = line[2];
-            ret.lista = isNaN(line[3]) ? null : Math.round(line[3]*100)/100;
-            ret.reposicion = ret.lista;
-            //ret.porcentage = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-            //ret.descuento = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-            //ret.reposicion = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            if((!line[0] || line[0] === '') && ret.nombre && ret.reposicion )
-              ret.codigo = ret.nombre.replace(/[ ]/g);
-            line[1] = ret.nombre;
-            line[2] = ret.marca;
-            line[3] = ret.bulto;
-            line[4] = ret.contiene;
-            line[5] = ret.unidad;
-            line[6] = ret.lista;
-            line[7] = ret.porcentage;
-            line[8] = ret.descuento;
-            line[9] = ret.reposicion;
-            if(line[0] && line[1] && line[9]) return line;
-          }`
-        ]
+      "*":{
+        "input_fields": fieldsNames,
+        "filters":[ commonFilter ]
       }
     },
 //    aggregate:[
@@ -552,478 +504,202 @@ export const proveedoresSettings = [
 //    ]
   },
   {
-  "_id": '5f401e384e0d2b3e5371c666',
+    "_id": "61ccb984ac0a1e5674aa8013",
+    "nombre": "Rap",
+    "type": "XLSX",
+    "encode": "utf-8",
+    "named": false,
+    "input": {
+      "*":{
+        "input_fields": [
+          "codigo",
+          "nombre",
+          "vinput",
+          "vbulto",
+          "vunidad",
+          "fabricante",
+          "marca",
+          "name",
+          "especie",
+          "edad",
+          "rubro",
+          "linea",
+          "raza",
+          "nbulto",
+          "presentacion",
+          "unidad",
+          "clase",
+          "ean",
+          "peso",
+          "pesable",
+          "unidades"
+        ],
+        "filters":[
+          `(line,idx,array) => {
+            if(line[col.U] && line[col.U] === 1){
+              const ret = {};
+              ret.codigo = line[col.A];
+              ret.clase = isNaN(line[col.T]) ? 0 : line[col.T];
+              ret.ean = line[col.B];
+              ret.peso = isNaN(line[col.AA]) ? null : Math.round(line[col.AA]*10000)/10000;
+              ret.unidades = isNaN(line[col.AB]) ? null : Math.round(line[col.AB]*10000)/10000;
+              ret.pesable = isNaN(line[col.AC]) ? null : Math.round(line[col.AC]*10000)/10000;
+
+              ret.descripcion = line[col.C]+" "+line[col.D]+" "+line[col.E]+" "+line[col.F];
+              ret.input = {};
+              ret.input.lista =  isNaN(line[col.P]) ? null : Math.round(line[col.P]*10000)/10000;
+              ret.input.reposicion = isNaN(line[col.V]) ? null : Math.round(line[col.V]*10000)/10000;
+              ret.input.promo = isNaN(line[col.W]) ? null : Math.round(line[col.W]*10000)/10000;
+              ret.input.base = isNaN(line[col.X]) ? null : Math.round(line[col.X]*10000)/10000;
+              ret.input.oferta = isNaN(line[col.Y]) ? null : Math.round(line[col.Y]*10000)/10000;
+              ret.input.sugerido = isNaN(line[col.Z]) ? null : Math.round(line[col.Z]*10000)/10000;
+
+              ret.vbulto = {
+                margen:  isNaN(line[col.AH]) ? array[4][col.AK] : line[col.AH],
+                tarjeta: isNaN(line[col.AI]) ? null : Math.round(line[col.AI]*10000)/10000,
+                debito: isNaN(line[col.AJ]) ? null : Math.round(line[col.AJ]*10000)/10000,
+                efectivo: isNaN(line[col.AK]) ? null : Math.round(line[col.AK]*10000)/10000,
+                descuento1: isNaN(line[col.AL]) ? null : Math.round(line[col.AL]*10000)/10000,
+                descuento2: isNaN(line[col.AM]) ? null : Math.round(line[col.AM]*10000)/10000
+              };
+
+              ret.vunidad = {
+                margen:  isNaN(line[col.AO]) ? array[4][col.AR] : line[col.AO],
+                tarjeta: isNaN(line[col.AP]) ? null : Math.round(line[col.AP]*10000)/10000,
+                debito: isNaN(line[col.AQ]) ? null : Math.round(line[col.AQ]*10000)/10000,
+                efectivo: isNaN(line[col.AR]) ? null : Math.round(line[col.AR]*10000)/10000,
+                descuento1: isNaN(line[col.AS]) ? null : Math.round(line[col.AS]*10000)/10000,
+                descuento2: isNaN(line[col.AT]) ? null : Math.round(line[col.AT]*10000)/10000
+              };
+
+              ret.fabricante = line[col.BA];
+              ret.marca = line[col.BB];
+              ret.name = line[col.BC];
+              ret.especie = line[col.BD];
+              ret.edad = line[col.BE];
+              ret.rubro = line[col.BF];
+              ret.linea = line[col.BG];
+              ret.raza = line[col.BH];
+              ret.bulto = line[col.BI];
+              ret.presentacion = line[col.BJ];
+              ret.unidad = line[col.BK];
+
+              line[col.A] = ret.codigo;
+              line[col.B] = ret.descripcion;
+              line[col.C] = ret.input;
+              line[col.D] = ret.vbulto;
+              line[col.E] = ret.vunidad;
+              line[col.F] = ret.fabricante;
+              line[col.G] = ret.marca;
+              line[col.H] = ret.name;
+              line[col.I] = ret.especie;
+              line[col.J] = ret.edad;
+              line[col.K] = ret.rubro;
+              line[col.L] = ret.linea;
+              line[col.M] = ret.raza;
+              line[col.N] = ret.bulto;
+              line[col.O] = ret.presentacion;
+              line[col.P] = ret.unidad;
+              line[col.Q] = ret.clase;
+              //line[col.R] = ret.ean;
+              line[col.S] = ret.peso;
+              line[col.T] = ret.pesable;
+              line[col.U] = ret.unidades;
+              if( line[col.A] && line[col.B] && line[col.C] && line[col.D] )
+                return line;
+            }
+          }`
+        ]
+      }
+    }
+  },
+  {
+  "_id": '61ccba46ac0a1e5674aa8071',
   "nombre": "Sciarriello",
   "type": "XLSX",
   "encode": "utf-8",
   "named": false,
   "input": {
-    "SABROSITOS":{
-      "input_fields": [
-        "codigo",
-        "nombre",
-        "bulto",
-        "contiene",
-        "unidad",
-        "reposicion",
-        "lista",
-      ],
+    "*":{
+      "input_fields": fieldsNames,
       "filters":[
-        `(line) => {
-          const ret = {};
-          ret['nombre'] = line[1];
-          if(line[2]){
-            const contenido = line[2].match(/(?<bulto>[0-9]+)[ ]?(?<bunidad>[A-Z]+)[ xX]*(?<contiene1>[0-9,+]+)[ ]?(?<unidad1>[A-Z]+)|(?<contiene>[0-9+]*)[ ]?(?<unidad>[A-Z]*)/);
-            ret['contiene'] = contenido.groups.contiene || contenido.groups.contiene1;
-            ret['unidad'] = contenido.groups.unidad || contenido.groups.unidad1;
-            ret['bulto'] = parseFloat(contenido.groups.bulto || 1);
-            if(ret['contiene']) {
-              ret['contiene'] = ret['contiene'].replace(/[,]/,".");
-              if(ret['contiene'].search(/[+]/)>-1){
-                ret['nombre'] = ret['nombre']+' '+ret['contiene'];
-                ret['contiene'] = eval(ret['contiene']);
-              } else {
-                ret['contiene'] = parseFloat(ret['contiene']);
-              }
-            }
+        `(line,idx,array) => {
+          if(line[col.U] && line[col.U] === 1){
+            const ret = {};
+            if(line[col.B] && line[col.C])
+              ret.codigo = (line[col.B]+line[col.C]).replace(/[ ]/g,'');
+            ret.descripcion = line[col.B];
+            ret.clase = isNaN(line[col.T]) ? 0 : line[col.T];
+            ret.peso = isNaN(line[col.AA]) ? null : Math.round(line[col.AA]*10000)/10000;
+            ret.unidades = isNaN(line[col.AB]) ? null : Math.round(line[col.AB]*10000)/10000;
+            ret.pesable = isNaN(line[col.AC]) ? null : Math.round(line[col.AC]*10000)/10000;
+
+            ret.input = {};
+            ret.input.lista =  isNaN(line[col.P]) ? null : Math.round(line[col.P]*10000)/10000;
+            ret.input.reposicion = isNaN(line[col.V]) ? null : Math.round(line[col.V]*10000)/10000;
+            ret.input.promo = isNaN(line[col.W]) ? null : Math.round(line[col.W]*10000)/10000;
+            ret.input.base = isNaN(line[col.X]) ? null : Math.round(line[col.X]*10000)/10000;
+            ret.input.oferta = isNaN(line[col.Y]) ? null : Math.round(line[col.Y]*10000)/10000;
+            ret.input.sugerido = isNaN(line[col.Z]) ? null : Math.round(line[col.Z]*10000)/10000;
+
+            ret.vbulto = {
+              margen:  isNaN(line[col.AH]) ? array[4][col.AK] : line[col.AH],
+              tarjeta: isNaN(line[col.AI]) ? null : Math.round(line[col.AI]*10000)/10000,
+              debito: isNaN(line[col.AJ]) ? null : Math.round(line[col.AJ]*10000)/10000,
+              efectivo: isNaN(line[col.AK]) ? null : Math.round(line[col.AK]*10000)/10000,
+              descuento1: isNaN(line[col.AL]) ? null : Math.round(line[col.AL]*10000)/10000,
+              descuento2: isNaN(line[col.AM]) ? null : Math.round(line[col.AM]*10000)/10000
+            };
+
+            ret.vunidad = {
+              margen:  isNaN(line[col.AO]) ? array[4][col.AR] : line[col.AO],
+              tarjeta: isNaN(line[col.AP]) ? null : Math.round(line[col.AP]*10000)/10000,
+              debito: isNaN(line[col.AQ]) ? null : Math.round(line[col.AQ]*10000)/10000,
+              efectivo: isNaN(line[col.AR]) ? null : Math.round(line[col.AR]*10000)/10000,
+              descuento1: isNaN(line[col.AS]) ? null : Math.round(line[col.AS]*10000)/10000,
+              descuento2: isNaN(line[col.AT]) ? null : Math.round(line[col.AT]*10000)/10000
+            };
+
+            ret.fabricante = line[col.BA];
+            ret.marca = line[col.BB];
+            ret.name = line[col.BC];
+            ret.especie = line[col.BD];
+            ret.edad = line[col.BE];
+            ret.rubro = line[col.BF];
+            ret.linea = line[col.BG];
+            ret.raza = line[col.BH];
+            ret.bulto = line[col.BI];
+            ret.presentacion = line[col.BJ];
+            ret.unidad = line[col.BK];
+
+            line[col.A] = ret.codigo;
+            line[col.B] = ret.descripcion;
+            line[col.C] = ret.input;
+            line[col.D] = ret.vbulto;
+            line[col.E] = ret.vunidad;
+            line[col.F] = ret.fabricante;
+            line[col.G] = ret.marca;
+            line[col.H] = ret.name;
+            line[col.I] = ret.especie;
+            line[col.J] = ret.edad;
+            line[col.K] = ret.rubro;
+            line[col.L] = ret.linea;
+            line[col.M] = ret.raza;
+            line[col.N] = ret.bulto;
+            line[col.O] = ret.presentacion;
+            line[col.P] = ret.unidad;
+            line[col.Q] = ret.clase;
+            //line[col.R] = ret.ean;
+            line[col.S] = ret.peso;
+            line[col.T] = ret.pesable;
+            line[col.U] = ret.unidades;
+
+            if( line[col.A] && line[col.B] && line[col.C] && line[col.D] )
+              return line;
           }
-          if(line[3]){
-            let reposicion = line[3] && isNaN(line[3]) ? line[3].match(/[$](?<value>[0-9\.]*)/) : null;
-            if (reposicion){
-              reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
-            }
-            ret['reposicion'] = reposicion;
-          }
-          if(line[4]){
-            let lista = line[4] && isNaN(line[3]) ? line[4].match(/[$](?<value>[0-9\.]*)/) : null;
-            if (lista){
-              lista = lista['groups']['value'] ? parseFloat(lista['groups']['value']): null;
-            }
-            ret['lista'] = lista;
-          }
-          if (ret.nombre)
-            ret.nombre = ret.nombre.replace(/[  ]/g," ");
-          line[1] = ret.nombre;
-          line[2] = ret.bulto;
-          line[3] = ret.contiene;
-          line[4] = ret.unidad;
-          line[5] = ret.reposicion;
-          line[6] = ret.lista;
-          line[0] = String(ret.nombre+ret.bulto+ret.contiene).replace(/[  ]/g,"").toLowerCase();
-          if(line[1] && line[2] && line[3] && line[4] && line[5] && line[6]) return line;
         }`
       ]
-    },
-    "SEDA":{
-      "input_fields": [
-        "codigo",
-        "nombre",
-        "bulto",
-        "contiene",
-        "unidad",
-        "reposicion"
-      ],
-      "filters":[
-        `(line) => {
-          const ret = {};
-          if(line[1]){
-            ret['nombre'] = line[1];
-            if(line[4]) ret['nombre'] = line[1]+" ("+line[4]+")"
-          }
-          if(line[2]){
-            const contenido = line[2].match(/(?<bulto>[0-9]+)[ ]?(?<bunidad>[A-Za-z]+)[ xX]*(?<contiene1>[0-9,+]+)[ ]?(?<unidad1>[A-Za-z]+)|(?<contiene>[0-9+]*)[ ]?(?<unidad>[A-Za-z]*)/);
-            ret['contiene'] = contenido.groups.contiene || contenido.groups.contiene1;
-            ret['unidad'] = contenido.groups.unidad || contenido.groups.unidad1;
-            ret['bulto'] = parseFloat(contenido.groups.bulto || 1);
-            if(ret['contiene']) {
-              ret['contiene'] = ret['contiene'].replace(/[,]/,".");
-              if(ret['contiene'].search(/[+]/)>-1){
-                ret['nombre'] = ret['nombre']+' '+ret['contiene'];
-                ret['contiene'] = eval(ret['contiene']);
-              } else {
-                ret['contiene'] = parseFloat(ret['contiene']);
-              }
-            }
-          }
-          if(line[3]){
-            let reposicion = line[3] ? line[3].match(/[$](?<value>[0-9\.]*)/) : null;
-            if (reposicion){
-              reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
-            }
-            ret['reposicion'] = reposicion;
-          }
-
-          if (ret.nombre)
-            ret.nombre = ret.nombre.replace(/[  ]/g," ");
-          line[1] = ret.nombre;
-          line[2] = ret.bulto;
-          line[3] = ret.contiene;
-          line[4] = ret.unidad;
-          line[5] = ret.reposicion;
-          line[6] = ret.lista;
-          line[0] = String(ret.nombre+ret.bulto+ret.contiene).replace(/[  ]/g,"").toLowerCase();
-          if(line[1] && line[2] && line[3] && line[4] && line[5]) return line;
-        }`
-      ]
-
-    },
-    "KEIKO, MAUSSY":{
-      "input_fields": [
-        "codigo",
-        "nombre",
-        "bulto",
-        "contiene",
-        "unidad",
-        "reposicion"
-      ],
-      "filters":[
-        `(line) => {
-          const ret = {};
-          if(line[1]){
-            ret['nombre'] = line[1];
-            if(line[4]) ret['nombre'] = line[1]+" ("+line[4]+")"
-          }
-          if(line[2]){
-            const contenido = line[2].match(/(?<bulto>[0-9]+)[ ]?(?<bunidad>[A-Za-z]+)[ xX]*(?<contiene1>[0-9,+]+)[ ]?(?<unidad1>[A-Za-z]+)|(?<contiene>[0-9+]*)[ ]?(?<unidad>[A-Za-z]*)/);
-            ret['contiene'] = contenido.groups.contiene || contenido.groups.contiene1;
-            ret['unidad'] = contenido.groups.unidad || contenido.groups.unidad1;
-            ret['bulto'] = parseFloat(contenido.groups.bulto || 1);
-            if(ret['contiene']) {
-              ret['contiene'] = ret['contiene'].replace(/[,]/,".");
-              if(ret['contiene'].search(/[+]/)>-1){
-                ret['nombre'] = ret['nombre']+' '+ret['contiene'];
-                ret['contiene'] = eval(ret['contiene']);
-              } else {
-                ret['contiene'] = parseFloat(ret['contiene']);
-              }
-            }
-          }
-          if(line[3]){
-            let reposicion = line[3] ? line[3].match(/[$](?<value>[0-9\.]*)/) : null;
-            if (reposicion){
-              reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
-            }
-            ret['reposicion'] = reposicion;
-          }
-
-          if (ret.nombre)
-            ret.nombre = ret.nombre.replace(/[  ]/g," ");
-          line[1] = ret.nombre;
-          line[2] = ret.bulto;
-          line[3] = ret.contiene;
-          line[4] = ret.unidad;
-          line[5] = ret.reposicion;
-          line[0] = String(ret.nombre+ret.bulto+ret.contiene).replace(/[  ]/g,"").toLowerCase();
-          if(line[1] && line[2] && line[3] && line[4] && line[5]) return line;
-        }`
-      ]
-    },
-    "RAZA":{
-      "input_fields": [
-        "codigo",
-        "nombre",
-        "bulto",
-        "contiene",
-        "unidad",
-        "reposicion"
-      ],
-      "filters":[
-        `(line) => {
-          const ret = {};
-          if(line[1]){
-            ret['nombre'] = line[1];
-            if(line[4]) ret['nombre'] = line[1]+" ("+line[4]+")"
-          }
-          if(line[2]){
-            const contenido = line[2].match(/(?<bulto>[0-9]+)[ ]?(?<bunidad>[A-Za-z]+)[ xX]*(?<contiene1>[0-9,+]+)[ ]?(?<unidad1>[A-Za-z]+)|[xX ]+(?<contiene2>[0-9+]*)[ ]?(?<unidad2>[A-Za-z]*)|(?<contiene>[0-9+]*)[ ]?(?<unidad>[A-Za-z]*)/);
-            ret['contiene'] = contenido.groups.contiene || contenido.groups.contiene1 || contenido.groups.contiene2;
-            ret['unidad'] = contenido.groups.unidad || contenido.groups.unidad1 || contenido.groups.unidad2;
-            ret['bulto'] = parseFloat(contenido.groups.bulto || 1);
-            if(ret['contiene']) {
-              ret['contiene'] = ret['contiene'].replace(/[,]/,".");
-              if(ret['contiene'].search(/[+]/)>-1){
-                ret['nombre'] = ret['nombre']+' '+ret['contiene'];
-                ret['contiene'] = eval(ret['contiene']);
-              } else {
-                ret['contiene'] = parseFloat(ret['contiene']);
-              }
-            }
-          }
-          if(line[3]){
-            let reposicion = line[3] ? line[3].match(/[$](?<value>[0-9\.]*)/) : null;
-            if (reposicion){
-              reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
-            }
-            ret['reposicion'] = reposicion;
-          }
-
-          if (ret.nombre)
-            ret.nombre = ret.nombre.replace(/[  ]/g," ");
-          line[1] = ret.nombre;
-          line[2] = ret.bulto;
-          line[3] = ret.contiene;
-          line[4] = ret.unidad;
-          line[5] = ret.reposicion;
-          line[0] = String(ret.nombre+ret.bulto+ret.contiene).replace(/[  ]/g,"").toLowerCase();
-          if(line[1] && line[2] && line[3] && line[4] && line[5]) return line;
-        }`
-      ]
-    },
-    "PURINA":{
-      "input_fields": [
-        "codigo",
-        "nombre",
-        "bulto",
-        "contiene",
-        "unidad",
-        "reposicion"
-      ],
-      "filters":[
-        `(line) => {
-          const ret = {};
-          if(line[1]){
-            ret['nombre'] = line[1];
-            if(line[4]) ret['nombre'] = line[1]+" ("+line[4]+")"
-          }
-          if(line[2]){
-            const contenido = line[2].match(/(?<bulto>[0-9]+)[ ]?(?<bunidad>[A-Za-z]+)[ xX]*(?<contiene1>[0-9,+]+)[ ]?(?<unidad1>[A-Za-z]+)|[xX ]+(?<contiene2>[0-9+]*)[ ]?(?<unidad2>[A-Za-z]*)|(?<contiene>[0-9+]*)[ ]?(?<unidad>[A-Za-z]*)/);
-            ret['contiene'] = contenido.groups.contiene || contenido.groups.contiene1 || contenido.groups.contiene2;
-            ret['unidad'] = contenido.groups.unidad || contenido.groups.unidad1 || contenido.groups.unidad2;
-            ret['bulto'] = parseFloat(contenido.groups.bulto || 1);
-            if(ret['contiene']) {
-              ret['contiene'] = ret['contiene'].replace(/[,]/,".");
-              if(ret['contiene'].search(/[+]/)>-1){
-                ret['nombre'] = ret['nombre']+' '+ret['contiene'];
-                ret['contiene'] = eval(ret['contiene']);
-              } else {
-                ret['contiene'] = parseFloat(ret['contiene']);
-              }
-            }
-          }
-          if(line[3]){
-            let reposicion = line[3] ? line[3].match(/[$](?<value>[0-9\.]*)/) : null;
-            if (reposicion){
-              reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
-            }
-            ret['reposicion'] = reposicion;
-          }
-
-          if (ret.nombre)
-            ret.nombre = ret.nombre.replace(/[  ]/g," ");
-          line[1] = ret.nombre;
-          line[2] = ret.bulto;
-          line[3] = ret.contiene;
-          line[4] = ret.unidad;
-          line[5] = ret.reposicion;
-          line[0] = String(ret.nombre+ret.bulto+ret.contiene).replace(/[  ]/g,"").toLowerCase();
-          if(line[1] && line[2] && line[3] && line[4] && line[5]) return line;
-        }`
-      ]
-    },
-    "SIEGER, 7 VIDAS":{
-      "input_fields": [
-        "codigo",
-        "nombre",
-        "bulto",
-        "contiene",
-        "unidad",
-        "reposicion"
-      ],
-      "filters":[
-        `(line) => {
-          const ret = {};
-          if(line[1]){
-            ret['nombre'] = line[1];
-            if(line[4]) ret['nombre'] = line[1]+" ("+line[4]+")"
-          }
-          if(line[2]){
-            const contenido = line[2].match(/(?<bulto>[0-9]+)[ ]?(?<bunidad>[A-Za-z]+)[ xX]*(?<contiene1>[0-9,+]+)[ ]?(?<unidad1>[A-Za-z]+)|[xX ]+(?<contiene2>[0-9+]*)[ ]?(?<unidad2>[A-Za-z]*)|(?<contiene>[0-9,+]*)[ ]?(?<unidad>[A-Za-z]*)/);
-            ret['contiene'] = contenido.groups.contiene || contenido.groups.contiene1 || contenido.groups.contiene2;
-            ret['unidad'] = contenido.groups.unidad || contenido.groups.unidad1 || contenido.groups.unidad2;
-            ret['bulto'] = parseFloat(contenido.groups.bulto || 1);
-            if(ret['contiene']) {
-              ret['contiene'] = ret['contiene'].replace(/[,]/,".");
-              if(ret['contiene'].search(/[+]/)>-1){
-                ret['nombre'] = ret['nombre']+' '+ret['contiene'];
-                ret['contiene'] = eval(ret['contiene']);
-              } else {
-                ret['contiene'] = parseFloat(ret['contiene']);
-              }
-            }
-          }
-          if(line[3]){
-            let reposicion = line[3] ? line[3].match(/[$](?<value>[0-9\.]*)/) : null;
-            if (reposicion){
-              reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
-            }
-            ret['reposicion'] = reposicion;
-          }
-
-          if (ret.nombre)
-            ret.nombre = ret.nombre.replace(/[  ]/g," ");
-          line[1] = ret.nombre;
-          line[2] = ret.bulto;
-          line[3] = ret.contiene;
-          line[4] = ret.unidad;
-          line[5] = ret.reposicion;
-          line[0] = String(ret.nombre+ret.bulto+ret.contiene).replace(/[  ]/g,"").toLowerCase();
-          if(line[1] && line[2] && line[3] && line[4] && line[5]) return line;
-        }`
-      ]
-    },
-    "PEDIGREE & WHISKAS":{
-      "input_fields": [
-        "codigo",
-        "nombre",
-        "bulto",
-        "contiene",
-        "unidad",
-        "reposicion"
-      ],
-      "filters":[
-        `(line) => {
-          const ret = {};
-          if(line[1]){
-            ret['nombre'] = line[1];
-            if(line[4]) ret['nombre'] = line[1]+" ("+line[4]+")"
-          }
-          if(line[2]){
-            const contenido = line[2].match(/(?<bulto>[0-9]+)[ ]?(?<bunidad>[A-Za-z]+)[ xX]*(?<contiene1>[0-9,+]+)[ ]?(?<unidad1>[A-Za-z]+)|[xX ]+(?<contiene2>[0-9+]*)[ ]?(?<unidad2>[A-Za-z]*)|(?<contiene>[0-9,+]*)[ ]?(?<unidad>[A-Za-z]*)/);
-            ret['contiene'] = contenido.groups.contiene || contenido.groups.contiene1 || contenido.groups.contiene2;
-            ret['unidad'] = contenido.groups.unidad || contenido.groups.unidad1 || contenido.groups.unidad2;
-            ret['bulto'] = parseFloat(contenido.groups.bulto || 1);
-            if(ret['contiene']) {
-              ret['contiene'] = ret['contiene'].replace(/[,]/,".");
-              if(ret['contiene'].search(/[+]/)>-1){
-                ret['nombre'] = ret['nombre']+' '+ret['contiene'];
-                ret['contiene'] = eval(ret['contiene']);
-              } else {
-                ret['contiene'] = parseFloat(ret['contiene']);
-              }
-            }
-          }
-          if(line[3]){
-            let reposicion = line[3] ? line[3].match(/[$](?<value>[0-9\.]*)/) : null;
-            if (reposicion){
-              reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
-            }
-            ret['reposicion'] = reposicion;
-          }
-
-          if (ret.nombre)
-            ret.nombre = ret.nombre.replace(/[  ]/g," ");
-          line[1] = ret.nombre;
-          line[2] = ret.bulto;
-          line[3] = ret.contiene;
-          line[4] = ret.unidad;
-          line[5] = ret.reposicion;
-          line[0] = String(ret.nombre+ret.bulto+ret.contiene).replace(/[  ]/g,"").toLowerCase();
-          if(line[1] && line[2] && line[3] && line[4] && line[5]) return line;
-        }`
-      ]
-    },
-    "DOG SELECTION & PACHA":{
-      "input_fields": [
-        "codigo",
-        "nombre",
-        "bulto",
-        "contiene",
-        "unidad",
-        "reposicion"
-      ],
-      "filters":[
-        `(line) => {
-          const ret = {};
-          if(line[1]){
-            ret['nombre'] = line[1];
-            if(line[4]) ret['nombre'] = line[1]+" ("+line[4]+")"
-          }
-          if(line[2]){
-            const contenido = line[2].match(/(?<bulto>[0-9]+)[ ]?(?<bunidad>[A-Za-z]+)[ xX]*(?<contiene1>[0-9,+]+)[ ]?(?<unidad1>[A-Za-z]+)|[xX ]+(?<contiene2>[0-9+]*)[ ]?(?<unidad2>[A-Za-z]*)|(?<contiene>[0-9,+]*)[ ]?(?<unidad>[A-Za-z]*)/);
-            ret['contiene'] = contenido.groups.contiene || contenido.groups.contiene1 || contenido.groups.contiene2;
-            ret['unidad'] = contenido.groups.unidad || contenido.groups.unidad1 || contenido.groups.unidad2;
-            ret['bulto'] = parseFloat(contenido.groups.bulto || 1);
-            if(ret['contiene']) {
-              ret['contiene'] = ret['contiene'].replace(/[,]/,".");
-              if(ret['contiene'].search(/[+]/)>-1){
-                ret['nombre'] = ret['nombre']+' '+ret['contiene'];
-                ret['contiene'] = eval(ret['contiene']);
-              } else {
-                ret['contiene'] = parseFloat(ret['contiene']);
-              }
-            }
-          }
-          if(line[3]){
-            let reposicion = line[3] ? line[3].match(/[$](?<value>[0-9\.]*)/) : null;
-            if (reposicion){
-              reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
-            }
-            ret['reposicion'] = reposicion;
-          }
-
-          if (ret.nombre)
-            ret.nombre = ret.nombre.replace(/[  ]/g," ");
-          line[1] = ret.nombre;
-          line[2] = ret.bulto;
-          line[3] = ret.contiene;
-          line[4] = ret.unidad;
-          line[5] = ret.reposicion;
-          line[0] = String(ret.nombre+ret.bulto+ret.contiene).replace(/[  ]/g,"").toLowerCase();
-          if(line[1] && line[2] && line[3] && line[4] && line[5]) return line;
-        }`
-      ]
-    },
-    "BALANCEADOS, SEMILLAS & OTROS":{
-      "input_fields": [
-        "codigo",
-        "nombre",
-        "bulto",
-        "contiene",
-        "unidad",
-        "reposicion"
-      ],
-      "filters":[
-        `(line) => {
-          const ret = {};
-          if(line[1]){
-            ret['nombre'] = line[1];
-            if(line[4]) ret['nombre'] = line[1]+" ("+line[4]+")"
-          }
-          if(line[2]){
-            const contenido = line[2].match(/(?<bulto>[0-9]+)[ ]?(?<bunidad>[A-Za-z]+)[ xX]*(?<contiene1>[0-9,+]+)[ ]?(?<unidad1>[A-Za-z]+)|[xX ]+(?<contiene2>[0-9+]*)[ ]?(?<unidad2>[A-Za-z]*)|(?<contiene>[0-9,+]*)[ ]?(?<unidad>[A-Za-z]*)/);
-            ret['contiene'] = contenido.groups.contiene || contenido.groups.contiene1 || contenido.groups.contiene2;
-            ret['unidad'] = contenido.groups.unidad || contenido.groups.unidad1 || contenido.groups.unidad2;
-            ret['bulto'] = parseFloat(contenido.groups.bulto || 1);
-            if(ret['contiene']) {
-              ret['contiene'] = ret['contiene'].replace(/[,]/,".");
-              if(ret['contiene'].search(/[+]/)>-1){
-                ret['nombre'] = ret['nombre']+' '+ret['contiene'];
-                ret['contiene'] = eval(ret['contiene']);
-              } else {
-                ret['contiene'] = parseFloat(ret['contiene']);
-              }
-            }
-          }
-          if(line[3]){
-            let reposicion = line[3]  && isNaN(line[3]) ? line[3].match(/[$](?<value>[0-9\.]*)/) : null;
-            if (reposicion){
-              reposicion = reposicion['groups']['value'] ? parseFloat(reposicion['groups']['value']): null;
-            }
-            ret['reposicion'] = reposicion;
-          }
-
-          if (ret.nombre)
-            ret.nombre = ret.nombre.replace(/[  ]/g," ");
-          line[1] = ret.nombre;
-          line[2] = ret.bulto;
-          line[3] = ret.contiene;
-          line[4] = ret.unidad;
-          line[5] = ret.reposicion;
-          line[0] = String(ret.nombre+ret.bulto+ret.contiene).replace(/[  ]/g,"").toLowerCase();
-          if(line[1] && line[2] && line[3] && line[4] && line[5]) return line;
-        }`
-      ]
-    },
+    }
   },
 //  aggregate:[
 ////    {
@@ -1058,7 +734,7 @@ export const proveedoresSettings = [
 //  ]
   },
   {
-    "_id": '613fa68cdab04e52e3a59a37',
+    "_id": '61ccc87eac0a1e5674aa86ec',
     "nombre": "CanCat",
     "type": "XLSX",
     "encode": "utf-8",
@@ -1086,8 +762,8 @@ export const proveedoresSettings = [
             ret.ean = isNaN(line[3]) ? null : line[3];
             ret.bulto = line[4];
             ret.contiene = isNaN(line[5]) ? 1 : line[5];
-            ret.reposicion = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-            ret.sugerido = isNaN(line[10]) ? null : Math.round(line[10]*100)/100;
+            ret.reposicion = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+            ret.sugerido = isNaN(line[10]) ? null : Math.round(line[10]*10000)/10000;
             line[3] = ret.ean;
             line[5] = ret.contiene;
             line[6] = ret.reposicion;
@@ -1131,6 +807,7 @@ export const proveedoresSettings = [
 
   }
 ];
+
 
 @Injectable({
   providedIn: 'root'
@@ -1332,13 +1009,13 @@ export class ListasProveedoresService {
 //      //      ret.codigo = line[1];
 //      //      ret.bulto = line[2];
 //      //      ret.contiene = line[3];
-//      //      ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//      //      ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//      //      ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//      //      ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//      //      ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//      //      ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-//      //      ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//      //      ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//      //      ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//      //      ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//      //      ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//      //      ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//      //      ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
+//      //      ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*1000000)/10000;
 //      //      line[0] = ret.nombre;
 //      //      line[1] = ret.codigo + '';
 //      //      line[2] = ret.bulto;
@@ -1390,18 +1067,18 @@ export class ListasProveedoresService {
 //            ret.codigo = line[1];
 //            ret.bulto = line[3];
 //            ret.contiene = line[2];
-//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
 //            ret.sugeridobulto = line[10];
-//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
 //            ret.pesable = line[11];
 //            ret.reposicionbulto = line[12];
-//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*10000)/10000;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*10000)/10000;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*10000)/10000;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*10000)/10000;
 //            line[0] = ret.nombre;
 //            line[1] = ret.codigo + '';
 //            line[2] = ret.bulto;
@@ -1457,13 +1134,13 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[2];
 //        //    ret.bulto = line[3];
 //        //    ret.contiene = line[4];
-//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
-//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
+//        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*1000000)/10000;
 //        //    line[1] = ret.nombre;
 //        //    line[2] = ret.codigo;
 //        //    line[3] = ret.bulto;
@@ -1513,12 +1190,12 @@ export class ListasProveedoresService {
 //      //      ret.codigo = line[2];
 //      //      ret.bulto = line[3];
 //      //      ret.contiene = line[4];
-//      //      ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//      //      ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//      //      ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//      //      ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//      //      ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-//      //      ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//      //      ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//      //      ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//      //      ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//      //      ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//      //      ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*10000)/10000;
+//      //      ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 ////    //        ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //      //      line[1] = ret.nombre;
 //      //      line[2] = ret.codigo;
@@ -1574,18 +1251,18 @@ export class ListasProveedoresService {
 //            ret.codigo = line[1];
 //            ret.bulto = line[3];
 //            ret.contiene = line[2];
-//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
 //            ret.sugeridobulto = line[10];
-//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
 //            ret.pesable = line[11];
 //            ret.reposicionbulto = line[12];
-//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*10000)/10000;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*10000)/10000;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*10000)/10000;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*10000)/10000;
 //            line[0] = ret.nombre;
 //            line[1] = ret.codigo + '';
 //            line[2] = ret.bulto;
@@ -1641,12 +1318,12 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[2];
 //        //    ret.bulto = line[3];
 //        //    ret.contiene = line[4];
-//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 //        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //        //    line[1] = ret.nombre;
 //        //    line[2] = ret.codigo;
@@ -1703,18 +1380,18 @@ export class ListasProveedoresService {
 //            ret.codigo = line[1];
 //            ret.bulto = line[3];
 //            ret.contiene = line[2];
-//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
 //            ret.sugeridobulto = line[10];
-//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
 //            ret.pesable = line[11];
 //            ret.reposicionbulto = line[12];
-//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*10000)/10000;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*10000)/10000;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*10000)/10000;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*10000)/10000;
 //            line[0] = ret.nombre;
 //            line[1] = ret.codigo + '';
 //            line[2] = ret.bulto;
@@ -1770,12 +1447,12 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[2];
 //        //    ret.bulto = line[3];
 //        //    ret.contiene = line[4];
-//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 //        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //        //    line[1] = ret.nombre;
 //        //    line[2] = ret.codigo;
@@ -1829,18 +1506,18 @@ export class ListasProveedoresService {
 //            ret.codigo = line[1];
 //            ret.bulto = line[3];
 //            ret.contiene = line[2];
-//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
 //            ret.sugeridobulto = line[10];
-//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
 //            ret.pesable = line[11];
 //            ret.reposicionbulto = line[12];
-//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*10000)/10000;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*10000)/10000;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*10000)/10000;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*10000)/10000;
 //            line[0] = ret.nombre;
 //            line[1] = ret.codigo + '';
 //            line[2] = ret.bulto;
@@ -1896,12 +1573,12 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[2];
 //        //    ret.bulto = line[3];
 //        //    ret.contiene = line[4];
-//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 //        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //        //    line[1] = ret.nombre;
 //        //    line[2] = ret.codigo;
@@ -1955,18 +1632,18 @@ export class ListasProveedoresService {
 //            ret.codigo = line[1];
 //            ret.bulto = line[3];
 //            ret.contiene = line[2];
-//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
 //            ret.sugeridobulto = line[10];
-//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
 //            ret.pesable = line[11];
 //            ret.reposicionbulto = line[12];
-//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*10000)/10000;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*10000)/10000;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*10000)/10000;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*10000)/10000;
 //            line[0] = ret.nombre;
 //            line[1] = ret.codigo + '';
 //            line[2] = ret.bulto;
@@ -2022,12 +1699,12 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[2];
 //        //    ret.bulto = line[3];
 //        //    ret.contiene = line[4];
-//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 //        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //        //    line[1] = ret.nombre;
 //        //    line[2] = ret.codigo;
@@ -2081,18 +1758,18 @@ export class ListasProveedoresService {
 //            ret.codigo = line[1];
 //            ret.bulto = line[3];
 //            ret.contiene = line[2];
-//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
 //            ret.sugeridobulto = line[10];
-//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
 //            ret.pesable = line[11];
 //            ret.reposicionbulto = line[12];
-//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*10000)/10000;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*10000)/10000;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*10000)/10000;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*10000)/10000;
 //            line[0] = ret.nombre;
 //            line[1] = ret.codigo + '';
 //            line[2] = ret.bulto;
@@ -2147,12 +1824,12 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[1];
 //        //    ret.bulto = line[2];
 //        //    ret.contiene = line[3];
-//        //    ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//        //    ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//        //    ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 //        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //        //    line[0] = ret.nombre;
 //        //    line[1] = ret.codigo;
@@ -2206,18 +1883,18 @@ export class ListasProveedoresService {
 //            ret.codigo = line[1];
 //            ret.bulto = line[3];
 //            ret.contiene = line[2];
-//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
 //            ret.sugeridobulto = line[10];
-//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
 //            ret.pesable = line[11];
 //            ret.reposicionbulto = line[12];
-//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*10000)/10000;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*10000)/10000;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*10000)/10000;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*10000)/10000;
 //            line[0] = ret.nombre;
 //            line[1] = ret.codigo + '';
 //            line[2] = ret.bulto;
@@ -2273,12 +1950,12 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[2];
 //        //    ret.bulto = line[3];
 //        //    ret.contiene = line[4];
-//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 //        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //        //    line[1] = ret.nombre;
 //        //    line[2] = ret.codigo;
@@ -2332,18 +2009,18 @@ export class ListasProveedoresService {
 //            ret.codigo = line[1];
 //            ret.bulto = line[3];
 //            ret.contiene = line[2];
-//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
 //            ret.sugeridobulto = line[10];
-//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
 //            ret.pesable = line[11];
 //            ret.reposicionbulto = line[12];
-//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*10000)/10000;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*10000)/10000;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*10000)/10000;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*10000)/10000;
 //            line[0] = ret.nombre;
 //            line[1] = ret.codigo + '';
 //            line[2] = ret.bulto;
@@ -2399,12 +2076,12 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[2];
 //        //    ret.bulto = line[3];
 //        //    ret.contiene = line[4];
-//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 //        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //        //    line[1] = ret.nombre;
 //        //    line[2] = ret.codigo;
@@ -2459,18 +2136,18 @@ export class ListasProveedoresService {
 //            ret.codigo = line[1];
 //            ret.bulto = line[3];
 //            ret.contiene = line[2];
-//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
 //            ret.sugeridobulto = line[10];
-//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
 //            ret.pesable = line[11];
 //            ret.reposicionbulto = line[12];
-//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*10000)/10000;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*10000)/10000;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*10000)/10000;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*10000)/10000;
 //            line[0] = ret.nombre;
 //            line[1] = ret.codigo + '';
 //            line[2] = ret.bulto;
@@ -2527,12 +2204,12 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[2];
 //        //    ret.bulto = line[3];
 //        //    ret.contiene = line[4];
-//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 //        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //        //    line[1] = ret.nombre;
 //        //    line[2] = ret.codigo;
@@ -2586,18 +2263,18 @@ export class ListasProveedoresService {
 //            ret.codigo = line[1];
 //            ret.bulto = line[3];
 //            ret.contiene = line[2];
-//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
 //            ret.sugeridobulto = line[10];
-//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
 //            ret.pesable = line[11];
 //            ret.reposicionbulto = line[12];
-//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*10000)/10000;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*10000)/10000;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*10000)/10000;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*10000)/10000;
 //            line[0] = ret.nombre;
 //            line[1] = ret.codigo + '';
 //            line[2] = ret.bulto;
@@ -2653,12 +2330,12 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[2];
 //        //    ret.bulto = line[3];
 //        //    ret.contiene = line[4];
-//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 //        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //        //    line[1] = ret.nombre;
 //        //    line[2] = ret.codigo;
@@ -2708,12 +2385,12 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[2];
 //        //    ret.bulto = line[3];
 //        //    ret.contiene = line[4];
-//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.bultoneto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.neto = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.lista = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[9]) ? null : Math.round(line[9]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 //        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //        //    line[1] = ret.nombre;
 //        //    line[2] = ret.codigo;
@@ -2767,18 +2444,18 @@ export class ListasProveedoresService {
 //            ret.codigo = line[1];
 //            ret.bulto = line[3];
 //            ret.contiene = line[2];
-//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
 //            ret.sugeridobulto = line[10];
-//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
 //            ret.pesable = line[11];
 //            ret.reposicionbulto = line[12];
-//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*10000)/10000;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*10000)/10000;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*10000)/10000;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*10000)/10000;
 //            line[0] = ret.nombre;
 //            line[1] = ret.codigo + '';
 //            line[2] = ret.bulto;
@@ -2842,12 +2519,12 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[1];
 //        //    ret.bulto = line[2];
 //        //    ret.contiene = line[3];
-//        //    ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//        //    ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//        //    ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 //        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //        //    line[0] = ret.nombre;
 //        //    line[1] = ret.codigo;
@@ -2896,12 +2573,12 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[1];
 //        //    ret.bulto = line[2];
 //        //    ret.contiene = line[3];
-//        //    ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//        //    ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//        //    ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 //        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //        //    line[0] = ret.nombre;
 //        //    line[1] = ret.codigo;
@@ -2955,18 +2632,18 @@ export class ListasProveedoresService {
 //            ret.codigo = line[1];
 //            ret.bulto = line[3];
 //            ret.contiene = line[2];
-//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
 //            ret.sugeridobulto = line[10];
-//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
 //            ret.pesable = line[11];
 //            ret.reposicionbulto = line[12];
-//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*10000)/10000;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*10000)/10000;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*10000)/10000;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*10000)/10000;
 //            line[0] = ret.nombre;
 //            line[1] = ret.codigo + '';
 //            line[2] = ret.bulto;
@@ -3019,12 +2696,12 @@ export class ListasProveedoresService {
 //        //    ret.codigo = line[1];
 //        //    ret.bulto = line[2];
 //        //    ret.contiene = line[3];
-//        //    ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//        //    ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//        //    ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//        //    ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
-//        //    ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
-//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*100)/100;
+//        //    ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//        //    ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//        //    ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//        //    ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
+//        //    ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
+//        //    ret.reposicion = Math.round((ret.bultoneto*1.245)*10000)/10000;
 //        //    ret.margen = Math.round(((ret.sugerido/(ret.neto*1.245))-1)*10000)/100;
 //        //    line[0] = ret.nombre;
 //        //    line[1] = ret.codigo;
@@ -3078,18 +2755,18 @@ export class ListasProveedoresService {
 //            ret.codigo = line[1];
 //            ret.bulto = line[3];
 //            ret.contiene = line[2];
-//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*100)/100;
-//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*100)/100;
-//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*100)/100;
-//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*100)/100;
+//            ret.bultoneto = isNaN(line[4]) ? null : Math.round(line[4]*10000)/10000;
+//            ret.neto = isNaN(line[5]) ? null : Math.round(line[5]*10000)/10000;
+//            ret.bultolista = isNaN(line[6]) ? null : Math.round(line[6]*10000)/10000;
+//            ret.lista = isNaN(line[7]) ? null : Math.round(line[7]*10000)/10000;
 //            ret.sugeridobulto = line[10];
-//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*100)/100;
+//            ret.sugerido = isNaN(line[8]) ? null : Math.round(line[8]*10000)/10000;
 //            ret.pesable = isNaN(line[11]) ? false : true;
 //            ret.reposicionbulto = line[12];
-//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*100)/100;
-//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*100)/100;
-//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*100)/100;
-//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*100)/100;
+//            ret.reposicion = isNaN(line[13]) ? null : Math.round(line[13]*10000)/10000;
+//            ret.margen = isNaN(line[14]) ? null : Math.round(line[14]*10000)/10000;
+//            ret.vtabulto = isNaN(line[18]) ? null : Math.round(line[18]*10000)/10000;
+//            ret.vtaunidad = isNaN(line[26]) ? null : Math.round(line[26]*10000)/10000;
 //            line[0] = ret.nombre;
 //            line[1] = ret.codigo + '';
 //            line[2] = ret.bulto;

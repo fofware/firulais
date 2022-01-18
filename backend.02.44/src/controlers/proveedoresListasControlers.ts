@@ -54,23 +54,31 @@ class ProveedoresListasControler {
 	}
 
   async checkLista(req: Request, res: Response ){
-    console.log(req.body);
-    const listaReg = {
+    const filter = { 
 			file_name: req.body.filename,
 			last_modified: req.body.lastModified,
 			size: req.body.size,
 			proveedor_id: new ObjectID(req.body.proveedor_id)
-		}
-		let lista_reg = await lista.findOne({ 
-                        file_name: listaReg.file_name,
-												last_modified: listaReg.last_modified,
-												proveedor_id: listaReg.proveedor_id
-											});
-		if(!lista_reg){
-			lista_reg = new lista(listaReg);
-			const rslt = await lista_reg.save();
-		}
-    return res.status(200).json(lista_reg);
+    };
+    const update = req.body;
+
+    //await provArt.countDocuments(filter); // 0
+
+    let ret = await lista.findOneAndUpdate(filter, update, {
+      new: true,
+      upsert: true,
+      rawResult: true // Return the raw result from the MongoDB driver
+    });
+
+    ret.value instanceof lista; // true
+    // The below property will be `false` if MongoDB upserted a new
+    // document, and `true` if MongoDB updated an existing object.
+    ret.lastErrorObject.updatedExisting; // false
+
+
+
+
+    return res.status(200).json(ret);
   }
 
   async savelink(req: Request, res: Response){

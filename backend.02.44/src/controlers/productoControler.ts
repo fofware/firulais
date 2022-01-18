@@ -7,7 +7,7 @@ import { articuloCtrl, articuloSanitize, articuloSanitizeString, articuloTextSea
 import { qryProductosProcess, readParent } from '../common/productosCommon';
 import { decimales, round } from '../common/utils';
 import {Strategy, ExtractJwt, StrategyOptions} from 'passport-jwt';
-import productoIdx from '../models/productoIdx';
+//import productoIdx from '../models/productoIdx';
 export const producto_ins_template = () => {
 	return 				{
 		from: "productos",
@@ -1413,8 +1413,8 @@ class ProductoControler {
 //		this.router.get('/productos/fb', this.fb);
 		this.router.get('/productos/fulldata', this.fulldataG);
 		this.router.post('/productos/fulldata', this.fulldataP);
-		this.router.get('/productos/textlink/:search', this.textFulldata);
-		this.router.get('/productos/crealista', this.creaLista);
+		//this.router.get('/productos/textlink/:search', this.textFulldata);
+		//this.router.get('/productos/crealista', this.creaLista);
 	}
 
 	public index(req: Request, res: Response) {
@@ -1496,105 +1496,105 @@ class ProductoControler {
 		res.status(200).json(readData)
 	}
 
-	async creaLista(req: Request, res: Response) {
-		const qry:any = {};
-		qry.showData = {
-			_id: 0,
-			producto: '$_id',
-			articulo: '$articuloId',
-			codigo: 1,
-			plu: 1,
-			fullName: 1,
-			art_name: 1,
-			art_fullName: 1,
-			name: 1,
-			fabricante: 1,
-			marca: 1,
-			rubro: 1,
-			linea: 1,
-			especie: 1,
-			edad: 1,
-			raza: 1,
-			pVenta: 1,
-			pCompra: 1,
-			pesable: 1,
-			bulto: 1,
-			contiene: 1,
-			unidad: 1,
-			tags: 1,
-			art_image: 1,
-			image: 1,
-			private_web: 1,
-			precio: 1,
-			calc_precio: 1,
-			lista: 1,
-			showPrecio: 1,
-			reventa: 1,
-			reventa1: 1,
-			reventa2: 1,
-			precioref: 1,
-			prodName: 1
-		};
-		const readData: any = await productoGetData(qry);
-		const pattern = new RegExp('/^http/');
+	//async creaLista(req: Request, res: Response) {
+	//	const qry:any = {};
+	//	qry.showData = {
+	//		_id: 0,
+	//		producto: '$_id',
+	//		articulo: '$articuloId',
+	//		codigo: 1,
+	//		plu: 1,
+	//		fullName: 1,
+	//		art_name: 1,
+	//		art_fullName: 1,
+	//		name: 1,
+	//		fabricante: 1,
+	//		marca: 1,
+	//		rubro: 1,
+	//		linea: 1,
+	//		especie: 1,
+	//		edad: 1,
+	//		raza: 1,
+	//		pVenta: 1,
+	//		pCompra: 1,
+	//		pesable: 1,
+	//		bulto: 1,
+	//		contiene: 1,
+	//		unidad: 1,
+	//		tags: 1,
+	//		art_image: 1,
+	//		image: 1,
+	//		private_web: 1,
+	//		precio: 1,
+	//		calc_precio: 1,
+	//		lista: 1,
+	//		showPrecio: 1,
+	//		reventa: 1,
+	//		reventa1: 1,
+	//		reventa2: 1,
+	//		precioref: 1,
+	//		prodName: 1
+	//	};
+	//	const readData: any = await productoGetData(qry);
+	//	const pattern = new RegExp('/^http/');
+//
+	//	for (let i = 0; i < readData.length; i++) {
+	//		const e = readData[i];
+	//		e.images = [];
+	//		if (e.image){
+	//			//e.image = e.image.match(pattern) ? e.image : `https://firulais.net.ar${e.image}`;
+	//			e.images.push(e.image);
+	//		}
+	//		if (e.art_image){
+	//			//e.art_image = e.art_image.match(pattern) ? e.art_image : `https://firulais.net.ar${e.art_image}`;
+	//			if(e.art_image !== e.image) e.images.push(e.art_image);
+	//		}
+	//		if(!e.private_web) e.socialWeb = ['FB'];
+	//		readData[i] = await productoIdx.updateOne(
+	//			{ producto: e.producto, articulo: e.articulo } ,   // Query parameter
+	//			{ $set: e }, 
+	//			{ upsert: true }    // Options
+	//		);
+	//	}
+	//	res.status(200).json(readData);
+	//}
 
-		for (let i = 0; i < readData.length; i++) {
-			const e = readData[i];
-			e.images = [];
-			if (e.image){
-				//e.image = e.image.match(pattern) ? e.image : `https://firulais.net.ar${e.image}`;
-				e.images.push(e.image);
-			}
-			if (e.art_image){
-				//e.art_image = e.art_image.match(pattern) ? e.art_image : `https://firulais.net.ar${e.art_image}`;
-				if(e.art_image !== e.image) e.images.push(e.art_image);
-			}
-			if(!e.private_web) e.socialWeb = ['FB'];
-			readData[i] = await productoIdx.updateOne(
-				{ producto: e.producto, articulo: e.articulo } ,   // Query parameter
-				{ $set: e }, 
-				{ upsert: true }    // Options
-			);
-		}
-		res.status(200).json(readData);
-	}
-
-	async textFulldata(req: Request, res: Response) {
-		const {search} = req.params;
-		const values = search.split(' ').map(val =>
-			{
-				const tiene = new RegExp(val,'i');
-				return { $or: [ 
-					{"fullName": {$regex: tiene}},
-					{fabricante: {$regex: tiene}},
-					{marca: {$regex: tiene}},
-					{rubro: {$regex: tiene}},
-					{linea: {$regex: tiene}},
-					{edad: {$regex: tiene}},
-					{especie: {$regex: tiene}},
-					{raza: {$regex: tiene}},
-					{tags:{$regex: tiene}}
-				] }
-			}
-		);
-		/*
-		const ret = {
-			count: await productoIdx.aggregate( [
-				{ $match: { '$and': values } },
-				{ $group: { _id: null, n: { $sum: 1 } } }
-		 	]),
-			data: await productoIdx.aggregate([
-				{ $match: { '$and': values } },
-				{ $sort: { fullName: 1 } },
-			])
-		}
-		*/
-		const ret = await productoIdx.aggregate([
-			{ $match: { '$and': values } },
-			{ $sort: { fullName: 1 } },
-		]);
-		res.status(200).json(ret)
-	}
+	//async textFulldata(req: Request, res: Response) {
+	//	const {search} = req.params;
+	//	const values = search.split(' ').map(val =>
+	//		{
+	//			const tiene = new RegExp(val,'i');
+	//			return { $or: [ 
+	//				{"fullName": {$regex: tiene}},
+	//				{fabricante: {$regex: tiene}},
+	//				{marca: {$regex: tiene}},
+	//				{rubro: {$regex: tiene}},
+	//				{linea: {$regex: tiene}},
+	//				{edad: {$regex: tiene}},
+	//				{especie: {$regex: tiene}},
+	//				{raza: {$regex: tiene}},
+	//				{tags:{$regex: tiene}}
+	//			] }
+	//		}
+	//	);
+	//	/*
+	//	const ret = {
+	//		count: await productoIdx.aggregate( [
+	//			{ $match: { '$and': values } },
+	//			{ $group: { _id: null, n: { $sum: 1 } } }
+	//	 	]),
+	//		data: await productoIdx.aggregate([
+	//			{ $match: { '$and': values } },
+	//			{ $sort: { fullName: 1 } },
+	//		])
+	//	}
+	//	*/
+	//	const ret = await productoIdx.aggregate([
+	//		{ $match: { '$and': values } },
+	//		{ $sort: { fullName: 1 } },
+	//	]);
+	//	res.status(200).json(ret)
+	//}
 
 //		const ret = await productoIdx.aggregate([
 //			//{ $match: { $text: { $search: search } } },

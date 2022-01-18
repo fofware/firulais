@@ -248,6 +248,9 @@ class ProveedoresArticulosControler {
 		this.router.post('/api/proveedoresarticulos/text/'
 										//, passport.authenticate('jwt', {session:false})
 										, this.textSearch );
+		this.router.post('/api/proveedoresarticulos/linksearch/'
+										//, passport.authenticate('jwt', {session:false})
+										, this.linkSearch );
 		//this.router.post( '/api/proveedoresarticulos/insmany', passport.authenticate('jwt', {session:false}), this.insMany );
 		this.router.put( '/api/proveedoresarticulos/:id', passport.authenticate('jwt', {session:false}), this.put );
 		this.router.delete( '/api/proveedoresarticulos/:id', passport.authenticate('jwt', {session:false}), this.delete );
@@ -302,19 +305,62 @@ class ProveedoresArticulosControler {
 	}
 
 	async textSearch(req: Request, res: Response){
-		const { search } = req.body;
+//		const { filtro } = req.body;
 		let data = [];
-		if( search && search.length > 0 ){
-			data = await provArt.aggregate([
-				{ $match: { $text: { $search: search } } },
-				{
-					$addFields: {
-						score: { $meta: "textScore" }
+		const filtro = req.body;
+		console.log(req.body);
+		console.log(filtro);
+		const preData = [];
+		const myFind = {};
+		for (const key in req.body) {
+			if (Object.prototype.hasOwnProperty.call(req.body, key)) {
+				const value = req.body[key];
+				console.log('filtroValue',key,req.body[key]);
+				if (value !== null && value !== "" ) {
+					switch (key) {
+						case 'itemSearchProdProv':
+							myFind['nombre'] = { $regex: `${value}`, $options: 'i' };
+							break;
+						case 'proveedor':
+							myFind['proveedor'] = value;
+							break;
+						case 'peso':
+							myFind['peso'] = { $eq: parseFloat(value) };
+							break;
+						case 'unidades':
+							myFind['unidades'] = { $eq: parseFloat(value) };
+							break;
+						case 'link':
+							if (value) {
+								myFind['articulo_id'] = null;
+							}
+							break;
+						default:
+							myFind[key] = { $regex: `${value}`, $options: 'i' };
+							break;
 					}
-				}, 
+				}
+			}
+		}
+		console.log("myFind",myFind);
+		const indata = await provArt.find(myFind);
+		indata.forEach(element => {
+			preData.push(new ObjectID(element._id))	
+		});
+		console.log(preData);
+		const myMatch = preData.length ? { _id: { $in: preData } } : {};
+		//if( search && search.length > 0 ){
+			data = await provArt.aggregate([
+			//	{ $match: { $text: { $search: search } } },
+				{ $match: myMatch },
+				//{
+				//	$addFields: {
+				//		score: { $meta: "textScore" }
+				//	}
+				//}, 
 				{
 					$lookup: {
-						from: "personas",
+						from: "proveedores",
 						localField: "proveedor",    // field in the orders collection
 						foreignField: "_id",  // field in the items collection
 						as: "proveedor"
@@ -324,32 +370,126 @@ class ProveedoresArticulosControler {
 					$unwind: {
 						path: '$proveedor',
 						preserveNullAndEmptyArrays: true
-					}				
+					}
 				},
+				//{
+				//	$unwind: {
+				//		path: '$productos',
+				//		preserveNullAndEmptyArrays: true
+				//	}				
+				//},
 				//{ $project: { nombre: 1, contiene: 1, unidad:1, proveedor: { $concat:['$proveedor.apellido', " ", '$proveedor.nombre']}, score: { $meta: "textScore" } } },
-				{ $sort: { score: -1, nombre: 1, contiene: 1 } },
+				{ $sort: { score: -1, nombre: 1 , contiene: 1, unidades: 1 } },
 				//{ $match: { score: { $gt: 1.0 } } }
 			]);
-		} else {
-			data = await provArt.aggregate([
-				{
-					$lookup: {
-						from: "personas",
-						localField: "proveedor",    // field in the orders collection
-						foreignField: "_id",  // field in the items collection
-						as: "proveedor"
-					 }
-				},
-				{
-					$unwind: {
-						path: '$proveedor',
-						preserveNullAndEmptyArrays: true
-					}				
-				},
-				{ $sort: { nombre: 1, contiene: 1 } },
-			]);
+		//} else {
+		//	data = await provArt.aggregate([
+		//		{
+		//			$lookup: {
+		//				from: "proveedores",
+		//				localField: "proveedor",    // field in the orders collection
+		//				foreignField: "_id",  // field in the items collection
+		//				as: "proveedor"
+		//			 }
+		//		},
+		//		{
+		//			$unwind: {
+		//				path: '$proveedor',
+		//				preserveNullAndEmptyArrays: true
+		//			}				
+		//		},
+		//		{ $sort: { nombre: 1, contiene: 1 } },
+		//	]);
+		//}
+		//const retData = data.map(item => `${item.nombre} ${item.contiene} ${item.unidad} ${item.proveedor} ${item.score}` )
+		res.status(200).json(data);
+	}
+
+	async linkSearch(req: Request, res: Response) {
+		//		const { filtro } = req.body;
+		let data = [];
+		const filtro = req.body;
+		console.log(req.body);
+		console.log(filtro);
+		const preData = [];
+		const myFind:any = {};
+		for (const key in req.body) {
+			if (Object.prototype.hasOwnProperty.call(req.body, key)) {
+				const value = req.body[key];
+				console.log('filtroValue', key, req.body[key]);
+				if (value !== null && value !== "") {
+					switch (key) {
+						case 'itemSearchProdProv':
+							myFind['$text'] = { $search: `${value}` };
+							//myFind['nombre'] = { $regex: `${value}`, $options: 'ig' };
+							break;
+						case 'proveedor':
+							myFind['proveedor'] = value;
+							break;
+						case 'peso':
+							myFind['peso'] = { $eq: parseFloat(value) };
+							break;
+						case 'unidades':
+							myFind['unidades'] = { $eq: parseFloat(value) };
+							break;
+						case 'link':
+							if (value) {
+								myFind['articulo_id'] = null;
+							}
+							break;
+						default:
+							myFind[key] = { $regex: `${value}`, $options: 'i' };
+							break;
+					}
+				}
+			}
 		}
-		const retData = data.map(item => `${item.nombre} ${item.contiene} ${item.unidad} ${item.proveedor} ${item.score}` )
+		console.log("myFind", myFind);
+		const indata = await provArt.find(myFind);
+		indata.forEach(element => {
+			preData.push(new ObjectID(element._id))
+		});
+		console.log(preData);
+		//const myMatch = preData.length ? { _id: { $in: preData } } : {};
+		const myMatch = { _id: { $in: preData } };
+		data = await provArt.aggregate([
+			//	{ $match: { $text: { $search: search } } },
+			{ $match: myMatch },
+			//{
+			//	$addFields: {
+			//		score: { $meta: "textScore" }
+			//	}
+			//}, 
+			{
+				$lookup: {
+					from: "proveedores",
+					localField: "proveedor",    // field in the orders collection
+					foreignField: "_id",  // field in the items collection
+					as: "proveedor"
+				}
+			},
+			{
+				$unwind: {
+					path: '$proveedor',
+					preserveNullAndEmptyArrays: true
+				}
+			},
+			{
+				$unwind: {
+					path: '$productos',
+					preserveNullAndEmptyArrays: true
+				}				
+			},
+			{
+				$match: {
+					"productos.pesable": { $ne: 1 }
+				}
+			},
+			
+			//{ $project: { nombre: 1, contiene: 1, unidad:1, proveedor: { $concat:['$proveedor.apellido', " ", '$proveedor.nombre']}, score: { $meta: "textScore" } } },
+			{ $sort: { score: -1, nombre: 1, contiene: 1, unidades: 1 } },
+			//{ $match: { score: { $gt: 1.0 } } }
+		]).limit(150);
 		res.status(200).json(data);
 	}
 
@@ -430,21 +570,29 @@ class ProveedoresArticulosControler {
 
 	async add( req: Request, res: Response){
 		req.body.codigo = req.body.codigo+'';
-		req.body.ean = req.body.ean ? req.body.ean+'' : null;
+		//req.body.ean = req.body.ean ? req.body.ean+'' : null;
 		req.body.proveedor = new ObjectID(req.body.proveedor);
-		req.body.producto = req.body.producto ? new ObjectID(req.body.producto) : null;
 
 		try {
-			const ret = {
-				new: false
-			} 
-			let articulo_reg = await provArt.findOne({ proveedor: req.body.proveedor, codigo: req.body.codigo });
-			if(!articulo_reg){
-				articulo_reg = new provArt(req.body);
-				await articulo_reg.save();
-				ret.new = true;
-			}
-			Object.assign(ret, articulo_reg['_doc']);
+			const filter = { proveedor: req.body.proveedor, codigo: req.body.codigo };
+			const update = req.body;
+
+			//await provArt.countDocuments(filter); // 0
+			req.body.productos.forEach(element => {
+				if (element.articulo_id) element.articulo_id = new ObjectID(element.articulo_id);
+				if (element.producto_id) element.producto_id = new ObjectID(element.producto_id);
+			});
+
+			let ret = await provArt.findOneAndUpdate(filter, update, {
+  			new: true,
+  			upsert: true,
+  			rawResult: true // Return the raw result from the MongoDB driver
+			});
+
+			ret.value instanceof provArt; // true
+			// The below property will be `false` if MongoDB upserted a new
+			// document, and `true` if MongoDB updated an existing object.
+			ret.lastErrorObject.updatedExisting; // false
 			return res.status(200).json(ret);
 		} catch (error) {
 			console.log(error);

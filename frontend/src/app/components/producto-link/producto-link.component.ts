@@ -20,7 +20,22 @@ export class ProductoLinkComponent implements OnInit {
   itemSearchProducto = "";
   itemSearchProdProv = "";
   tmpList = [];
-
+  filtro = {
+    proveedor: null,
+    nombre: null,
+    fabricante: null,
+    marca: null,
+    name: null,
+    especie: null,
+    edad: null,
+    raza: null,
+    rubro: null,
+    linea: null,
+    itemSearchProdProv: null,
+    unidades: null,
+    peso: null,
+    link: true
+  };
   active;
   stage = 0;
   disabled = true;
@@ -68,16 +83,8 @@ export class ProductoLinkComponent implements OnInit {
     this.stage = 0;
     this.readyData = [];
     this.dbProducto = [];
-    const retProvProd:any = await this.artprov.artProvList()
-    for (let i = 0; i < retProvProd.length; i++) {
-      const element = retProvProd[i];
-      if(element.articulo_id) element.class="ready1";
-      if(element.producto_id) element.class="ready2";
-    }
-    this.dbProvProd = retProvProd;
-    this.filtrar();
+    //this.filtrar();
     console.log(this.dbProducto);
-    console.log(this.dbProvProd);
   }
 
   async setHeight() {
@@ -115,6 +122,7 @@ export class ProductoLinkComponent implements OnInit {
   dbProductoClear(){
     this.dbProducto = [];
   }
+
   async searchProducto(){
     try {
       const data:any = await this.provprod.leerData(
@@ -130,7 +138,111 @@ export class ProductoLinkComponent implements OnInit {
       console.log(error);
     }
   }
+
+  async toggleCheck3(e,r){
+    if (e.target.checked) {
+      console.log("Checked", e.target.value)
+      console.log("Checked reg", r)
+      this.selected.push(r);
+    } else {
+      const index = this.selected.findIndex(x => x._id === r._id);
+      console.log("UnChecked", r)
+      this.selected.splice(index,1);
+    }
+    console.log(this.selected);
+  }
+  mezclar(){
+    const preData = {
+      fabricante: [],
+      marca: [],
+      name: [],
+      especie: [],
+      edad: [],
+      raza: [],
+      nombre: [],
+
+    };
+
+    for (let i = 0; i < this.selected.length; i++) {
+      const element = this.selected[i];
+
+
+    }
+  }
   async toggleCheck(e,r){
+    if (e.target.checked) {
+      console.log("Checked", e.target.value)
+      console.log("Checked reg", r)
+      this.selected.push(r);
+      //selected.push(new FormControl(e.target.value));
+/*
+      _id?: object;
+      id_proveedor: object;
+      codigo_proveedor: string;
+      codigo_ean: string;
+      fabricante?: string;
+      marca?: string;
+      especie?: string;
+      edad?: string;
+      raza?: string;
+      rubro?: string;
+      linea?: string;
+      name?: string;
+      descripcion?: string;
+      bulto?: number;
+      bname?: string;
+      contiene?: number;
+      cname?: string;
+      unidad?: string;
+      precio_lista?: number;
+      coef_descuento?: number;
+      coef_retenciones?: number;
+      precio_final?: number;
+      articulo_id?: object;
+      producto_id?: object;
+*/
+      if ( this.stage > 0 ) return;
+      //const reg = this.dbProvProd[e.target.value];
+      console.log('stage > 0',r);
+      const art_keys = [
+        'fabricante',
+        'marca',
+        'especie',
+        'edad',
+        'raza',
+        'rubro',
+        'linea',
+        'name',
+//        'descripcion'
+      ];
+      const prod_keys = [
+        'codigo_ean',
+        'bulto',
+        'bname',
+        'contiene',
+        'cname',
+        'unidad'
+      ];
+
+      const Articulo = {};
+      for (let i = 0; i < art_keys.length; i++) {
+        const key = art_keys[i];
+        if(r[key]){
+          Articulo[key] = {'$regex': {flags: 'i', params: r[key] }};
+        }
+      }
+      //const names = reg['nombre'].split(' ');
+      this.itemSearchProducto = r['nombre'];
+      this.searchProducto();
+    } else {
+       const index = this.selected.findIndex(x => x._id === r._id);
+       console.log("UnChecked", r)
+       this.selected.splice(index,1);
+    }
+    console.log(this.selected);
+  }
+
+  async toggleCheck1(e,r){
     if (e.target.checked) {
       console.log("Checked", e.target.value)
       console.log("Checked reg", r)
@@ -266,9 +378,30 @@ export class ProductoLinkComponent implements OnInit {
     this.readyData.splice(idx,1);
   }
 
-  filtrar(): void {
+  async filtrar() {
     //if(this.itemSearchProdProv.trim().length === 0)  this.tmpList = JSON.parse(JSON.stringify(this.dbProvProd));
     //else this.tmpList = this.dbProvProd.filter( (val) => (val.nombre).trim().toLowerCase().includes(this.itemSearchProdProv));
+    console.log(this.filtro)
+    const retProvProd:any = await this.artprov.artProvList(this.itemSearchProdProv);
+    for (let i = 0; i < retProvProd.length; i++) {
+      const element = retProvProd[i];
+      if(element.articulo_id) element.class="ready1";
+      if(element.producto_id) element.class="ready2";
+    }
+    this.dbProvProd = retProvProd;
+    console.log(this.dbProvProd);
+  }
+
+  async filter() {
+    console.log(this.filtro);
+    const retProvProd:any = await this.artprov.artProvList(this.filtro);
+    for (let i = 0; i < retProvProd.length; i++) {
+      const element = retProvProd[i];
+      if(element.articulo_id) element.class="ready1";
+      if(element.producto_id) element.class="ready2";
+    }
+    this.dbProvProd = retProvProd;
+    console.log(this.dbProvProd);
   }
 
   provProdSearch(){

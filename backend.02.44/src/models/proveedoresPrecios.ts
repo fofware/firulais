@@ -6,8 +6,9 @@ export interface IProveedoresPrecios extends Document {
   proveedor_articulo: Object;
   producto_id?: Object;
   fecha: Object;
-  precio_lista: Number;
-  reposicion: Number;
+  vinput: Object;
+  vbulto: Object;
+  vunidad: Object;
 }
 
 const ProveedoresPreciosSchema = new Schema({
@@ -19,7 +20,7 @@ const ProveedoresPreciosSchema = new Schema({
   },
   proveedor_id: {
     type: Schema.Types.ObjectId
-    ,ref: "personas"
+    ,ref: "proveedores"
     ,$id: "_id"
     ,index: true
   },
@@ -35,23 +36,16 @@ const ProveedoresPreciosSchema = new Schema({
     ,$id: "_id"
     ,index: true
   }
-  ,fecha:{
-    type: Schema.Types.Date
-    ,index: true
-  }
   ,lista: {
     type: Schema.Types.Number
   }
-  ,reposicion: {
-    type: Schema.Types.Number
-  }
-  , bonificacion: {
-    type: Schema.Types.Number
-  }
+  ,vinput: {}
+  ,vbulto: {}
+  ,vunidad: {}
 },{
-  timestamps: true,
+  timestamps: false,
   versionKey: false
-})
+});
 
 ProveedoresPreciosSchema.on('index', error => {
   // "_id index cannot be sparse"

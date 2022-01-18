@@ -20,6 +20,7 @@ import { ProveedoresListasCtrl } from './controlers/proveedoresListasControlers'
 import { TmpListasCtrl } from './controlers/tmpListasControler';
 import { MercadoPagoCtrl } from './controlers/mercadopagoControler';
 import { ProveedoresPreciosCtrl } from './controlers/proveedoresPreciosControlers';
+import { ProveedoresCtrl } from './controlers/proveedorControler';
 
 export default class Server {
 
@@ -47,10 +48,11 @@ export default class Server {
 		this.app.use('/api', peoplesRoutes);
 		this.app.use('/api', articulosRt);
 		this.app.use('/api', productoCtrl.router);
-		this.app.use('/api', ProveedoresListasCtrl.router)
-		this.app.use('/api', ProveedoresPreciosCtrl.router)
-		this.app.use( TmpListasCtrl.router)
-		this.app.use( ProveedoresArticulosCtrl.router)
+		this.app.use('/api', ProveedoresCtrl.router);
+		this.app.use('/api', ProveedoresListasCtrl.router);
+		this.app.use('/api', ProveedoresPreciosCtrl.router);
+		this.app.use( TmpListasCtrl.router);
+		this.app.use( ProveedoresArticulosCtrl.router);
 		this.app.use( personaCtrl.router );
 		this.app.use( userCtrl.router );
 		this.app.use( mongoCtrl.router);

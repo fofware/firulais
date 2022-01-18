@@ -1,0 +1,43 @@
+<div class="modal-header">
+  <div class='d-flex flex-column w-100 bd-highlight'>
+    <h4 class="modal-title" id="modal-basic-title">
+      <span >{{selectedProveedor.nombre }} </span>
+    </h4>
+  </div>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+    <span aria-hidden="true">×</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <ul ngbNav #nav="ngbNav" [activeId]="1" class="nav-tabs justify-content-center">
+    <li [ngbNavItem]="1">
+      <a ngbNavLink><b>Data</b></a>
+      <ng-template ngbNavContent>
+          <div>
+            <div class="row">
+              <div class="input-group col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                <div class="input-group-prepend">
+                  <div class="input-group-text setw">Nombre Proveedor</div>
+                </div>
+                <input type="text" class="form-control" name="nombre" placeholder="Nombre"
+                  [(ngModel)]="selectedProveedor.nombre">
+              </div>
+            </div>
+          </div>
+      </ng-template>
+    </li>
+    <li [ngbNavItem]="2" class="mr-auto">
+      <a ngbNavLink><b>Productos</b></a>
+      <ng-template ngbNavContent>
+        <div>
+        </div>
+      </ng-template>
+    </li>
+  </ul>
+  <div [ngbNavOutlet]="nav" class="mt-2"></div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger" (click)="checkData() ? activeModal.close('Cancel') : ''">Cancel</button>
+  <button type="button" class="btn btn-danger" (click)="saveData();">Save</button>
+</div>

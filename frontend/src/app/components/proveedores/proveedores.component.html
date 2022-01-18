@@ -1,0 +1,32 @@
+<div [class.isPrinting]="printService.isPrinting">
+  <div class="sticky-top">
+    <app-top-menu></app-top-menu>
+    <div class="bg-dark">
+      <app-browse-ctrl
+        [page]="page"
+        [pageSize]="pageSize"
+        [collectionSize]="collectionSize"
+        [tools]="tools"
+        (onBrowseCtrlEvent)="browseEvent($event)"
+      ></app-browse-ctrl>
+    </div>
+  <!--form class="form-inline bg-dark p-1">
+      <input type="search" id="busca" aria-label="Search" class="form-control mr-sm-2" placeholder="Buscar por Nombre"
+        name="searchItem" (input)="filter()" [(ngModel)]="searchItem">
+  </form-->
+  </div>
+  <!--div class="container"-->
+    <table class="table table-hover">
+      <tbody>
+        <!--tr *ngFor="let item of tmpList | personasFilter: searchItem | slice: (page-1) * pageSize : page * pageSize; index as i"
+          (click)="edit(item)"-->
+        <tr *ngFor="let item of tmpList; index as i"
+          (click)="edit(i)">
+          <!--th scope="row">{{ (page -1) * pageSize + i + 1 }}</th-->
+          <td>{{item.nombre}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <!--button class="btn btn-block btn-secondary" [hidden]="((hoja-1)*pageSize) >= collectionSize" (click)="more(tmpList)">Mostrar más</button-->
+  <!--/div-->
+</div>

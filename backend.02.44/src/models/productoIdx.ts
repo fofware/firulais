@@ -23,6 +23,7 @@ export interface IProductosIdx extends Document {
   contiene: Number;
   unidad: String;
   art_image: String;
+//  productocompra: [];
   image: String;
   private_web: Boolean;
 }
@@ -51,6 +52,7 @@ let ProductosIdxSchema = new Schema({
   , image: { type: String, trim: true, default: "" }
   , images: {type: Array, default: []}
   , videos: {type: Array, default: []}
+//  , productocompra: { type: Array, default: [] }
   , socialWeb: { type: Array, default: [], index: true }
   , private_web: { type: Boolean, default: false, index: false } 
 },{
@@ -86,4 +88,4 @@ ProductosIdxSchema.on('index', error => {
 
 //ProductosIdxSchema.plugin(aggregatePaginate);
 
-export default model<IProductosIdx>('productosname', ProductosIdxSchema);
+export default model<IProductosIdx>('productosIdx', ProductosIdxSchema);

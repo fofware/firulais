@@ -25,6 +25,7 @@ import { ProductoEditComponent } from './components/producto-edit/producto-edit.
 import { ProductoLinkComponent } from './components/producto-link/producto-link.component';
 import { ProductoComponent } from './components/producto/producto.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { ProveedoresComponent } from './components/proveedores/proveedores.component';
 import { SigninComponent } from './components/signin/signin.component';
 import { SignupComponent } from './components/signup/signup.component';
 import { TestMpHooksComponent } from './components/test-mp-hooks/test-mp-hooks.component';
@@ -123,6 +124,11 @@ const routes: Routes = [
   ,{
     path: "personas"
     , component: PersonasListComponent
+    , canActivate: [AuthGuard]
+  }
+  ,{
+    path: "proveedores"
+    , component: ProveedoresComponent
     , canActivate: [AuthGuard]
   }
   , {

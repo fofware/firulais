@@ -9,9 +9,17 @@ export class ArticulosLinkService {
 
   constructor(private http: HttpClient) { }
 
-  async artProvList(search?:string): Promise<any> {
+  async artProvList(filtro?:any): Promise<any> {
+    console.log(filtro);
     return this.http
-    .post(`${API_URI}/proveedoresarticulos/text/`, { search })
+    .post(`${API_URI}/proveedoresarticulos/text/`, filtro )
+    .toPromise();
+
+  }
+  async artProvToLink(filtro?:any): Promise<any> {
+    console.log(filtro);
+    return this.http
+    .post(`${API_URI}/proveedoresarticulos/linksearch/`, filtro )
     .toPromise();
 
   }

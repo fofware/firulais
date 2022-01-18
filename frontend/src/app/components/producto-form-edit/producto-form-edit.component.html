@@ -129,6 +129,9 @@
                 <input type="datetime-local" class="form-control form-control-sm mb-1" name="precio_hasta" placeholder="precio hasta"
                   [(ngModel)]="producto.precio_hasta">
               </div>
+              <div [hidden]="producto.pesable" class="col-6 col-md-6 col-lg-3 col-xl-2 px-1">
+                <button (click)="productLink()">Proveedores</button>
+              </div>
             </div>
           </div>
         </div>
