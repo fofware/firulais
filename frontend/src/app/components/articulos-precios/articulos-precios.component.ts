@@ -309,12 +309,15 @@ export class ArticulosPreciosComponent implements OnInit {
 
   }
   more(inList,outList): any {
+    /*
     console.log(this.hoja);
-      console.log((this.hoja-1) * this.pageSize);
-      console.log(this.hoja * this.pageSize);
-      this.collectionSize = inList.length;
-      outList = outList.concat(inList.slice((this.hoja-1) * this.pageSize , this.hoja * this.pageSize));
-      this.hoja=this.hoja+1;
-      return outList;
+    console.log((this.hoja-1) * this.pageSize);
+    console.log(this.hoja * this.pageSize);
+    this.collectionSize = inList.length;
+    outList = outList.concat(inList.slice((this.hoja-1) * this.pageSize , this.hoja * this.pageSize));
+    this.hoja=this.hoja+1;
+    return outList;
+    */
+    return inList;
   }
 }

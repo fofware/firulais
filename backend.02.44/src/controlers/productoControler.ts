@@ -720,7 +720,6 @@ export const productoFullTemplate =
 	'reventa1': calculaPrecio(.43,14.5,true),
 	'reventa2': calculaPrecio(.1556,11.5,true),
 	'precio': 1,
-
 	'sub': {
 		$cond: [{ $eq: ['$count_ins', 0] },
 			'$ins',
@@ -957,7 +956,7 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 				"name": 1,
 				"contiene": { $ifNull: [ '$contiene', 1 ] },
 				"strContiene": {$toString: '$contiene'},
-				"unidad": 1,
+				"unidad": { $ifNull: ['$unidad', ''] },
 				"precio": 1,
 				"compra": 1,
 				"reposicion": { $ifNull: ['$reposicion', '$compra'] },

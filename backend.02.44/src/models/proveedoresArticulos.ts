@@ -92,7 +92,7 @@ ProveedoresArticulosSchema.index(
     tags: "text"
   },
   { default_language: "spanish" }
-)
+);
 
 ProveedoresArticulosSchema.on('index', error => {
   // "_id index cannot be sparse"

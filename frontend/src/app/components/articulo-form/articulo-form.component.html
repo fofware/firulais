@@ -260,6 +260,8 @@
   <div [ngbNavOutlet]="nav" class="mt-2"></div>
 </div>
 <div class="modal-footer">
+  <button type="button" class="btn btn-info ml-auto mb-2" (click)="copyReg()">copy</button>
+  <button type="button" class="btn btn-info mb-2" (click)="pasteReg()">paste</button>
   <button type="button" class="btn btn-danger" (click)="checkData() ? activeModal.close('Cancel') : ''">Cancel</button>
   <button type="button" class="btn btn-danger" (click)="saveData();">Save</button>
 </div>

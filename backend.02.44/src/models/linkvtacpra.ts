@@ -9,11 +9,8 @@ export interface IlinkVtaCpra extends Document {
 
 const linkVtaCpraSchema = new Schema({
   producto_id: { type: Schema.Types.ObjectId, ref: "productos", index: true },
-  producto_cpra: { type: Schema.Types.ObjectId, ref: "articulos", index: true },
-  compra: { type: Schema.Types.ObjectId, ref: "articulos", index: true },
-  fch_cpra: { type: Schema.Types.Date},
-  prefered: { type: Schema.Types.ObjectId, ref: "articulos", index: true }
-  
+  producto_cpra: { type: Schema.Types.ObjectId, ref: "proveedoresarticulos", index: true },
+  prefered: { type: Schema.Types.Boolean, default: false }
 },{
   timestamps: false,
   versionKey: false,

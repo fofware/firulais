@@ -7,6 +7,7 @@ import { ObjectID } from 'bson'
 import { ArticuloFormComponent } from '../articulo-form/articulo-form.component';
 import { AuthService } from 'src/app/services/auth.service';
 import { PrintService } from 'src/app/services/print.service';
+import { IdService } from 'src/app/services/id.service';
 
 @Component({
   selector: 'app-articulos-list',
@@ -41,7 +42,7 @@ export class ArticulosListComponent implements OnInit {
     formula: [],
     detalles: [],
     beneficios: [],
-    productos:[{}]
+    productos:[]
   }
   filterButtons = [
     {
@@ -204,6 +205,7 @@ export class ArticulosListComponent implements OnInit {
   detalles: any[] = [];
   unidades: [{ id: any, name: string }];
   selectedArticulo: any;
+  previusArticulo: any;
   compareArticulo: any;
   editedArticulo: any;
   dialog: any;
@@ -213,7 +215,8 @@ export class ArticulosListComponent implements OnInit {
                 private modalService: NgbModal,
                 private list: ListasArtProdService,
                 public printService: PrintService,
-                private authService: AuthService
+                private authService: AuthService,
+                private idServive: IdService
               ) {
                 this.modalService.activeInstances.subscribe((list) => {
                   this.modalsNumber = list.length;
@@ -240,11 +243,14 @@ export class ArticulosListComponent implements OnInit {
     this.searchArticulos();
   }
 
-  newReg(ev){
-    console.log("Add New Articulo")
-    this.selectedArticulo = this.newArticulo;
-    this.selectedArticulo._id = new ObjectID();
+  setprevius(){
 
+  }
+  async newReg(ev){
+    console.log("Add New Articulo")
+    console.log(this.newArticulo);
+    this.selectedArticulo = Object.assign({},this.newArticulo);
+    this.selectedArticulo._id = `${new ObjectID()}`; //await this.idServive.generate();
     //const newArticulo = this.modalService.open(ArticuloFormAddModalComponent);
     const modalRef = this.modalService.open(ArticuloFormComponent, {
       ariaLabelledBy: 'modal-basic-title'
@@ -259,11 +265,15 @@ export class ArticulosListComponent implements OnInit {
       , centered: false
       , backdrop: false
     });
+    modalRef.componentInstance.newReg = true;
+    modalRef.componentInstance.user = this.user
     modalRef.componentInstance.selectedArticulo = this.selectedArticulo;
+    modalRef.componentInstance.previusArticulo = this.previusArticulo;
     modalRef.result.then((result) => {
       if (result) {
         console.log(result);
         if (result === 'Save'){
+          this.previusArticulo = Object.assign({},modalRef.componentInstance.selectedArticulo);
           this.articuloList.push(modalRef.componentInstance.selectedArticulo);
         }
       }
@@ -353,8 +363,12 @@ export class ArticulosListComponent implements OnInit {
       , backdrop: false
     });
     modalRef.componentInstance.selectedArticulo = this.selectedArticulo;
+    modalRef.componentInstance.newReg = false;
+    modalRef.componentInstance.user = this.user;
     modalRef.result.then( res => {
+      this.previusArticulo = modalRef.componentInstance.selectedArticulo;
       console.log(res);
+      console.log(this.previusArticulo);
       if(res === 'Save'){
         //console.log(modalRef.componentInstance.selectedArticulo);
         this.articuloList[this.editedArticulo] = modalRef.componentInstance.selectedArticulo;

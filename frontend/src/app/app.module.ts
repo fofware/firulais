@@ -33,7 +33,7 @@ import { ArticuloEditComponent } from './components/articulo-edit/articulo-edit.
 import { ArticuloCardSelectToolsComponent } from './components/articulo-card-select-tools/articulo-card-select-tools.component';
 import { ProdCardViewDosComponent } from './components/prod-card-view-dos/prod-card-view-dos.component';
 import { ArticuloPagoSelectComponent } from './components/articulo-pago-select/articulo-pago-select.component';
-import {NgbPaginationModule, NgbAlertModule, NgbModule, NgbNav, NgbNavbar, NgbCollapse} from '@ng-bootstrap/ng-bootstrap';
+import { NgbPaginationModule, NgbAlertModule, NgbModule, NgbNav, NgbNavbar, NgbCollapse } from '@ng-bootstrap/ng-bootstrap';
 import { ArticuloFormComponent } from './components/articulo-form/articulo-form.component';
 import { ArticuloFormAddModalComponent } from './components/articulo-form-add-modal/articulo-form-add-modal.component';
 import { ProductoFormAddModalComponent } from './components/producto-form-add-modal/producto-form-add-modal.component';

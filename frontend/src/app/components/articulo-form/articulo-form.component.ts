@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalDismissReasons, NgbModal, NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import { ObjectID } from 'bson';
 import { AuthService } from 'src/app/services/auth.service';
 import { ListasArtProdService } from 'src/app/services/listas-art-prod.service';
 import { API_URI } from 'src/app/shared/uris';
@@ -13,11 +14,13 @@ import { ProductoFormAddModalComponent } from '../producto-form-add-modal/produc
 export class ArticuloFormComponent implements OnInit {
 
   @Input() public selectedArticulo;
+  @Input() public user;
+  @Input() public newReg = false;
+//  @Input() public previusArticulo;
 
   compareArticulo = {};
   prodList = [];
   unidades = [];
-  user: {}
   newFormula: any = {
     name: '',
     showname: false,
@@ -45,7 +48,8 @@ export class ArticuloFormComponent implements OnInit {
     this.compareArticulo = JSON.parse(JSON.stringify(this.selectedArticulo));
     this.prodList = JSON.parse(JSON.stringify(this.selectedArticulo.productos));
     this.unidades = [{ id: null, name: null }];
-
+    console.log(this.compareArticulo);
+    console.log(this.prodList);
     for (let index = 0; index < this.prodList.length; index++) {
       const e = this.prodList[index];
       if(e.count_parte !== 0 && e.count_ins !== 0) // No se muestran los pesables ni las cajas o Packs
@@ -193,6 +197,7 @@ export class ArticuloFormComponent implements OnInit {
       console.log("Result",retData);
       if(retData){
         if(retData === 'Save'){
+          console.log(add_form.componentInstance.producto);
           this.selectedArticulo.productos.push(add_form.componentInstance.producto);
           this.setProdList();
         }
@@ -200,6 +205,30 @@ export class ArticuloFormComponent implements OnInit {
     }, retData => {
       console.log("dismissed",retData);
     })
+  }
+  pasteReg(){
+    const regData = JSON.parse(localStorage.getItem("reg"));
+    const idsarray = {};
+    regData._id = this.selectedArticulo._id;
+    for (let i = 0; i < regData.productos.length; i++) {
+      const e = regData.productos[i];
+      idsarray[e._id] = `${new ObjectID}`;
+    }
+    for (let i = 0; i < regData.productos.length; i++) {
+      const e = regData.productos[i];
+      e._id = idsarray[e._id];
+      if(e.parent){
+        e.parent = idsarray[e.parent];
+        e.sub._id = idsarray[e.sub._id];
+      }
+    }
+    this.selectedArticulo = regData;
+    this.setProdList();
+    console.log(this.selectedArticulo);
+  }
+  copyReg(){
+    console.log("set previus");
+    const regData = localStorage.setItem( "reg", JSON.stringify(this.selectedArticulo));
   }
   setformulatempate(){
     this.selectedArticulo.formula = [{

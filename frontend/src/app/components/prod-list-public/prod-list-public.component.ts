@@ -183,7 +183,8 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
       this.hoja = 1;
       this.collectionSize = this.tmpList.length;
       this.calculaPrecio();
-      this.articuloList = this.more(this.tmpList, [])
+      //this.articuloList = this.more(this.tmpList, [])
+      this.articuloList = this.tmpList;
 
       this.wait = false;
       if( this.buffer_searchItem !== this.searchItem ){
