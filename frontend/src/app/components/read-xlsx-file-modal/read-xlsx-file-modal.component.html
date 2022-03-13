@@ -1,7 +1,57 @@
-<input type="file" (change)="chooseFile($event)" />
+<div class="card">
+  <div class="card-header">
+    <h5>Cargar Lista de {{proveedor.nombre}}</h5>
+  </div>
+  <div class="card-body">
+    <div class="form-group">
+      <input type="file" class="form-control-file" (change)="chooseFile($event)">
+    </div>
+    <div *ngIf="chosenFiles && fileInDb">
+      <div *ngIf="fileInDb && fileInDb._id" >
+        <h5 class="card-title">Este archivo ya fue cargado</h5>
+        <p *ngIf="fileInDb && fileInDb._id">lastModified: {{lastModifiedDate}}</p>
+        <!--p *ngIf="fileInDb && fileInDb._id">lastModifiedDate: {{fileInDb.lastModifiedDate}}</p-->
+        <p *ngIf="fileInDb && fileInDb._id">size: {{fileInDb.size}}</p>
+        <p *ngIf="!dataChanged.file" class="card-text">No parece que hayan cambiado los dato que ya se cargaron.</p>
+        <p *ngIf="dataChanged.file" class="card-text color-danger">Los datos parecen haber cambiado.</p>
+        <div class="form-group">
+          <label class="form-label">Fecha de vigencia</label>
+          <input type="date" class="form-control" name="vigencia" placeholder="Vigencia"
+          [(ngModel)]="setDate" value="fechaInputValue" (input)="checkFecha()" (blur)="checkFecha()">
+        </div>
+        <div class="form-group">
+          <input type="checkbox" class="form-check-input" [(ngModel)]="dataChanged.saveData" id="saveDataCheck">
+          <label class="form-check-label" for="saveDataCheck">Se graban los datos en la base de datos</label>
+        </div>
+      </div>
+      <div *ngIf="!fileInDb._id" >
+        <h5 class="card-title">Va a cargar una nueva lista para este proveedor</h5>
+        <!--p class="card-text">No parece que hayan cambiado los dato que ya se cargaron.</p-->
+        <div class="form-group">
+          <label class="form-label">Fecha de vigencia</label>
+          <input type="date" class="form-control" name="vigencia" placeholder="Vigencia"
+          [(ngModel)]="setDate" value="fechaInputValue" (input)="checkFecha()" (blur)="checkFecha()">        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer">
+    <button *ngIf="dataChanged.saveData || dataChanged.date || dataChanged.file" class="btn btn-success" [disabled]="!chosenFiles" (click)="load()">
+      Cargar
+    </button>
+    <!--button *ngIf="saveData" class="btn btn-success" [disabled]="!chosenFiles" (click)="load()">
+      Recargar
+    </button>
+    <button *ngIf="fileInDb && fileInDb._id" class="btn btn-warning" [disabled]="" (click)="resetVigencia()">
+      reset vigencia
+    </button-->
+    <button class="btn btn-secondary" [disabled]="" (click)="cancel()">
+      Cancel
+    </button>
+  </div>
+</div>
 
-<button class="btn btn-primary" [disabled]="!chosenFiles" (click)="load()">
-  Upload
-</button>
+<div *ngIf="chosenFiles" class="card">
+  <p *ngIf="fileInDb && fileInDb._id && !dataChanged">Sin Cambios</p>
+</div>
 
 <div class="alert alert-light">{{ msg }}</div>

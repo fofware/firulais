@@ -15,7 +15,7 @@ export class ArticuloPagoSelectComponent implements OnInit {
   //  ,{name: "QR.Debito",icon:'far fa-money-bill-alt',value: 1.045328, coef: [ { comiMP: 0.012, op: 1}, { RetImpIngBru: 0.033328, op: 1 }] }
   //  ,{name: "QR.Crédito",icon:'far fa-credit-card', value: 1.103387, coef: [ { comiMP: 0.070059, op: 1 }, { RetImpIngBru: 0.033328, op: 1 } ] }
     ,{name: "Trj.Débito",icon:'fas fa-money-check', value: 1.0778521857, coef: [ {comiMP: 0.039803256, op: 1 }, { RetImpIngBru: 0.033328, op: 1 } ] }
-    ,{name: "Trj.Crédito",icon:'far fa-credit-card', value: 1.120220997, coef: [ { comiMP: 0.0778898, op: 1 }, { RetImpIngBru: 0.033328, op: 1 } ] }
+    ,{name: "Trj.Crédito",icon:'far fa-credit-card', value: 1.121707443494469, coef: [ { comiMP: 0.0778898, op: 1 }, { RetImpIngBru: 0.033328, op: 1 } ] }
   ]
 
   constructor() { }

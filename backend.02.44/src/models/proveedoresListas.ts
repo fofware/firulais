@@ -3,9 +3,10 @@ import { Schema, model, Document } from "mongoose";
 export interface IProveedoresListas extends Document {
   _id?: Object;
   proveedor_id: Object;
-  file_name: String;
+  name: String;
   last_modified: Number;
   size: Number;
+  vigencia: Date;
 }
 
 const ProveedoresListasSchema = new Schema({
@@ -15,20 +16,25 @@ const ProveedoresListasSchema = new Schema({
     ,$id: '_id'
     , require: true  
   }
-  ,file_name: {
+  ,name: {
     type: Schema.Types.String
     , require: true  
   }
-  , last_modified: {
+  ,last_modified: {
     type: Schema.Types.Number
     , require: true  
   }
   ,size: {
     type: Schema.Types.Number
   }
+  ,vigencia: {
+    type: Schema.Types.Date
+    , require: true
+  }
 },{
   timestamps: true,
-  versionKey: false
+  versionKey: false,
+  strict: false
 })
 
 ProveedoresListasSchema.on('index', error => {

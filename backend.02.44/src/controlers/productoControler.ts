@@ -1001,7 +1001,7 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 				'art_margen': '$art.margen',
 				'private_web': { $ifNull: [ '$art.private_web', false ] },
 				'formula': '$art.formula',
-				'detalles': '$art.detalles',
+				'detalles': { $ifNull: [ '$art.detalles', '' ] },
 				'beneficios': '$art.beneficios',
 				'tipo': {
 					$cond: ['$parent', 
@@ -1059,46 +1059,6 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 				"compra_fecha":1,
 				"reposicion_fecha":1,
 				"ahora":1,
-				//"calc_precio": {
-				//	$cond: [{ $eq: ['$pesable', true] },
-				//	{
-				//		$ceil: {
-				//			$ceil:
-				//			{
-				//				$cond: [{ $eq: ['$count_parte', 0] },
-				//				{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
-				//				{
-				//					$cond:
-				//						[{ $eq: ['$count_cerrado', 0] },
-				//						{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
-				//						{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
-				//						]
-				//				}]
-				//			}
-				//		}
-				//	},
-				//	{
-				//		$multiply: [{
-				//			$ceil: {
-				//				$divide: [{
-				//					$ceil:
-				//					{
-				//						$cond: [{ $eq: ['$count_parte', 0] },
-				//						{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
-				//						{
-				//							$cond:
-				//								[{ $eq: ['$count_cerrado', 0] },
-				//								{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
-				//								{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
-				//								]
-				//						}]
-				//					}
-				//				}, 10]
-				//			}
-				//		}, 10]
-				//	}
-				//	]
-				//},
 				'calc_precio': calculaPrecio(1,22.5,true),
 				'lista': precioLista(1.14),
 				'showPrecio': calculaPrecio(1,22.5,true),
@@ -1409,7 +1369,7 @@ class ProductoControler {
 		this.router.get('/productos/toprovlista', this.toprovlista);
 		this.router.get('/productos/search/:search', this.search);
 		this.router.get('/productos/test', this.test);
-//		this.router.get('/productos/fb', this.fb);
+		this.router.get('/productos/fb', this.fb);
 		this.router.get('/productos/fulldata', this.fulldataG);
 		this.router.post('/productos/fulldata', this.fulldataP);
 		//this.router.get('/productos/textlink/:search', this.textFulldata);
@@ -2013,35 +1973,36 @@ class ProductoControler {
 	async fb(req: Request, res: Response){
 		const fbShowData = {
 			id: { $cond: [{ $eq:['$codigo', '']},'$_id','$codigo']},
-			'title': {
-				$trim: 
-				{ input: 
-					{ $concat: [
-						'$art_name', 
-						{ $cond: [{ $eq: ['$name', '']}, '', ' ']},
-						'$name',
-						{ $cond: [{ $eq: ['$strContiene', '']}, '', ' ']},
-						'$strContiene',
-						{ $cond: [{ $eq: ['$unidad', '']}, '', ' ']},
-						'$unidad',
-						{ $cond: [{ $eq: ['$sname', '']}, '', ' ']},
-						'$sname',
-						{ $cond: [{ $eq: ['$sStrContiene', '']}, '', ' ']},
-						'$sStrContiene',
-						{ $cond: [{ $eq: ['$sunidad', '']}, '', ' ']},
-						'$sunidad'
-						]
-					}
-				}
-			},
-//			'description': '$detalles',
-			'description': 'probando la descripción otra linea',
-			'availability': 'in stock',
-/*
+			'title': '$fullName',
+			//{
+			//	$trim: 
+			//	{ input: 
+			//		{ $concat: [
+			//			'$art_name', 
+			//			{ $cond: [{ $eq: ['$name', '']}, '', ' ']},
+			//			'$name',
+			//			{ $cond: [{ $eq: ['$strContiene', '']}, '', ' ']},
+			//			'$strContiene',
+			//			{ $cond: [{ $eq: ['$unidad', '']}, '', ' ']},
+			//			'$unidad',
+			//			{ $cond: [{ $eq: ['$sname', '']}, '', ' ']},
+			//			'$sname',
+			//			{ $cond: [{ $eq: ['$sStrContiene', '']}, '', ' ']},
+			//			'$sStrContiene',
+			//			{ $cond: [{ $eq: ['$sunidad', '']}, '', ' ']},
+			//			'$sunidad'
+			//			]
+			//		}
+			//	}
+			//},
+			'description': { $cond: [{ $eq: ['$detalles', '']}, '$art_fullName','$detalles'] },
+//			'description': 'probando la descripción otra linea',
+//			'availability': 'in stock',
+
 			'availability': {
 				$cond: [ {$gte: [ '$stock', 1] }, 'in stock', 'out of stock'] 
 			},
-*/
+
 			'condition': 'new',
 			'price':{
 				$concat: [{ 
@@ -2062,6 +2023,21 @@ class ProductoControler {
 			'brand': { 
 				$cond: [{$ne: ['$marca','']},'$marca','firulais']
 			},
+			//93,pet supplies > pet carriers & containment
+			//94,pet supplies > pet grooming supplies
+			//95,pet supplies > small animal supplies
+			//96,pet supplies > pet feeding & watering supplies
+			//97,pet supplies > reptile & amphibian supplies
+			//98,"pet supplies > pet collars, harnesses & leashes"
+			//99,pet supplies > pet steps & ramps
+			//100,pet supplies > bird supplies
+			//101,pet supplies > pet care & health
+			//102,pet supplies > pet beds & bedding
+			//103,pet supplies > fish supplies
+			//104,pet supplies > cat supplies
+			//105,pet supplies > dog supplies
+			//106,pet supplies
+			
 			'fb_product_category': { 
 				$cond: [ { $in:['$especie', ['Perro','perro', 'Perros', 'perros']] },
 					105,
@@ -2156,7 +2132,7 @@ class ProductoControler {
 
 			]},
 */
-			'item_group_id': '$art_name',
+			'item_group_id': '$articuloId',
 			'custom_label_0': '$marca',
 			'custom_label_1': '$rubro',
 			'custom_label_2': '$linea',
@@ -2234,29 +2210,28 @@ class ProductoControler {
 			const key = fbFields[n];
 			line.push(key);
 		}
-		retData += line.toString()+'\n';
+		retData += line.join('	')+'\n';
 		const patt = /\n/g
-		const pat1 = /,/g
+		const pat1 = /\,/g
 		for (let i = 0; i < array.length; i++) {
 			const e = array[i];
 			const line = [];
 			for (let n = 0; n < fbFields.length; n++) {
 				const key = fbFields[n];
-				/*
 				if(key === 'description') {
 					if (typeof e[key] === 'string'){
-						const str = e[key].replace(patt,"");
-						e[key] = str.replace(pat1,'&#44;');
-//						e[key] = str.replace(pat1,'\,');
-						line.push(`'${e[key]}'`);
+						e[key] = e[key].replace(patt," ");
+						//e[key] = e[key].replace(pat1,' ');
+						//e[key] = e[key].replace(pat1,'&#44;');
+						//e[key] = e[key].replace(pat1,'');
+						e[key] = `${e[key]}`;
 					} else {
-						line.push("")
+						e[key] = "no data";
 					}
-				} else 
-				*/
+				} 
 				line.push(e[key]);
 			}
-			retData += line.toString()+'\n';
+			retData += line.join('	')+'\n';
 		}
 //		var text={"hello.txt":"Hello World!","bye.txt":"Goodbye Cruel World!"};
 //		res.set({"Content-Disposition":"attachment; filename=\"fbproduct.csv\""});

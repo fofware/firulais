@@ -1,6 +1,7 @@
 :host {
   position: relative;
   font-size: 130%;
+  background-color: aliceblue;
 /*
   border: 1px solid orange;
   text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
@@ -81,7 +82,7 @@ img {
   }
   .textbox {
     max-width: 370px;
-    height: 200px;
+    height: 270px;
   }
   .caja-img {
 /*

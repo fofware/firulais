@@ -17,6 +17,7 @@ class ProveedoresListasControler {
 		this.router.post( '/proveedoreslistas/getid', this.provlistaid );
 		this.router.post( '/proveedoreslistas/savelink', this.savelink );
 		this.router.post( '/proveedoreslistas/checklista', this.checkLista );
+		this.router.post( '/proveedoreslistas/setlista', this.setLista );
 	}
 
 	public index(req: Request, res: Response) {
@@ -55,15 +56,20 @@ class ProveedoresListasControler {
 
   async checkLista(req: Request, res: Response ){
     const filter = { 
-			file_name: req.body.filename,
-			last_modified: req.body.lastModified,
-			size: req.body.size,
+			name: req.body.name,
+			proveedor_id: new ObjectID(req.body.proveedor_id)
+    };
+    //console.log(filter);
+    const ret = await lista.findOne(filter);
+    return res.status(200).json(ret);
+  }
+
+  async setLista(req: Request, res: Response ){
+    const filter = { 
+			name: req.body.name,
 			proveedor_id: new ObjectID(req.body.proveedor_id)
     };
     const update = req.body;
-
-    //await provArt.countDocuments(filter); // 0
-
     let ret = await lista.findOneAndUpdate(filter, update, {
       new: true,
       upsert: true,
@@ -74,9 +80,6 @@ class ProveedoresListasControler {
     // The below property will be `false` if MongoDB upserted a new
     // document, and `true` if MongoDB updated an existing object.
     ret.lastErrorObject.updatedExisting; // false
-
-
-
 
     return res.status(200).json(ret);
   }

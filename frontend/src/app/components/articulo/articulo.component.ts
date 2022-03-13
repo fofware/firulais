@@ -1,23 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ProductosService } from 'src/app/services/productos.service';
+import { ArticulosService } from 'src/app/services/articulos.service';
 
 @Component({
-  selector: 'app-producto',
-  templateUrl: './producto.component.html',
-  styleUrls: ['./producto.component.css']
+  selector: 'app-articulo',
+  templateUrl: './articulo.component.html',
+  styleUrls: ['./articulo.component.css']
 })
-export class ProductoComponent implements OnInit {
-
+export class ArticuloComponent implements OnInit {
   producto:any = {};
   presentaciones:any = {}
+
   constructor(
-    private productoService: ProductosService
+    private articuloService: ArticulosService
     , private router: Router
     , private activatedRouter: ActivatedRoute
-  ) {}
+  ) { }
 
-  async ngOnInit(): Promise<void> {
+  async ngOnInit(): Promise<void>  {
     const values = this.activatedRouter.snapshot.params;
     const values1 = this.activatedRouter.snapshot.queryParams;
     const values2 = this.activatedRouter.snapshot.queryParamMap;
@@ -26,9 +26,12 @@ export class ProductoComponent implements OnInit {
     //console.log(values1);
 
     if (values.id) {
-      const retData = await this.productoService.get(values.id);
-      this.producto = retData[0];
+      const retData = await this.articuloService.leerArticuloProductos(values.id);
+      console.log(retData);
+      this.producto = retData;
     }
     console.log(this.producto);
+
   }
+
 }

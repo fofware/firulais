@@ -1,7 +1,7 @@
 <div [class.isPrinting]="printService.isPrinting">
   <div class="sticky-top print-oculta">
-  <app-top-menu></app-top-menu>
-  <!--app-articulo-card-select-header
+    <app-top-menu></app-top-menu>
+    <!--app-articulo-card-select-header
     [filterButtons]='filterButtons'
     [searchItem]='searchItem'
     [order]='articuloOrder'
@@ -9,40 +9,26 @@
     (onButtonMsg)='buttonMsg($event)'
     (onCardSelectHeaderEvent)='filterEvent($event)'
     (onNewRegEvent)='newReg($event)'>
-  </app-articulo-card-select-header-->
-  <form class="form-inline bg-dark p-1">
-    <app-articulo-card-select-filter
-      [filterButtons]='filterButtons'
-      [wait]='wait'
-      (onSearchArticulos)='filterEvent($event)'
-      (onButtonMsg)='buttonMsg($event)'
-    >
-    </app-articulo-card-select-filter>
-    <app-articulo-card-select-order
-      [order]="articuloOrder"
-      [listaOrden]='listaOrden'
-      (onOrderChangeEvent)='filterEvent($event)'
-    ></app-articulo-card-select-order>
-    <app-articulo-card-select-tools class="float-left"
-      (onNewRegEvent)='newReg($event)'
-    >
-    </app-articulo-card-select-tools>
-    <button (click)="imprimir()"><i class="fas fa-print"></i></button>
-  </form>
-
-</div>
-<div class="container">
-<table>
-  <tr *ngFor="let articulo of articuloList; index as i;">
-    <td  class="card">
-    <app-articulos-list-card-view
-      [articulo]='articulo'
-      [idx]=i
-      [publico]='publico'
-      (onSelectArticulo)='SelectEvent($event)'
-    ></app-articulos-list-card-view>
-    </td>
-  </tr>
-</table>
-</div>
+    </app-articulo-card-select-header-->
+    <form class="form-inline bg-dark p-1">
+      <app-articulo-card-select-filter [filterButtons]='filterButtons' [wait]='wait'
+        (onSearchArticulos)='filterEvent($event)' (onButtonMsg)='buttonMsg($event)'>
+      </app-articulo-card-select-filter>
+      <app-articulo-card-select-order [order]="articuloOrder" [listaOrden]='listaOrden'
+        (onOrderChangeEvent)='filterEvent($event)'></app-articulo-card-select-order>
+      <app-articulo-card-select-tools class="float-left" (onNewRegEvent)='newReg($event)'>
+      </app-articulo-card-select-tools>
+      <button (click)="imprimir()"><i class="fas fa-print"></i></button>
+    </form>
+  </div>
+  <div class="container">
+    <table>
+      <tr *ngFor="let articulo of articuloList; index as i;">
+        <td class="card">
+          <app-articulos-list-card-view [articulo]='articulo' [idx]=i [publico]='publico'
+            (onSelectArticulo)='SelectEvent($event)'></app-articulos-list-card-view>
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>

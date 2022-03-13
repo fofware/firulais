@@ -252,6 +252,7 @@ export class ArticulosListComponent implements OnInit {
     this.selectedArticulo = Object.assign({},this.newArticulo);
     this.selectedArticulo._id = `${new ObjectID()}`; //await this.idServive.generate();
     //const newArticulo = this.modalService.open(ArticuloFormAddModalComponent);
+    console.log("Selected",this.selectedArticulo);
     const modalRef = this.modalService.open(ArticuloFormComponent, {
       ariaLabelledBy: 'modal-basic-title'
       , size: 'xl'

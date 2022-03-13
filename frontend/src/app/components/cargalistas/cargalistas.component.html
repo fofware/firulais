@@ -132,7 +132,7 @@
                 </div>
               </div>
               <div class="form-row align-items-center">
-                <div class="col-12">
+                <div class="col">
                   <div class="input-group mb-2">
                     <div class="input-group-prepend">
                       <div class="input-group-text">Nombre</div>
@@ -140,8 +140,58 @@
                     <input type="text" class="form-control" id="nombre_{{i}}" placeholder="Nombre" [(ngModel)]="item.nombre">
                   </div>
                 </div>
+                <div class="col-sm-3">
+                  <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">Cont</div>
+                    </div>
+                    <input type="text" class="form-control" id="peso_{{i}}" placeholder="Contenido" [(ngModel)]="item.peso">
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">Unids</div>
+                    </div>
+                    <input type="text" class="form-control" id="unidades_{{i}}" placeholder="Unidades" [(ngModel)]="item.unidades">
+                  </div>
+                </div>
               </div>
-              <!--div class="form-row align-items-center justify-content-end">
+              <div class="form-row align-items-center">
+                <div class="col-sm-3">
+                  <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">Precio</div>
+                    </div>
+                    <input type="text" class="form-control" id="precio_{{i}}" placeholder="Precio" [(ngModel)]="item.precio">
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">Bulto</div>
+                    </div>
+                    <input type="text" class="form-control" id="bulto_{{i}}" placeholder="Bulto" [(ngModel)]="item.bulto">
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">Sugeriodo</div>
+                    </div>
+                    <input type="text" class="form-control" id="sugerido_{{i}}" placeholder="Sugerido" [(ngModel)]="item.sugerido">
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">Margen</div>
+                    </div>
+                    <input type="text" class="form-control" id="margen_{{i}}" placeholder="Margen" [(ngModel)]="item.margen_s">
+                  </div>
+                </div>
+              </div>
+            <!--div class="form-row align-items-center justify-content-end">
                 <div class="col-sm-3 col-md-2 col-lg-2 col-xl-3">
                   <div class="input-group mb-2">
                     <div class="input-group-prepend">
@@ -256,7 +306,7 @@
   <!--button (click)="readFileSciarriello()">Cargar Sciarriello</button-->
   <!--button (click)="readFileCSV()">Cargar CSV Archivo</button-->
   <!--button (click)="readXlsxFile()">Cargar XLSX</button-->
-  <button (click)="importArticulos()">Check Lista</button>
+  <button (click)="importProductos()">Check Lista</button>
   <!--button (click)="importarFile()">Importar</button-->
 
 </footer>

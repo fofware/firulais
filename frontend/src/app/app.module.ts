@@ -85,6 +85,8 @@ import { MarcasComponent } from './components/marcas/marcas.component';
 import { ProveedoresComponent } from './components/proveedores/proveedores.component';
 import { ProveedoresModalFormComponent } from './components/proveedores-modal-form/proveedores-modal-form.component';
 import { ArticuloLinkProductoComponent } from './components/articulo-link-producto/articulo-link-producto.component';
+import { ProgressUpdateComponent } from './components/progress-update/progress-update.component';
+import { ArticuloComponent } from './components/articulo/articulo.component';
 
 @NgModule({
   declarations: [
@@ -166,6 +168,8 @@ import { ArticuloLinkProductoComponent } from './components/articulo-link-produc
     ProveedoresComponent,
     ProveedoresModalFormComponent,
     ArticuloLinkProductoComponent,
+    ProgressUpdateComponent,
+    ArticuloComponent,
   ],
   imports: [
     BrowserModule,

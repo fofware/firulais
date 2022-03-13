@@ -21,6 +21,7 @@ import { TmpListasCtrl } from './controlers/tmpListasControler';
 import { MercadoPagoCtrl } from './controlers/mercadopagoControler';
 import { ProveedoresPreciosCtrl } from './controlers/proveedoresPreciosControlers';
 import { ProveedoresCtrl } from './controlers/proveedorControler';
+import { ProveedoresProductosCtrl } from './controlers/proveedoresproductosControlers';
 
 export default class Server {
 
@@ -33,7 +34,7 @@ export default class Server {
 	}
 	config(): void {
 //		this.app.set('port', process.env.PORT || 3000);
-		this.app.use(morgan('common'));
+		this.app.use(morgan('dev'));
 		this.app.use(cors());
 		this.app.use(express.json());
 		this.app.use(express.urlencoded({ extended: false }));
@@ -51,6 +52,7 @@ export default class Server {
 		this.app.use('/api', ProveedoresCtrl.router);
 		this.app.use('/api', ProveedoresListasCtrl.router);
 		this.app.use('/api', ProveedoresPreciosCtrl.router);
+		this.app.use( ProveedoresProductosCtrl.router);
 		this.app.use( TmpListasCtrl.router);
 		this.app.use( ProveedoresArticulosCtrl.router);
 		this.app.use( personaCtrl.router );

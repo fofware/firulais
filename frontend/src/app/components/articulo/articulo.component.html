@@ -4,30 +4,22 @@
 <div class="container">
   <div class="card mb-3" >
     <div class="card-header">
-      <h3>{{producto.art_fullName}}</h3>
+      <h3>{{producto.fullName}}</h3>
     </div>
     <div class="row no-gutters">
       <div class="col-md-5 col-lg-6">
-        <img src="{{producto.image}}" class="card-img" alt="image of {{producto.art_name}}">
-        <div class="row">
-          <!--div class="col-8">
-            <h4 class="card-title">{{producto.name}} {{producto.contiene}} {{producto.unidad}}</h4>
-          </div>
-          <div class="col-4">
-            <h4 class="card-title d-block" style="text-align: right;">$ {{producto.showPrecio}}</h4>
-          </div-->
-        </div>
-    </div>
+        <img src="{{producto.image}}" class="card-img" alt="image of {{producto.fullName}}">
+      </div>
       <div class="col-md-7 col-lg-6">
         <div class="card-body">
-          <div class="row">
+          <!--div class="row">
             <div class="col-8">
               <h4 class="card-title">{{producto.name}} {{producto.contiene}} {{producto.unidad}}</h4>
             </div>
             <div class="col-4">
               <h4 class="card-title d-block" style="text-align: right;">$ {{producto.showPrecio}}</h4>
             </div>
-          </div>
+          </div-->
           <!--div class="row" *ngFor="let presentacion of producto.presentaciones">
             <div class="col-8">
               <h6 class="card-title">{{presentacion.name}} {{presentacion.contiene}} {{presentacion.unidad}}</h6>
@@ -54,16 +46,16 @@
           </table-->
           <div [innerHTML]="producto.detalles"></div>
 
-          <ul ngbNav #nav="ngbNav" [activeId]="1" class="nav-tabs">
-            <li [ngbNavItem]="1" [hidden]="!producto.presentaciones || producto.presentaciones.length===0 ">
-              <a ngbNavLink><b>Otras Presentaciones</b></a>
+          <ul ngbNav #nav="ngbNav" class="nav-tabs">
+            <li [ngbNavItem]="1" [hidden]="!producto.productos || producto.productos.length===0 ">
+              <a ngbNavLink><b>Presentaciones</b></a>
               <ng-template ngbNavContent>
-                <div class="row" *ngFor="let presentacion of producto.presentaciones">
+                <div class="row" *ngFor="let presentacion of producto.productos">
                   <div class="col-8">
-                    <h6 class="card-title">{{presentacion.name}} {{presentacion.contiene}} {{presentacion.unidad}}</h6>
+                    <h6 class="card-title">{{presentacion.name}} {{presentacion.contiene}} {{presentacion.unidad}} {{presentacion.sname}} {{presentacion.scontiene}} {{presentacion.sunidad}}</h6>
                   </div>
                   <div class="col-4">
-                    <h6 class="d-block" style="text-align: right;">$ {{presentacion.showPrecio}}</h6>
+                    <h6 class="d-block" style="text-align: right;">$ {{presentacion.calc_precio}}</h6>
                   </div>
                 </div>
               </ng-template>
