@@ -1040,7 +1040,7 @@ export const proveedoresSettings = [
     "type": "XLSX",
     "encode": "iso8859-3",
     "named": false,
-    "coeficiente": 1.245,
+    "coeficiente": 1.028925619834711,
     "input": {
       "*":{
         "input_fields":
@@ -1079,6 +1079,7 @@ export const proveedoresSettings = [
             ) cols += 1;
             if (
               !isNaN(parseFloat(line[col.C]))
+              && cols < 0
               && !isNaN(parseFloat(line[col.D]))
               && !isNaN(parseFloat(line[col.E]))
               && !isNaN(parseFloat(line[col.F]))
@@ -1094,8 +1095,8 @@ export const proveedoresSettings = [
                 ret.nombre = line[col.A];
                 ret.peso = isNaN(line[col.C]) ? null : line[col.C];
                 ret.unidades = isNaN(line[col.D]) ? null : line[col.D];
-                ret.bultoPrecio = isNaN(line[col.E]) ? null : line[col.E]*1.245;
-                ret.unidadPrecio = isNaN(line[col.F]) ? null : line[col.F]*1.245;
+                ret.bultoPrecio = isNaN(line[col.G+cols]) ? null : line[col.G]*1.028925619834711;
+                ret.unidadPrecio = isNaN(line[col.H+cols]) ? null : line[col.H]*1.028925619834711;
                 ret.unidadSugerido = isNaN(line[col.I]) ? null : line[col.I];
                 ret.margen = isNaN(ret.unidadSugerido) || isNaN(ret.unidadPrecio) ? null : ret.unidadSugerido/ret.unidadPrecio;
                 break;
@@ -1104,18 +1105,18 @@ export const proveedoresSettings = [
                 ret.nombre = line[col.A+cols];
                 ret.peso = isNaN(line[col.C+cols]) ? null : line[col.C+cols];
                 ret.unidades = isNaN(line[col.D+cols]) ? null : line[col.D+cols];
-                ret.bultoPrecio = isNaN(line[col.E+cols]) ? null : line[col.E+cols]*1.245;
-                ret.unidadPrecio = isNaN(line[col.F+cols]) ? null : line[col.F+cols]*1.245;
+                ret.bultoPrecio = isNaN(line[col.G+cols]) ? null : line[col.G+cols]*1.028925619834711;
+                ret.unidadPrecio = isNaN(line[col.H+cols]) ? null : line[col.H+cols]*1.028925619834711;
                 ret.unidadSugerido = isNaN(line[col.I+cols]) ? null : line[col.I+cols];
                 ret.margen = isNaN(ret.unidadSugerido) || isNaN(ret.unidadPrecio) ? null : ret.unidadSugerido/ret.unidadPrecio;
                 break;
               default:
-                //console.log("Error cols",cols);
-                //console.log(line)
+                console.log("Error cols",cols);
+                console.log(line)
                 break;
             }
             if (cols > -1){
-              line[col.A] = ret.codigo.trim();
+              line[col.A] = ret.codigo ? ret.codigo.trim() : '';
               line[col.B] = ret.nombre;
               line[col.C] = ret.peso;
               line[col.D] = ret.unidades;

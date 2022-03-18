@@ -81,28 +81,6 @@ export const artProject = {
 	'detalles': 1,
 	'beneficios': 1,
 	'fullName':	art_full_name_template,
-	//{ $trim: 
-	//	{ input: 
-	//		{	$concat: [
-	//			{ $cond: ['$d_fabricante', 'fabricante', '']},
-	//			{ $cond: ['$d_marca', ' ', '']},
-	//			{ $cond: ['$d_marca', '$marca', '']},
-	//			{ $cond: ['$d_especie', ' ', '']},
-	//			{ $cond: ['$d_especie', '$especie', '']},
-	//			{ $cond: ['$d_edad', ' ', '']},
-	//			{ $cond: ['$d_edad', '$edad', '']},
-	//			{ $cond: ['$d_raza', ' ', '']},
-	//			{ $cond: ['$d_raza', '$raza', '']},
-	//			{ $cond: [ { $or: ['$d_marca','$d_fabricante','$d_especie','$d_edad','$d_raza'] }, ' ', '']},
-	//			'$name',
-	//			{ $cond: ['$d_rubro', ' ', '']},
-	//			{ $cond: ['$d_rubro', '$rubro', '']},
-	//			{ $cond: ['$d_linea', ' ', '']},
-	//			{ $cond: ['$d_linea', '$linea', '']},
-	//			]
-	//		}
-	//	}
-	//}
 };
 
 export const saleProduct =

@@ -9,6 +9,8 @@ export interface IProveedoresProductos extends Document {
   peso?: number;
   unidades?: number;
   producto_id?: object;
+  precio?: number;
+  bulto?: number;
   fieldsvalues:[];
 }
 
@@ -36,6 +38,8 @@ const ProveedoresProductosSchema = new Schema({
   }
   , peso: { type: Number, default: null, index: true  }
   , unidades: { type: Schema.Types.Number, default: null, index: true  }
+  , precio: { type: Schema.Types.Number, default: null, index: true  }
+  , bulto: { type: Schema.Types.Number, default: null, index: true  }
   , producto_id: {                        // id del producto en nuestro sistema
     type: Schema.Types.ObjectId
     , ref: "productos"

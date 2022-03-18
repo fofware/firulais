@@ -575,10 +575,14 @@ const producto_base = {
 const producto_precios_merge = (input:Object) => {
 	const data = {
 		'lista': precioLista(1.14),
-		'showPrecio': calculaPrecio(1,22.5,true),
-		'reventa': calculaPrecio(.85,18.5,true),
-		'reventa1': calculaPrecio(.43,14.5,true),
+		'showPrecio': calculaPrecio(1,18.5,true),
+		'reventa': calculaPrecio(.85,14.5,true),
+		'reventa1': calculaPrecio(.43,13,true),
 		'reventa2': calculaPrecio(.1556,11.5,true),
+		//'showPrecio': calculaPrecio(1,22.5,true),
+		//'reventa': calculaPrecio(.85,18.5,true),
+		//'reventa1': calculaPrecio(.43,14.5,true),
+		//'reventa2': calculaPrecio(.1556,11.5,true),
 		'precio': 1,
 	}
 	return Object.assign(input,data)
@@ -700,25 +704,17 @@ export const productoFullTemplate =
 	"compra": 1,
 	"showCompra" : compra(),
 	"reposicion": 1,
-	"calc_precio": calculaPrecio(1,22.5,true), 
-	//{
-	//	$ceil:
-	//	{
-	//		$cond: [{ $eq: ['$count_parte', 0] },
-	//		{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
-	//		{	$cond:
-	//				[ { $eq: ['$count_cerrado', 0] },
-	//				{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$cerrado.compra', '$cerrado.contiene'] }] },
-	//				{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }
-	//				]
-	//		}]
-	//	}
-	//},
 	'lista': precioLista(1.14),
-	'showPrecio': calculaPrecio(1,22.5,true),
-	'reventa': calculaPrecio(.85,18.5,true),
-	'reventa1': calculaPrecio(.43,14.5,true),
-	'reventa2': calculaPrecio(.1556,11.5,true),
+	//"calc_precio": calculaPrecio(1,22.5,true), 
+	//'showPrecio': calculaPrecio(1,22.5,true),
+	//'reventa': calculaPrecio(.85,18.5,true),
+	//'reventa1': calculaPrecio(.43,14.5,true),
+	//'reventa2': calculaPrecio(.1556,11.5,true),
+	"calc_precio": calculaPrecio(1,15,true), 
+	'showPrecio': calculaPrecio(1,15,true),
+	'reventa': calculaPrecio(.85,14,true),
+	'reventa1': calculaPrecio(.43,12,true),
+	'reventa2': calculaPrecio(.1556,10,true),
 	'precio': 1,
 	'sub': {
 		$cond: [{ $eq: ['$count_ins', 0] },
@@ -1059,12 +1055,17 @@ export const productoGetData = async function( qry: any, outProject?: any, hidde
 				"compra_fecha":1,
 				"reposicion_fecha":1,
 				"ahora":1,
-				'calc_precio': calculaPrecio(1,22.5,true),
 				'lista': precioLista(1.14),
-				'showPrecio': calculaPrecio(1,22.5,true),
-				'reventa': calculaPrecio(.85,18.5,true),
-				'reventa1': calculaPrecio(.43,14.5,true),
-				'reventa2': calculaPrecio(.1556,11.5,true),
+				//'calc_precio': calculaPrecio(1,22.5,true),
+				//'showPrecio': calculaPrecio(1,22.5,true),
+				//'reventa': calculaPrecio(.85,18.5,true),
+				//'reventa1': calculaPrecio(.43,14.5,true),
+				//'reventa2': calculaPrecio(.1556,11.5,true),
+				'calc_precio': calculaPrecio(1,15,true),
+				'showPrecio': calculaPrecio(1,15,true),
+				'reventa': calculaPrecio(.85,14,true),
+				'reventa1': calculaPrecio(.43,12,true),
+				'reventa2': calculaPrecio(.1556,10,true),
 				'precioref': referencia(qry.Decimales),
 				'sub': {
 					$cond: [ {$eq: ['$count_ins',0]},

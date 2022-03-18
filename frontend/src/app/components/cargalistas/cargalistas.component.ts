@@ -397,22 +397,14 @@ export class CargalistasComponent implements OnInit, OnChanges {
           console.log("normal", result)
           switch (result) {
             case 'nuevos':
-              console.log(addedData);
-              this.newData = addedData;
+              this.newData = await this.loadData(addedData);
               break;
             case 'error':
               //console.log(errorData);
-              const codigos = [];
-              for (let i = 0; i < errorData.length; i++) {
-                const e = errorData[i];
-                codigos.push(e.savedData._id);
-              }
-              console.log(codigos)
-              this.newData = await this.procesaLista.getProductos(codigos);
+              this.newData = await this.loadData(errorData);
               break;
             default:
-              this.newData = savedData;
-              console.log(this.newData)
+              this.newData = await this.loadData(savedData);
               break;
           }
           console.log(this.newData);
@@ -482,6 +474,14 @@ export class CargalistasComponent implements OnInit, OnChanges {
     }
   }
 
+  async loadData(data) {
+    const codigos = [];
+    for (let i = 0; i < data.length; i++) {
+      const e = data[i];
+      codigos.push(e.savedData._id);
+    }
+    return await this.procesaLista.getProductos(codigos);
+  }
   async initData() {
     try {
       const arrayp: any = await this.personas.fulllist();
