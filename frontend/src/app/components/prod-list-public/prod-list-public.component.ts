@@ -17,7 +17,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   Order = productosets.order;
   ApiUri = API_URI;
   wait = false;
-  searchItem = '';
+  searchItem:string;
   buffer_searchItem = '';
   fpago = 0;
   fpagoCoef = {name: "Efectivo",icon:'far fa-money-bill-alt',value: 1, coef: [{comiMP: 0, op: 1}, {RetImpIngBru: 0}] };
@@ -34,7 +34,7 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
   }
   collectionSize = 0;
   page = 1;
-  pageSize = 9;
+  pageSize = 30;
   searchBrowseItem = "";
 
   listasToPrint:any[] = [];
@@ -60,6 +60,9 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.contiene['$gte'] = 0;
+    console.log('ngOnInit');
+    console.log(this.searchItem);
+    this.searchItem = this.searchItem === undefined ? '' : this.searchItem;
     this.listProductos();
   }
 
@@ -183,8 +186,8 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
       this.hoja = 1;
       this.collectionSize = this.tmpList.length;
       this.calculaPrecio();
-      //this.articuloList = this.more(this.tmpList, [])
-      this.articuloList = this.tmpList;
+      this.articuloList = this.more(this.tmpList, [])
+      //this.articuloList = this.tmpList;
 
       this.wait = false;
       if( this.buffer_searchItem !== this.searchItem ){
@@ -197,12 +200,12 @@ export class ProdListPublicComponent implements OnInit, OnChanges {
 
   more(inList,outList): any {
     console.log(this.hoja);
-      console.log((this.hoja-1) * this.pageSize);
-      console.log(this.hoja * this.pageSize);
-      this.collectionSize = inList.length;
-      outList = outList.concat(inList.slice((this.hoja-1) * this.pageSize , this.hoja * this.pageSize));
-      this.hoja=this.hoja+1;
-      return outList;
+    console.log((this.hoja-1) * this.pageSize);
+    console.log(this.hoja * this.pageSize);
+    this.collectionSize = inList.length;
+    outList = outList.concat(inList.slice((this.hoja-1) * this.pageSize , this.hoja * this.pageSize));
+    this.hoja=this.hoja+1;
+    return outList;
   }
 
   browseEvent(evt){

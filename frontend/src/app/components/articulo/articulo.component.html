@@ -50,12 +50,16 @@
             <li [ngbNavItem]="1" [hidden]="!producto.productos || producto.productos.length===0 ">
               <a ngbNavLink><b>Presentaciones</b></a>
               <ng-template ngbNavContent>
-                <div class="row" *ngFor="let presentacion of producto.productos">
-                  <div class="col-8">
-                    <h6 class="card-title">{{presentacion.name}} {{presentacion.contiene}} {{presentacion.unidad}} {{presentacion.sname}} {{presentacion.scontiene}} {{presentacion.sunidad}}</h6>
+                <div class="row" [class.precio-oferta]="presentacion.oferta" *ngFor="let presentacion of producto.productos">
+                  <div class="col-7" [class.precio-oferta]="presentacion.oferta">
+                    <h5 class="d-block" >{{presentacion.name}} {{presentacion.contiene}} {{presentacion.unidad}} {{presentacion.sname}} {{presentacion.scontiene}} {{presentacion.sunidad}}<!--span [hidden]="!presentacion.oferta" > Oferta!!!</span--></h5>
                   </div>
-                  <div class="col-4">
-                    <h6 class="d-block" style="text-align: right;">$ {{presentacion.calc_precio}}</h6>
+                  <div class="col-5" [class.precio-oferta]="presentacion.oferta">
+                    <h5 class="d-block" style="text-align: right;">
+                      <span [hidden]="!presentacion.oferta" class="precio-out">$ {{presentacion.calc_precio}}</span>
+                      <span>&nbsp;&nbsp;</span>
+                      <span>$ {{presentacion.showPrecio}}</span>
+                    </h5>
                   </div>
                 </div>
               </ng-template>

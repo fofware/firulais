@@ -1,0 +1,9 @@
+.precio-out {
+  text-decoration: line-through;
+  font-size: smaller;
+  color:darkgrey;
+  text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
+}
+.precio-oferta{
+  color:blue;
+}

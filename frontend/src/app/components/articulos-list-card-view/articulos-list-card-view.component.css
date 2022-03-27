@@ -62,7 +62,10 @@ article .control {
           order: 3;
   overflow: auto;
 }
-
+.isPrecio {
+  color: red;
+  font-weight: 600;
+}
 .imgbox {
     display: flex;
     flex-direction: row;

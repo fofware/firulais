@@ -39,7 +39,7 @@
       <td  align="center"><strong>Código</strong></td>
       <td  align="center"><strong>Presentación</strong></td>
       <td width='35px' align="right"><strong>Stock</strong></td>
-      <td width='50px' align="right"><strong>Compra</strong></td>
+      <td width='50px' align="right"><strong>Repos.</strong></td>
       <!--td width='80px' align="right"><strong>Reposición</strong></td-->
       <td width='50px' align="right"><strong>Costo/Un</strong></td>
       <td width='50px' align="right"><strong>%Mgn</strong></td>
@@ -54,16 +54,16 @@
       <tr *ngFor="let producto of productos; index as i;">
         <td *ngIf="!articulo.image" align='center'><img src="{{producto.image}}" alt="" style="height: 60px; width: auto;"> </td>
         <td width='35px' align="right">{{producto.codigo}}</td>
-        <td >{{producto.name}} {{producto.strContiene}}
+        <td [class.isPrecio]="producto.precio">{{producto.name}} {{producto.strContiene}}
           {{producto.unidad}} {{producto.sname}}
           {{producto.sStrContiene}} {{producto.sunidad}}</td>
-        <td width='35px' align="right">{{producto.stock || producto.showStock }}</td>
-        <td width='50px' align="right">{{round(producto.compra || producto.showCompra) }}</td>
+        <td width='35px' align="right">{{round( (producto.stock ? (producto.stock >= 1 ? floor(producto.stock) : 0) : producto.stock ) || producto.sub.stock*producto.sub.contiene || 0 )}}</td>
+        <td width='50px' align="right">{{round(producto.reposicion || producto.sub.reposicion/producto.sub.contiene)}}</td>
         <!--td width='80px' align="right">{{producto.reposicion}}</td-->
-        <td width='50px' align="right">{{round((producto.compra || producto.showCompra)/producto.contiene)}}/{{sub(producto.unidad,2)}}</td>
+        <td width='50px' align="right">{{round((producto.reposicion || producto.sub.reposicion/producto.sub.contiene)/producto.contiene)}}/{{sub(producto.unidad,2)}}</td>
         <td width='50px' align="right">{{producto.margen}}%</td>
         <td width='50px' align="right">{{producto.lista}}</td>
-        <td width='50px' align="right">{{producto.showPrecio}}</td>
+        <td width='50px' align="right" [class.isPrecio]="producto.precio">{{producto.showPrecio}}</td>
         <td width='50px' align="right">{{round(producto.showPrecio/producto.contiene)}}/{{sub(producto.unidad,2)}}</td>
         <td width='50px' align="right">{{producto.reventa}}</td>
         <td width='50px' align="right">{{producto.reventa1}}</td>

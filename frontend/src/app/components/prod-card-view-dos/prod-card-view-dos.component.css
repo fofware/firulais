@@ -71,14 +71,26 @@
   font-size: larger;
   text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
 }
+
+.precio-out {
+  text-decoration: line-through;
+  font-size: x-large;
+  color:darkgrey;
+  text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
+}
+.precio-oferta {
+  color:blue;
+}
 .precio {
+  font-size: xx-large;
+}
+.precio-box {
   position: absolute;
   bottom: 0;
   right: 10px;
   text-align: center;
   z-index: 10;
   font-weight: 500;
-  font-size: xx-large;
   text-shadow: -1px 0 #dddddd, 0 1px #dddddd, 1px 0 #dddddd, 0 -1px #dddddd;
 }
 .detalles {

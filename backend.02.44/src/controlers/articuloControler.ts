@@ -542,6 +542,52 @@ export const dataProduct = (params) => {
 				$project: productoFullTemplate
 			}
 			,{
+				$project: {
+					"_id": 1,
+					"name": 1,
+					"contiene": 1,
+					"strContiene": 1,
+					"unidad": 1,
+					"compra": 1,
+					"showCompra" : 1,
+					"reposicion": 1,
+					'lista': 1,
+					"calc_precio": 1, 
+					"showPrecio": 1,
+					"oferta": {$lt:['$showPrecio','$calc_precio']},
+					'reventa': { $cond: [{$lt:['$reventa','$showPrecio']},'$reventa','$showPrecio']},
+					'reventa1': { $cond: [{$lt:['$reventa1','$showPrecio']},'$reventa1','$showPrecio']},
+					'reventa2': { $cond: [{$lt:['$reventa2','$showPrecio']},'$reventa2','$showPrecio']},
+					'precio': 1,
+					'precio_desde': 1,
+					'precio_hasta': 1,
+					'sub': 1,
+					"pesable": 1,
+					"servicio": 1,
+					"pVenta": 1,
+					"pCompra": 1,
+					"codigo": 1,
+					"plu": 1,
+					"image": 1,
+					"stock": 1,
+					"scontiene": 1,
+					"sStrContiene": 1,
+					"sname": 1,
+					"sunidad": 1,
+					"stockMin": 1,
+					"iva": 1,
+					"margen": 1,
+					"tipo": 1,
+					//'ins': 1,
+					'count_ins': 1,
+					//'cerrado':1,
+					'count_cerrado': 1,
+					//'parte':1,
+					'count_parte': 1,
+					'parent': 1
+				}
+			}
+			,{
 				$sort: params.sort
 			}
 			,{
@@ -856,7 +902,27 @@ class ArticuloControler {
 	async leerProductos(req: Request, res: Response) {
 		try {
 			const qry = {Articulo:{_id: new ObjectID(req.params.id) }};
-			const rpta = await readProductos(qry,saleProduct);
+			//const rpta = await readProductos(qry,saleProduct);
+
+			const rpta = await readProductos(qry,dataProduct({hidden:{
+				"compra": 0,
+				"reposicion": 0,
+				"promedio": 0,
+				//	"precioref": 0,
+				"stockMin": 0,
+				"margen": 0,
+				"art_margen": 0,
+				"tipo": 0,
+				'ins': 0,
+				'cerrado':0,
+				'parte':0,
+				'sub.compra':0,
+				'sub.reposicion':0
+			}}));
+
+
+
+
 			res.status(200).json(rpta[0])
 		} catch (error) {
 			res.status(404).json(error)
@@ -1307,6 +1373,7 @@ class ArticuloControler {
 			console.log(del_regs);
 			for (let i = 0; i < prod_regs.length; i++) {
 				const e = prod_regs[i];
+				console.log(e);
 				prod_saved.push( await producto.updateOne( {_id: e._id}, { $set :  e  }, { upsert: true }));
 			}
 			const qry = {Articulo: { _id: artReg._id } };

@@ -1,5 +1,5 @@
 <input type="search" id="busca" aria-label="Search" class="form-control mr-sm-2" placeholder="Buscar por Nombre"
-  name="searchItem" (input)="searchArticulos()" [(ngModel)]="searchItem">
+  name="searchItem" (input)="searchArticulos()" #pepe [(ngModel)]="searchItem">
 <span *ngFor="let item of filterButtons">
   <button *ngIf="item.tipo.search('button')===0" class="btn btn-outline-primary" [hidden]='!item.display'
     (click)="item.value = (item.value === item.show.length-1 ? 0 : item.value + 1);emitMsg(item)">

@@ -49,7 +49,7 @@
       [showStock]='showStock'
       (click)="selected(articulo)"
     ></app-prod-card-view-dos>
-    <!--button class="btn btn-block btn-secondary" [hidden]="((hoja-1)*pageSize) >= collectionSize" (click)="articuloList = more(tmpList, articuloList)">Mostrar más</button-->
+    <button class="btn btn-block btn-secondary" [hidden]="((hoja-1)*pageSize) >= collectionSize" (click)="articuloList = more(tmpList, articuloList)">Mostrar más</button>
 
   </div>
   <!--div class="fixed-bottom">

@@ -26,6 +26,6 @@
             [publico]='publico'
             (onSelectArticulo)='SelectEvent($event)'
           ></app-articulo-card-view-guest-full>
-    <!--button class="btn btn-block btn-secondary mt-2 mb-2" [hidden]="((hoja-1)*pageSize) >= collectionSize" (click)="articuloList = more(tmpList, articuloList)">Mostrar más</button-->
+    <button class="btn btn-block btn-secondary mt-2 mb-2" [hidden]="((hoja-1)*pageSize) >= collectionSize" (click)="articuloList = more(tmpList, articuloList)">Mostrar más</button>
   </div>
 </div>

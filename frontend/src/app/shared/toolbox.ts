@@ -91,24 +91,32 @@ export const tpPagos: any = [
 ];
 
 export function formapago(e, tpago){
-
+  const today = new Date(e.ahora).getTime();
+  const desde = new Date(e.precio_desde).getTime();
+  const hasta = new Date(e.precio_hasta).getTime();
+  let base = 0;
+  if( desde <= today && hasta >= today && e.precio)
+    base = e.precio;
+  else base = e.calc_precio;
+  //console.log(e.precio_hasta,today,desde,hasta);
+  //console.log(desde <= today, hasta >= today, e.precio)
   if ( tpago.value === 1 ){
     if ( !e.pesable ){
-      if ( e.calc_precio > 100 ){
-        e.showPrecio = Math.ceil(e.calc_precio/10 * tpago.value)*10;
+      if ( base > 100 ){
+        e.showPrecio = Math.ceil(base/10 * tpago.value)*10;
       } else {
-        const diff = e.precio % 5;
+        const diff = base % 5;
         if (diff < 3 ){
-          e.showPrecio = e.calc_precio - diff;
+          e.showPrecio = base - diff;
         } else {
-          e.showPrecio = e.calc_precio + ( 5 - diff )
+          e.showPrecio = base + ( 5 - diff )
         }
       }
     } else {
-      e.showPrecio = Math.ceil(e.calc_precio * tpago.value);
+      e.showPrecio = Math.ceil(base * tpago.value);
     }
   } else {
-    e.showPrecio = Math.ceil(e.calc_precio * tpago.value);
+    e.showPrecio = Math.ceil(base * tpago.value);
   }
-
+  e.precioref = round(e.showPrecio/e.contiene,2);
 }

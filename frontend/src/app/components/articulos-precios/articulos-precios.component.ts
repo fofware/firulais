@@ -190,7 +190,7 @@ export class ArticulosPreciosComponent implements OnInit {
   user:any;
   wait: boolean;
   hoja = 1;
-  pageSize = 9;
+  pageSize = 20;
   collectionSize = 1;
   dbList = [];
   tmpList = [];
@@ -309,7 +309,7 @@ export class ArticulosPreciosComponent implements OnInit {
 
   }
   more(inList,outList): any {
-    /*
+
     console.log(this.hoja);
     console.log((this.hoja-1) * this.pageSize);
     console.log(this.hoja * this.pageSize);
@@ -317,7 +317,7 @@ export class ArticulosPreciosComponent implements OnInit {
     outList = outList.concat(inList.slice((this.hoja-1) * this.pageSize , this.hoja * this.pageSize));
     this.hoja=this.hoja+1;
     return outList;
-    */
-    return inList;
+
+    //return inList;
   }
 }

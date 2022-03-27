@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_URI } from 'src/app/shared/uris';
 
@@ -19,11 +19,21 @@ export class ArticuloCardSelectFilterComponent implements OnInit, OnChanges{
 
   prevSearchItem = "";
   searchItem = "";
+  //@ViewChild('pepe', { static: true }) usernameElement: ElementRef;
+  constructor(
+    private http: HttpClient,
+    //usernameElement: ElementRef
+  ) {
+    //this.usernameElement = usernameElement;
 
-  constructor(private http: HttpClient) { }
+  }
 
   ngOnInit(): void {
+    //console.log("ngOnOnit-filter",this.searchItem);
+    //console.log("Value",this.usernameElement.nativeElement.value);
+    //this.searchArticulos();
   }
+
 
   // tslint:disable-next-line:use-lifecycle-interface
   ngOnChanges(changes: SimpleChanges): void {

@@ -29,8 +29,13 @@
         </ul>
       </div>
     </div>
-    <div class="precio">
-      $ {{articulo.showPrecio}}
+
+
+    <div ></div>
+    <div class="precio-box">
+      <span [hidden]="!articulo.oferta" [class.precio-out]="articulo.oferta">$ {{articulo.calc_precio}}</span>
+      <span>&nbsp;</span>
+      <span class="precio" [class.precio-oferta]="articulo.oferta">$ {{articulo.showPrecio}}</span>
     </div>
   </div>
   <div class="card-footer px-0 py-0 d-flex justify-content-between">

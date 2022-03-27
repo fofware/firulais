@@ -21,8 +21,9 @@ export class ProductoComponent implements OnInit {
     const values = this.activatedRouter.snapshot.params;
     const values1 = this.activatedRouter.snapshot.queryParams;
     const values2 = this.activatedRouter.snapshot.queryParamMap;
-    //console.log(values);
-    //console.log(values1);
+    console.log('ngOnInit');
+    console.log(values);
+    console.log(values1);
     //console.log(values1);
 
     if (values.id) {

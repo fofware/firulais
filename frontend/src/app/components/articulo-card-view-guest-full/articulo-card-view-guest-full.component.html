@@ -47,7 +47,7 @@
                   <tr *ngFor="let producto of articulo.productos; index as i;" [class.isStock]="!producto.stock && !producto.sub.stock" [hidden]="!producto.pVenta">
                     <td *ngIf="!articulo.image" align='center'><img src="{{producto.image}}" alt="" style="height: 60px; width: auto;"> </td>
                     <!--td width='35px' align="right">{{producto.codigo}}</td-->
-                    <td >{{producto.name}} {{producto.strContiene}}
+                    <td [class.isOferta]="producto.oferta">{{producto.name}} {{producto.strContiene}}
                       {{producto.unidad}} {{producto.sname}}
                       {{producto.sStrContiene}} {{producto.sunidad}}</td>
                     <!--td width='35px' align="right" style="padding: 5px;">{{ producto.showStock || producto.stock }}</td-->
@@ -55,10 +55,10 @@
                     <!--td width='80px' align="right">{{producto.reposicion}}</td>
                     <td width='80px' align="right">{{producto.precioxunidad}}/{{producto.unidad}}</td>
                     <td width='80px' align="right">{{producto.margen}}%</td-->
-                    <td width='80px' align="right" style="padding: 5px;">{{producto.lista}}</td>
-                    <td width='80px' align="right" style="padding: 5px;">{{producto.showPrecio}}</td>
-                    <td width='80px' align="right" style="padding: 5px;">{{producto.reventa}}</td>
-                    <td width='80px' align="right" style="padding: 5px;">{{producto.reventa1}}</td>
+                    <td width='80px' align="right" style="padding: 5px;" [class.isOferta]="producto.oferta" >{{producto.lista}}</td>
+                    <td width='80px' align="right" style="padding: 5px;" [class.isOferta]="producto.oferta" >{{producto.showPrecio}}</td>
+                    <td width='80px' align="right" style="padding: 5px;" [class.isOferta]="producto.oferta" >{{producto.reventa}}</td>
+                    <td width='80px' align="right" style="padding: 5px;" [class.isOferta]="producto.oferta" >{{producto.reventa1}}</td>
                     <!--td width='80px' align="right" style="padding: 5px;">{{producto.reventa2}}</td-->
                   </tr>
                 </tbody>

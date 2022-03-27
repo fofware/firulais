@@ -37,8 +37,12 @@ export class ArticulosListCardViewComponent implements OnInit, OnChanges {
     const myWin = window.open(url, 'myWindow');
     event.stopPropagation();
   }
-  round(valor: number ): number {
-    return round( valor, 2);
+  round(valor: number, dec?: number ): number {
+    const decimales = isNaN(dec) ? 2 : dec;
+    return round( valor, decimales);
+  }
+  floor(valor: number): number {
+    return Math.floor( valor);
   }
   sub(str:string,len):string {
     if(!str || str.length === 0) return "Un";

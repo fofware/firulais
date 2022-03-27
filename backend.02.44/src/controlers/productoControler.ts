@@ -8,6 +8,10 @@ import { qryProductosProcess, readParent } from '../common/productosCommon';
 import { decimales, round } from '../common/utils';
 import {Strategy, ExtractJwt, StrategyOptions} from 'passport-jwt';
 //import productoIdx from '../models/productoIdx';
+const ahora = new Date();
+const zeroTime = new Date(0);
+const baseCalculo = 'reposicion';
+
 export const producto_ins_template = () => {
 	return 				{
 		from: "productos",
@@ -120,30 +124,55 @@ export const producto_cerrado_template = () => {
 	}
 
 }
-const baseCalculo = 'reposicion'
+
 export const precioLista = (indice) => {
-	return {
-		$ceil:
-		{
-			$multiply: [{
-				$ceil: {
-					$divide: [{
-						$ceil:
-						{
-							$cond: [{ $eq: ['$count_parte', 0] },
-							{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }, indice] },
-							{
-								$cond:
-									[{ $eq: ['$count_cerrado', 0] },
-									{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }, indice] },
-									{ $multiply: [{ $add: ['$margen', 100] }, 0.01, `$${baseCalculo}`, indice] }
-									]
-							}]
+	return { 
+		$cond: [ { $and: ['$precio', {$lte: [ahora,'$precio_hasta']},{$gte: [ahora, '$precio_desde']}]}, 
+			{ $ceil:
+				{
+					$multiply: [{
+						$ceil: {
+							$divide: [{
+								$ceil:
+								{
+									$cond: [{ $eq: ['$count_parte', 0] },
+									{ $multiply: [{ $divide: ['$precio', '$parte.contiene'] }, indice] },
+									{
+										$cond:
+											[{ $eq: ['$count_cerrado', 0] },
+											{ $multiply: [{ $divide: ['$cerrado.precio', '$cerrado.contiene'] }, indice] },
+											{ $multiply: [ '$precio', indice] }
+											]
+									}]
+								}
+							}, 10]
 						}
 					}, 10]
 				}
-			}, 10]
-		}
+			},
+			{ $ceil:
+				{
+					$multiply: [{
+						$ceil: {
+							$divide: [{
+								$ceil:
+								{
+									$cond: [{ $eq: ['$count_parte', 0] },
+									{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }, indice] },
+									{
+										$cond:
+											[{ $eq: ['$count_cerrado', 0] },
+											{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }, indice] },
+											{ $multiply: [{ $add: ['$margen', 100] }, 0.01, `$${baseCalculo}`, indice] }
+											]
+									}]
+								}
+							}, 10]
+						}
+					}, 10]
+				}
+			}				
+		]
 	}
 }
 export const compra = () => {
@@ -183,156 +212,156 @@ export const producto_fullName_template = () => {
 	}
 }
 
-export const orig_calculaPrecio = (coeficienteDescuento,margenMinimo,pesable) => {
-	const incrementoMinimo = (margenMinimo+100)/100;
-	if(pesable)
-		return {
-			$cond: [
-				{ $eq: ['$pesable', true] },
-				{
-					$ceil: {
-						$ceil:
-						{
-							$cond: [{ $eq: ['$count_parte', 0] },
-							{
-								$cond: [{ $gt: [{ $multiply: ['$margen', coeficienteDescuento] }, '$parte.margen'] },
-								{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] },
-								{ $multiply: [{ $add: ['$parte.margen', 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] }
-								]
-							},
-							{
-								$cond:
-									[{ $eq: ['$count_cerrado', 0] },
-									{
-										$cond: [{ $gt: [{ $multiply: ['$margen', coeficienteDescuento] }, '$cerrado.margen'] },
-										{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] },
-										{ $multiply: [{ $add: ['$cerrado.margen', 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] }
-										]
-									},
-									{
-										$cond: [{ $gt: [{ $multiply: ['$margen', coeficienteDescuento] }, '$margen'] },
-										{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, `$${baseCalculo}`] },
-										{ $multiply: [{ $add: ['$margen', 100] }, 0.01, `$${baseCalculo}`] }
-										]
-									}
-									]
-							}]
-						}
-					}
-				}
-				, {
-					$multiply: [{
-						$ceil: {
-							$divide: [{
-								$ceil:
-								{
-									$cond: [{ $eq: ['$count_parte', 0] },
-									{
-										$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$parte.margen'] },
-										{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] },
-										{ $multiply: [{ $add: ['$parte.margen', 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] }
-										]
-									},
-									{
-										$cond: [{ $eq: ['$count_cerrado', 0] },
-											{
-												$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$cerrado.margen'] },
-												{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] },
-												{ $multiply: [{ $add: ['$cerrado.margen', 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] }
-												]
-											},
-											{
-/*												$cond: [{ $eq: ['$count_ins', 0] },
-													{
-														$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$margen'] },
-														{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, '$compra' ] },
-														{ $multiply: [incrementoMinimo, '$compra'] }
-														]
-													},
-													{
-*/														$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, margenMinimo] },
-														{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, `$${baseCalculo}`] },
-														{ $multiply: [incrementoMinimo, `$${baseCalculo}`] }
-														]
-													}]
-//											}]
-									}]
-								}
-							}, 10]
-						}
-					}, 10]
-				}
-			]
-		}
-	else
-		return {
-			$cond: [{ $eq: ['$pesable', true] },
-			{
-				$ceil: {
-					$ceil:
-					{
-						$cond: [{ $eq: ['$count_parte', 0] },
-						{ $multiply: [{ $add: ['$parte.margen', 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] },
-						{ $cond:[{ $eq: ['$count_cerrado', 0] },
-								{ $multiply: [{ $add: ['$cerrado.margen', 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] },
-//								{
-//									$cond:[{ $eq: ['$count_ins', 0] },
-//										{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$compra', '$contiene'] }] },
-										{ $multiply: [{ $add: ['$margen', 100] }, 0.01, `$${baseCalculo}`] }
+//export const orig_calculaPrecio = (coeficienteDescuento,margenMinimo,pesable) => {
+//	const incrementoMinimo = (margenMinimo+100)/100;
+//	if(pesable)
+//		return {
+//			$cond: [
+//				{ $eq: ['$pesable', true] },
+//				{
+//					$ceil: {
+//						$ceil:
+//						{
+//							$cond: [{ $eq: ['$count_parte', 0] },
+//							{
+//								$cond: [{ $gt: [{ $multiply: ['$margen', coeficienteDescuento] }, '$parte.margen'] },
+//								{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] },
+//								{ $multiply: [{ $add: ['$parte.margen', 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] }
+//								]
+//							},
+//							{
+//								$cond:
+//									[{ $eq: ['$count_cerrado', 0] },
+//									{
+//										$cond: [{ $gt: [{ $multiply: ['$margen', coeficienteDescuento] }, '$cerrado.margen'] },
+//										{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] },
+//										{ $multiply: [{ $add: ['$cerrado.margen', 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] }
+//										]
+//									},
+//									{
+//										$cond: [{ $gt: [{ $multiply: ['$margen', coeficienteDescuento] }, '$margen'] },
+//										{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, `$${baseCalculo}`] },
+//										{ $multiply: [{ $add: ['$margen', 100] }, 0.01, `$${baseCalculo}`] }
+//										]
+//									}
 //									]
+//							}]
+//						}
+//					}
+//				}
+//				, {
+//					$multiply: [{
+//						$ceil: {
+//							$divide: [{
+//								$ceil:
+//								{
+//									$cond: [{ $eq: ['$count_parte', 0] },
+//									{
+//										$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$parte.margen'] },
+//										{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] },
+//										{ $multiply: [{ $add: ['$parte.margen', 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] }
+//										]
+//									},
+//									{
+//										$cond: [{ $eq: ['$count_cerrado', 0] },
+//											{
+//												$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$cerrado.margen'] },
+//												{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] },
+//												{ $multiply: [{ $add: ['$cerrado.margen', 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] }
+//												]
+//											},
+//											{
+///*												$cond: [{ $eq: ['$count_ins', 0] },
+//													{
+//														$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$margen'] },
+//														{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, '$compra' ] },
+//														{ $multiply: [incrementoMinimo, '$compra'] }
+//														]
+//													},
+//													{
+//*/														$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, margenMinimo] },
+//														{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, `$${baseCalculo}`] },
+//														{ $multiply: [incrementoMinimo, `$${baseCalculo}`] }
+//														]
+//													}]
+////											}]
+//									}]
 //								}
-								
-								]
-						}]
-					}
-				}
-			},
-			{
-				$multiply: [{
-					$ceil: {
-						$divide: [{
-							$ceil:
-							{
-								$cond: [{ $eq: ['$count_parte', 0] },
-								{
-									$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$parte.margen'] },
-									{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] },
-									{ $multiply: [{ $add: ['$parte.margen', 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] }
-									]
-								},
-								{
-									$cond: [{ $eq: ['$count_cerrado', 0] },
-										{
-											$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$cerrado.margen'] },
-											{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] },
-											{ $multiply: [{ $add: ['$cerrado.margen', 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] }
-											]
-										},
-										{
-											$cond: [{ $eq: ['$count_ins', 0] },
-												{
-													$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$margen'] },
-													{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$${baseCalculo}`, '$contiene'] }] },
-													{ $multiply: [incrementoMinimo, `$${baseCalculo}`] }
-													]
-												},
-												{
-													$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, margenMinimo] },
-													{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, `$${baseCalculo}`] },
-													{ $multiply: [incrementoMinimo, `$${baseCalculo}`] }
-													]
-												}]
-										}]
-								}]
-							}
-						}, 10]
-					}
-				}, 10]
-			}
-		]
-	}
-
-}
+//							}, 10]
+//						}
+//					}, 10]
+//				}
+//			]
+//		}
+//	else
+//		return {
+//			$cond: [{ $eq: ['$pesable', true] },
+//			{
+//				$ceil: {
+//					$ceil:
+//					{
+//						$cond: [{ $eq: ['$count_parte', 0] },
+//						{ $multiply: [{ $add: ['$parte.margen', 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] },
+//						{ $cond:[{ $eq: ['$count_cerrado', 0] },
+//								{ $multiply: [{ $add: ['$cerrado.margen', 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] },
+////								{
+////									$cond:[{ $eq: ['$count_ins', 0] },
+////										{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$compra', '$contiene'] }] },
+//										{ $multiply: [{ $add: ['$margen', 100] }, 0.01, `$${baseCalculo}`] }
+////									]
+////								}
+//								
+//								]
+//						}]
+//					}
+//				}
+//			},
+//			{
+//				$multiply: [{
+//					$ceil: {
+//						$divide: [{
+//							$ceil:
+//							{
+//								$cond: [{ $eq: ['$count_parte', 0] },
+//								{
+//									$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$parte.margen'] },
+//									{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] },
+//									{ $multiply: [{ $add: ['$parte.margen', 100] }, 0.01, { $divide: [`$parte.${baseCalculo}`, '$parte.contiene'] }] }
+//									]
+//								},
+//								{
+//									$cond: [{ $eq: ['$count_cerrado', 0] },
+//										{
+//											$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$cerrado.margen'] },
+//											{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] },
+//											{ $multiply: [{ $add: ['$cerrado.margen', 100] }, 0.01, { $divide: [`$cerrado.${baseCalculo}`, '$cerrado.contiene'] }] }
+//											]
+//										},
+//										{
+//											$cond: [{ $eq: ['$count_ins', 0] },
+//												{
+//													$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, '$margen'] },
+//													{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, { $divide: [`$${baseCalculo}`, '$contiene'] }] },
+//													{ $multiply: [incrementoMinimo, `$${baseCalculo}`] }
+//													]
+//												},
+//												{
+//													$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, margenMinimo] },
+//													{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, `$${baseCalculo}`] },
+//													{ $multiply: [incrementoMinimo, `$${baseCalculo}`] }
+//													]
+//												}]
+//										}]
+//								}]
+//							}
+//						}, 10]
+//					}
+//				}, 10]
+//			}
+//		]
+//	}
+//
+//}
 
 
 export const calculaPrecio = (coeficienteDescuento,margenMinimo,pesable) => {
@@ -402,7 +431,8 @@ export const calculaPrecio = (coeficienteDescuento,margenMinimo,pesable) => {
 														]
 													},
 													{
-*/														$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, margenMinimo] },
+*/
+														$cond: [{ $gte: [{ $multiply: ['$margen', coeficienteDescuento] }, margenMinimo] },
 														{ $multiply: [{ $add: [{ $multiply: ['$margen', coeficienteDescuento] }, 100] }, 0.01, `$${baseCalculo}`] },
 														{ $multiply: [incrementoMinimo, `$${baseCalculo}`] }
 														]
@@ -492,11 +522,11 @@ export const referencia = (Decimales) => {
 			{
 				$cond: [{ $eq: ['$count_parte', 0] },
 //				{ $multiply: [{ $add: ['$margen', 100] }, 0.01, { $divide: ['$parte.compra', '$parte.contiene'] }] },
-				calculaPrecio(1,22.5,true),
+				calculaPrecio(1,15,true),
 				{
 					$cond: [{ $eq: ['$count_cerrado', 0] },
 						{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, `$cerrado.${baseCalculo}`] }, { $cond: [{ $eq: ['$cerrado.contiene', 0] }, 1, { $multiply: ['$cerrado.contiene', '$contiene'] }] }] },
-						{ $divide: [calculaPrecio(1,22.5,true),{ $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }]}
+						{ $divide: [calculaPrecio(1,15,true),{ $cond: [{ $eq: ['$contiene', 0] }, 1, '$contiene'] }]}
 //					{
 //						$cond: [{ $eq: ['$count_ins', 0] },
 //						{ $divide: [{ $multiply: [{ $add: ['$margen', 100] }, 0.01, '$compra'] }, { $cond: [{ $eq: ['$contiene', 0] }, '$contiene', { $multiply: ['$contiene', '$ins.contiene'] }] }] },
@@ -542,8 +572,6 @@ export const referencia = (Decimales) => {
 
 // TODO: #1 hay que limpiar el codigo en desuuso comentado de este archivo y crear las plantillas comunes para artículos y productos. 
 // buscar todo lo que se pueda unificar con articulos
-const ahora = new Date();
-const zeroTime = new Date(0);
 
 const producto_base = {
 	"_id": 1,
@@ -556,7 +584,7 @@ const producto_base = {
 	"compra": 1,
 	"reposicion": { $ifNull: ['$reposicion', '$compra'] },
 	"precio_desde":{ $ifNull: ['$precio_desde', zeroTime] },
-	"precio_hasta":{ $ifNull: ['$precio_hasta', zeroTime] },
+	"precio_hasta":{ $ifNull: ['$precio_hasta', ahora] },
 	"ahora": ahora,
 	"compra_fecha":1,
 	"reposicion_fecha":1,
@@ -574,8 +602,9 @@ const producto_base = {
 }
 const producto_precios_merge = (input:Object) => {
 	const data = {
-		'lista': precioLista(1.14),
-		'showPrecio': calculaPrecio(1,18.5,true),
+		'lista': precioLista(1.0778521857),
+		//'showPrecio': calculaPrecio(1,18.5,true),
+		"showPrecio": { $cond: [ { $and: ['$precio', {$lte: [ahora,'$precio_hasta']},{$gte: [ahora, '$precio_desde']}]}, '$precio', calculaPrecio(1,15,true)]}, 
 		'reventa': calculaPrecio(.85,14.5,true),
 		'reventa1': calculaPrecio(.43,13,true),
 		'reventa2': calculaPrecio(.1556,11.5,true),
@@ -704,18 +733,22 @@ export const productoFullTemplate =
 	"compra": 1,
 	"showCompra" : compra(),
 	"reposicion": 1,
-	'lista': precioLista(1.14),
+	'lista': precioLista(1.0778521857),
 	//"calc_precio": calculaPrecio(1,22.5,true), 
 	//'showPrecio': calculaPrecio(1,22.5,true),
 	//'reventa': calculaPrecio(.85,18.5,true),
 	//'reventa1': calculaPrecio(.43,14.5,true),
 	//'reventa2': calculaPrecio(.1556,11.5,true),
+	//"calc_precio": { $cond: [ { $and: ['$precio', {$lte: [ahora,'$precio_hasta']},{$gte: [ahora, '$precio_desde']}]}, '$precio' ,calculaPrecio(1,15,true)]}, 
 	"calc_precio": calculaPrecio(1,15,true), 
-	'showPrecio': calculaPrecio(1,15,true),
+	"showPrecio": { $cond: [ { $and: ['$precio', {$lte: [ahora,'$precio_hasta']},{$gte: [ahora, '$precio_desde']}]}, '$precio' ,calculaPrecio(1,15,true)]}, 
+	//'showPrecio': { $cond: [ '$precio', '$precio' ,calculaPrecio(1,15,true)]}, 
 	'reventa': calculaPrecio(.85,14,true),
 	'reventa1': calculaPrecio(.43,12,true),
 	'reventa2': calculaPrecio(.1556,10,true),
 	'precio': 1,
+	'precio_desde': 1,
+	'precio_hasta': 1,
 	'sub': {
 		$cond: [{ $eq: ['$count_ins', 0] },
 			'$ins',
@@ -823,7 +856,9 @@ const full_project = {
 	"reposicion": 1,
 	"promedio": 1,
 //	"precio": { $cond: [ '$precio', '$precio', "$calc_precio"]},
-	"precio": "$calc_precio",
+	"precio": 1,
+	"precio_desde":{ $ifNull: [ '$precio_desde', zeroTime] },
+	"precio_hasta":{ $ifNull: [ '$precio_hasta', ahora ] },
 	"calc_precio": 1, 
 	"precioref": 1,
 	'sub': 1,
@@ -895,11 +930,7 @@ const full_project = {
 			}
 		}
 	},
-	'showPrecio': { 
-		$cond: [ { $eq:['$pesable', true] },
-						{ $ceil:  '$calc_precio'  },
-						{ $multiply: [ { $ceil:{ $divide:['$calc_precio',10]}},10]}
-					]},
+	"showPrecio": 1
 }
 
 export const invalidData = {
@@ -916,425 +947,825 @@ export const invalidData = {
 //	'parte':0,
 }
 
-export const productoGetData = async function( qry: any, outProject?: any, hiddenData?: any ): Promise<IProducto[]> {
-//	if(!outProject) outProject = productoFullTemplate;
-//	if(!hiddenData) hiddenData = invalidData;
-	if( !qry.Producto ) qry.Producto = {};
-	if( !qry.Articulo ) qry.Articulo = {};
-	if( !qry.Extra ) qry.Extra = {};
-	if( !qry.showData) qry.showData = { 'noproject': 0}
-	if( !qry.hiddenData) qry.hiddenData = { 'noproject': 0}
-	if( !qry.Decimales) qry.Decimales = 2;
-//	if( !qry.Sort ) qry.Sort = {'fabricante': 1, 'marca': 1, 'especie': 1, 'rubro': 1, 'linea': 1, 'edad': 1, 'raza': 1	};
-	if( !qry.Sort ) qry.Sort = { 'art_fullName': 1, 'contiene': 1, 'precio': 1 };
-//	console.log('Articulo',qry.Articulo);
-//	console.log('Producto',qry.Producto);
-//	console.log('Extra',qry.Extra);
-//	console.log('Extra.$and',qry.Extra['$and']);
-	//const calculatedPrecioLista = precioLista(1.14);
-	const aggr = [
-		{ $match: qry.Producto },
-		{
-			$lookup: {
-				from: "articulos",
-				localField: "articulo",
-				foreignField: "_id",
-				as: "art"
-			}
-		},
-		{
-			$unwind: "$art"
-		},
-		{
-			$project: {
-				"_id": 1,
-				"parent": 1,
-				"name": 1,
-				"contiene": { $ifNull: [ '$contiene', 1 ] },
-				"strContiene": {$toString: '$contiene'},
-				"unidad": { $ifNull: ['$unidad', ''] },
-				"precio": 1,
-				"compra": 1,
-				"reposicion": { $ifNull: ['$reposicion', '$compra'] },
-				"precio_desde":{ $ifNull: ['$precio_desde', zeroTime] },
-				"precio_hasta":{ $ifNull: ['$precio_hasta', zeroTime] },
-				"ahora": ahora,
-				"compra_fecha":1,
-				"reposicion_fecha":1,
-				"pesable": 1,
-				"servicio": 1,
-				"pVenta": 1,
-				"pCompra": 1,
-				'codigo': { $ifNull: [ '$codigo', '' ] },
-				'plu': { $ifNull: [ '$plu', '' ] },
-				"stock": 1,
-				"stockMin": 1,
-				"iva": 1,
-				"margen": 1,
-				"articuloId": "$articulo",
-				//
-				"image": {$cond: [ '$image', '$image', '$art.image']},
-				'art_name': '$art.name',
-				'art_fullName': art_name_template,
-				'url': '$art.url',
-				'art_image': '$art.image',
-				'art_iva': '$art.iva',
-				'fabricante': { $ifNull: [ '$art.fabricante', '' ] },
-				'marca': { $ifNull: [ '$art.marca', '' ] },
-				'rubro': { $ifNull: [ '$art.rubro', '' ] },
-				'linea': { $ifNull: [ '$art.linea', '' ] },
-				'especie': { $ifNull: [ '$art.especie', '' ] },
-				'edad': { $ifNull: [ '$art.edad', '' ] },
-				'raza': { $ifNull: [ '$art.raza', '' ] },
-				'd_fabricante': '$art.d_fabricante',
-				'd_marca': '$art.d_marca',
-				'd_rubro': '$art.d_rubro',
-				'd_linea': '$art.d_linea',
-				'd_especie': '$art.d_especie',
-				'd_raza': '$art.d_raza',
-				'd_edad': '$art.d_edad',
-				'tags': { $ifNull: [ '$art.tags', '' ] },
-				'art_margen': '$art.margen',
-				'private_web': { $ifNull: [ '$art.private_web', false ] },
-				'formula': '$art.formula',
-				'detalles': { $ifNull: [ '$art.detalles', '' ] },
-				'beneficios': '$art.beneficios',
-				'tipo': {
-					$cond: ['$parent', 
-						// Tine parent 
-						1, 
-						0
-					]
-				},
-			}
-		},
-		{
-			$lookup: producto_ins_template()
-		},
-		{
-			$lookup: producto_parte_template()
-		},
-		{
-			$lookup: producto_cerrado_template()
-		},
-		{
-			$unwind: {
-				path: '$parte',
-				includeArrayIndex: 'count_parte',
-				preserveNullAndEmptyArrays: true
-			}				
-		},
-		{
-			$unwind: {
-				path: '$cerrado',
-				includeArrayIndex: 'count_cerrado',
-				preserveNullAndEmptyArrays: true
-			}				
-		},
-		{
-			$unwind: {
-				path: '$ins',
-				includeArrayIndex: 'count_ins',
-				preserveNullAndEmptyArrays: true
-			}				
-		},
-		{
-			$project:
+//export const productoGetData = async function( qry: any, outProject?: any, hiddenData?: any ): Promise<IProducto[]> {
+////	if(!outProject) outProject = productoFullTemplate;
+////	if(!hiddenData) hiddenData = invalidData;
+//	if( !qry.Producto ) qry.Producto = {};
+//	if( !qry.Articulo ) qry.Articulo = {};
+//	if( !qry.Extra ) qry.Extra = {};
+//	if( !qry.showData) qry.showData = { 'noproject': 0}
+//	if( !qry.hiddenData) qry.hiddenData = { 'noproject': 0}
+//	if( !qry.Decimales) qry.Decimales = 2;
+////	if( !qry.Sort ) qry.Sort = {'fabricante': 1, 'marca': 1, 'especie': 1, 'rubro': 1, 'linea': 1, 'edad': 1, 'raza': 1	};
+//	if( !qry.Sort ) qry.Sort = { 'art_fullName': 1, 'contiene': 1, 'precio': 1 };
+////	console.log('Articulo',qry.Articulo);
+////	console.log('Producto',qry.Producto);
+////	console.log('Extra',qry.Extra);
+////	console.log('Extra.$and',qry.Extra['$and']);
+//	//const calculatedPrecioLista = precioLista(1.14);
+//	const aggr = [
+//		{ $match: qry.Producto },
+//		{
+//			$lookup: {
+//				from: "articulos",
+//				localField: "articulo",
+//				foreignField: "_id",
+//				as: "art"
+//			}
+//		},
+//		{
+//			$unwind: "$art"
+//		},
+//		{
+//			$project: {
+//				"_id": 1,
+//				"parent": 1,
+//				"name": 1,
+//				"contiene": { $ifNull: [ '$contiene', 1 ] },
+//				"strContiene": {$toString: '$contiene'},
+//				"unidad": { $ifNull: ['$unidad', ''] },
+//				"precio": 1,
+//				"compra": 1,
+//				"reposicion": { $ifNull: [ '$reposicion', '$compra' ] },
+//				"precio_desde":{ $ifNull: ['$precio_desde', zeroTime] },
+//				"precio_hasta":{ $ifNull: ['$precio_hasta', ahora] },
+//				"ahora": ahora,
+//				"compra_fecha":1,
+//				"reposicion_fecha":1,
+//				"pesable": 1,
+//				"servicio": 1,
+//				"pVenta": 1,
+//				"pCompra": 1,
+//				'codigo': { $ifNull: [ '$codigo', '' ] },
+//				'plu': { $ifNull: [ '$plu', '' ] },
+//				"stock": 1,
+//				"stockMin": 1,
+//				"iva": 1,
+//				"margen": 1,
+//				"articuloId": "$articulo",
+//				"image": {$cond: [ '$image', '$image', '$art.image']},
+//				'art_name': '$art.name',
+//				'art_fullName': art_name_template,
+//				'url': '$art.url',
+//				'art_image': '$art.image',
+//				'art_iva': '$art.iva',
+//				'fabricante': { $ifNull: [ '$art.fabricante', '' ] },
+//				'marca': { $ifNull: [ '$art.marca', '' ] },
+//				'rubro': { $ifNull: [ '$art.rubro', '' ] },
+//				'linea': { $ifNull: [ '$art.linea', '' ] },
+//				'especie': { $ifNull: [ '$art.especie', '' ] },
+//				'edad': { $ifNull: [ '$art.edad', '' ] },
+//				'raza': { $ifNull: [ '$art.raza', '' ] },
+//				'd_fabricante': '$art.d_fabricante',
+//				'd_marca': '$art.d_marca',
+//				'd_rubro': '$art.d_rubro',
+//				'd_linea': '$art.d_linea',
+//				'd_especie': '$art.d_especie',
+//				'd_raza': '$art.d_raza',
+//				'd_edad': '$art.d_edad',
+//				'tags': { $ifNull: [ '$art.tags', '' ] },
+//				'art_margen': '$art.margen',
+//				'private_web': { $ifNull: [ '$art.private_web', false ] },
+//				'formula': '$art.formula',
+//				'detalles': { $ifNull: [ '$art.detalles', '' ] },
+//				'beneficios': '$art.beneficios',
+//				'tipo': {
+//					$cond: ['$parent', 
+//						// Tine parent 
+//						1, 
+//						0
+//					]
+//				},
+//			}
+//		},
+//		{
+//			$lookup: producto_ins_template()
+//		},
+//		{
+//			$lookup: producto_parte_template()
+//		},
+//		{
+//			$lookup: producto_cerrado_template()
+//		},
+//		{
+//			$unwind: {
+//				path: '$parte',
+//				includeArrayIndex: 'count_parte',
+//				preserveNullAndEmptyArrays: true
+//			}				
+//		},
+//		{
+//			$unwind: {
+//				path: '$cerrado',
+//				includeArrayIndex: 'count_cerrado',
+//				preserveNullAndEmptyArrays: true
+//			}				
+//		},
+//		{
+//			$unwind: {
+//				path: '$ins',
+//				includeArrayIndex: 'count_ins',
+//				preserveNullAndEmptyArrays: true
+//			}				
+//		},
+//		{
+//			$project:
+//			{
+//				"_id": 1,
+//				"name": 1,
+//				"contiene": 1,
+//				"strContiene": {$cond: [{$eq:['$count_ins',0]}, {$concat: ['con ','$strContiene']}, '$strContiene']},
+//				"unidad": 1,
+//				"compra": 1,
+//				"reposicion": 1,
+//				"precio": 1,
+//				"precio_desde":1,
+//				"precio_hasta":1,
+//				"compra_fecha":1,
+//				"reposicion_fecha":1,
+//				"ahora":1,
+//				'lista': precioLista(1.0778521857),
+//				//'calc_precio': calculaPrecio(1,22.5,true),
+//				//'showPrecio': calculaPrecio(1,22.5,true),
+//				//'reventa': calculaPrecio(.85,18.5,true),
+//				//'reventa1': calculaPrecio(.43,14.5,true),
+//				//'reventa2': calculaPrecio(.1556,11.5,true),
+//				'calc_precio': calculaPrecio(1,15,true),
+//				//'showPrecio': calculaPrecio(1,15,true),
+//				//"showPrecio": { $cond: [ { $and: ['$precio', {$lte: [ahora,'$precio_hasta']}, {$gte: [ahora, '$precio_desde']}]}, '$precio', calculaPrecio(1,15,true)]}, 
+//				"showPrecio": { $cond: [ { $and: ['$precio', {$lte: [ahora,'$precio_hasta']}, {$gte: [ahora, '$precio_desde']}]}, '$precio', calculaPrecio(1,15,true)]}, 
+//				'reventa': calculaPrecio(.85,14,true),
+//				'reventa1': calculaPrecio(.43,12,true),
+//				'reventa2': calculaPrecio(.1556,10,true),
+//				'precioref': referencia(qry.Decimales),
+//				'sub': {
+//					$cond: [ {$eq: ['$count_ins',0]},
+//						'$ins',
+//						{$cond: [{$eq: ['$count_parte',0]},
+//							'$parte',
+//							{$cond: [{$eq: ['$count_cerrado',0]},
+//								'$cerrado',
+//								{'name':'','strContiene':'','unidad':''}
+//							]}
+//						]}
+//					]
+//				},
+//				"pesable": 1,
+//				"servicio": 1,
+//				"pVenta": 1,
+//				"pCompra": 1,
+//				'codigo': { $ifNull: [ '$codigo', '' ] },
+//				'plu': { $ifNull: [ '$plu', '' ] },
+//				"image": {$cond:[{$eq:[{ $strLenBytes: "$image" },0]},'$art_image','$image']},
+//				"stock":{ $floor: 
+//					{ $cond: [ {$eq: ['$count_parte', 0]}, 
+//						{ $multiply: ['$parte.stock', '$parte.contiene']}, 
+//						{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+//							{ $multiply: ['$cerrado.stock', '$cerrado.contiene']},
+//							{ $cond: [ {$eq: ['$ins_count',0]},
+//								{ $cond: [ {$gte: [ '$stock', 1] }, '$stock', 0]}, 
+//								{ $cond: [ {$gte: [ '$stock', 1] }, '$stock', 0]} 
+//							]}
+//						]}
+//					]}
+//				},
+//				"divisor": { $cond: [ {$eq: ['$count_parte', 0]}, 
+//					'$parte.contiene', 
+//					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+//						'$cerrado.contiene', 
+//						{ $cond: [ {$eq: ['$ins_count',0]},
+//							'$ins.contiene',
+//							1 ] }
+//						]}
+//					]
+//				},
+//				"scontiene": { $cond: [ {$eq: ['$count_parte', 0]}, 
+//					'', 
+//					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+//						'', 
+//						{ $cond: [ {$eq: ['$count_ins',0]},
+//							'$ins.contiene',
+//							'' ] }
+//						]}
+//					]
+//				},
+//				"sStrContiene": { $cond: [ {$eq: ['$count_parte', 0]}, 
+//					'', 
+//					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+//						'', 
+//						{ $cond: [ {$eq: ['$count_ins',0]},
+//							'$ins.strContiene',
+//							'' ] }
+//						]}
+//					]
+//				},
+//				"sname": { $cond: [ {$eq: ['$count_parte', 0]}, 
+//					'', 
+//					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+//						'', 
+//						{ $cond: [ {$eq: ['$count_ins',0]},
+//							'$ins.name',
+//							'' ] }
+//						]}
+//					]
+//				},
+//				"sunidad": { $cond: [ {$eq: ['$count_parte', 0]}, 
+//					'', 
+//					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+//						'', 
+//						{ $cond: [ {$eq: ['$count_ins',0]},
+//							'$ins.unidad',
+//							'' ] }
+//						]}
+//					]
+//				},
+//				"stockMin": 1,
+//				"iva": 1,
+//				"margen": 1,
+//				"articuloId": 1,
+//				"art_name": 1,
+//				"art_fullName": 1,
+//				"url": 1,
+//				"art_image": 1,
+//				"art_iva": 1,
+//				"fabricante": 1,
+//				"marca": 1,
+//				"rubro": 1,
+//				"linea": 1,
+//				"especie": 1,
+//				"edad": 1,
+//				"raza": 1,
+//				"d_fabricante": 1,
+//				"d_marca": 1,
+//				"d_especie": 1,
+//				"d_edad": 1,
+//				"d_raza": 1,
+//				"d_rubro": 1,
+//				"d_linea": 1,
+//				"tags": 1,
+//				"art_margen": 1,
+//				"tipo": 1,
+//				'ins': 1,
+//				'count_ins':1,
+//				'cerrado':1,
+//				'count_cerrado': 1,
+//				'parte':1,
+//				'formula': 1,
+//				'detalles': 1,
+//				'beneficios': 1,
+//				'count_parte': 1,
+//				'private_web': 1,
+//			}
+//		},
+//		{ 
+//			$project: {
+//				"_id": 1,
+//				"name": 1,
+//				"contiene": 1,
+//				"strContiene": 1,
+//				"compra": 1,
+//				"reposicion": 1,
+//				"precio_desde":1,
+//				"precio_hasta":1,
+//				"compra_fecha":1,
+//				"ahora":1,
+//				"ahorad": { '$lte': ['$precio_desde', ahora]},
+//				"ahorah": { '$gte': ['$precio_hasta', ahora]},
+//				"ahoracomp": { '$and': [ { '$lte': ['$precio_desde', ahora]}, { '$gte': ['$precio_hasta', ahora]}]},
+//				"reposicion_fecha":1,
+//				"precio":1,
+//				"calc_precio":1,
+//				"showPrecio":1,
+//				'reventa': 1,
+//				'reventa1': 1,
+//				'reventa2': 1,
+//				"precioref": 1,
+//				'sub': 1,
+//				"pesable": 1,
+//				"servicio": 1,
+//				"pVenta": 1,
+//				"pCompra": 1,
+//				'codigo': 1,
+//				'plu': 1,
+//				"image": 1,
+//				"stock":1,
+//				"divisor": 1,
+//				"scontiene": 1,
+//				"sStrContiene": 1,
+//				"sname": 1,
+//				"sunidad": 1,
+//				"stockMin": 1,
+//				"iva": 1,
+//				"margen": 1,
+//				"articuloId": 1,
+//				"art_name": 1,
+//				"art_fullName": 1,
+//				"url": 1,
+//				"art_image": 1,
+//				"art_iva": 1,
+//				"fabricante": 1,
+//				"marca": 1,
+//				"rubro": 1,
+//				"linea": 1,
+//				"especie": 1,
+//				"edad": 1,
+//				"raza": 1,
+//				"d_fabricante": 1,
+//				"d_marca": 1,
+//				"d_especie": 1,
+//				"d_edad": 1,
+//				"d_raza": 1,
+//				"d_rubro": 1,
+//				"d_linea": 1,
+//				"tags": 1,
+//				"art_margen": 1,
+//				"tipo": 1,
+//				'ins': 1,
+//				'count_ins':1,
+//				'cerrado':1,
+//				'count_cerrado': 1,
+//				'parte':1,
+//				'formula': 1,
+//				'detalles': 1,
+//				'beneficios': 1,
+//				'count_parte': 1,
+//				'private_web': 1,
+//				'fullName': producto_fullName_template(),
+//				'unidad': { 
+//					$cond: [
+//						{$eq:['$unidad','']},
+//						{$trim:{
+//							input: {
+//								$concat: [
+//									{ $cond: [{ $eq: ['$sname', '']}, '', ' ']},
+//									'$sname',
+//									{ $cond: [{ $eq: ['$sStrContiene', '']}, '', ' ']},
+//									'$sStrContiene',
+//									{ $cond: [{ $eq: ['$sunidad', '']}, '', ' ']},
+//									'$sunidad'
+//								]
+//							}
+//						}},
+//						'$unidad'
+//					]
+//				},
+//				'prodName': {
+//					$trim:{ 
+//						input: { 
+//							$concat: [
+//								'$name',
+//								{ $cond: [{ $eq: ['$strContiene', '']}, '', ' ']},
+//								'$strContiene',
+//								{ $cond: [{ $eq: ['$unidad', '']}, '', ' ']},
+//								'$unidad',
+//								{ $cond: [{ $eq: ['$sname', '']}, '', ' ']},
+//								'$sname',
+//								{ $cond: [{ $eq: ['$sStrContiene', '']}, '', ' ']},
+//								'$sStrContiene',
+//								{ $cond: [{ $eq: ['$sunidad', '']}, '', ' ']},
+//								'$sunidad'
+//							]
+//						}
+//					}
+//				}
+//			}
+//		},
+//		{ $project: qry.showData },
+//		{
+//			$match: qry.Extra
+//		},
+//		{
+//			$project: qry.hiddenData
+//		},
+//		{
+//			$sort: qry.Sort
+//		}
+//
+//	];
+//	let array:any;
+//	if (qry.limit){
+//		array = { data: await producto.aggregate(aggr).skip(qry.skip).limit(qry.limit), count: await producto.find(qry.Producto).count()};
+//	} else {
+//		array = await producto.aggregate(aggr);
+//	}
+//	
+////	console.log(qry.Sort)
+//	return array;
+//} 
 
+export const productoGetData = async function( qry: any, outProject?: any, hiddenData?: any ): Promise<IProducto[]> {
+	//	if(!outProject) outProject = productoFullTemplate;
+	//	if(!hiddenData) hiddenData = invalidData;
+		if( !qry.Producto ) qry.Producto = {};
+		if( !qry.Articulo ) qry.Articulo = {};
+		if( !qry.Extra ) qry.Extra = {};
+		if( !qry.showData) qry.showData = { 'noproject': 0}
+		if( !qry.hiddenData) qry.hiddenData = { 'noproject': 0}
+		if( !qry.Decimales) qry.Decimales = 2;
+		if( !qry.Sort ) qry.Sort = { 'art_fullName': 1, 'contiene': 1, 'precio': 1 };
+		const aggr = [
+			{ $match: qry.Producto },
 			{
-				"_id": 1,
-				"name": 1,
-				"contiene": 1,
-				"strContiene": {$cond: [{$eq:['$count_ins',0]}, {$concat: ['con ','$strContiene']}, '$strContiene']},
-				"unidad": 1,
-				"compra": 1,
-				"reposicion": 1,
-				"precio": 1,
-				"precio_desde":1,
-				"precio_hasta":1,
-				"compra_fecha":1,
-				"reposicion_fecha":1,
-				"ahora":1,
-				'lista': precioLista(1.14),
-				//'calc_precio': calculaPrecio(1,22.5,true),
-				//'showPrecio': calculaPrecio(1,22.5,true),
-				//'reventa': calculaPrecio(.85,18.5,true),
-				//'reventa1': calculaPrecio(.43,14.5,true),
-				//'reventa2': calculaPrecio(.1556,11.5,true),
-				'calc_precio': calculaPrecio(1,15,true),
-				'showPrecio': calculaPrecio(1,15,true),
-				'reventa': calculaPrecio(.85,14,true),
-				'reventa1': calculaPrecio(.43,12,true),
-				'reventa2': calculaPrecio(.1556,10,true),
-				'precioref': referencia(qry.Decimales),
-				'sub': {
-					$cond: [ {$eq: ['$count_ins',0]},
-						'$ins',
-						{$cond: [{$eq: ['$count_parte',0]},
-							'$parte',
-							{$cond: [{$eq: ['$count_cerrado',0]},
-								'$cerrado',
-								{'name':'','strContiene':'','unidad':''}
+				$lookup: {
+					from: "articulos",
+					localField: "articulo",
+					foreignField: "_id",
+					as: "art"
+				}
+			},
+			{
+				$unwind: "$art"
+			},
+			{
+				$project: {
+					"_id": 1,
+					"parent": 1,
+					"name": 1,
+					"contiene": { $ifNull: [ '$contiene', 1 ] },
+					"strContiene": {$toString: '$contiene'},
+					"unidad": { $ifNull: ['$unidad', ''] },
+					"precio": 1,
+					"compra": 1,
+					"reposicion": { $ifNull: [ '$reposicion', '$compra' ] },
+					"ahora": ahora,
+					"ahorad": { '$lte': ['$precio_desde', ahora]},
+					"ahorah": { '$gte': ['$precio_hasta', ahora]},
+					"ahoracomp": { '$and': [ { '$lte': ['$precio_desde', ahora]}, { '$gte': ['$precio_hasta', ahora]}]},
+					"precio_desde": 1, //{ $ifNull: ['$precio_desde', zeroTime] },
+					"precio_hasta": 1, //{ $ifNull: ['$precio_hasta', ahora] },
+					"reposicion_fecha":1,
+					"pesable": 1,
+					"servicio": 1,
+					"pVenta": 1,
+					"pCompra": 1,
+					'codigo': { $ifNull: [ '$codigo', '' ] },
+					'plu': { $ifNull: [ '$plu', '' ] },
+					"stock": 1,
+					"stockMin": 1,
+					"iva": 1,
+					"margen": 1,
+					"articuloId": "$articulo",
+					"image": {$cond: [ '$image', '$image', '$art.image']},
+					'art_name': '$art.name',
+					'art_fullName': art_name_template,
+					'url': '$art.url',
+					'art_image': '$art.image',
+					'art_iva': '$art.iva',
+					'fabricante': { $ifNull: [ '$art.fabricante', '' ] },
+					'marca': { $ifNull: [ '$art.marca', '' ] },
+					'rubro': { $ifNull: [ '$art.rubro', '' ] },
+					'linea': { $ifNull: [ '$art.linea', '' ] },
+					'especie': { $ifNull: [ '$art.especie', '' ] },
+					'edad': { $ifNull: [ '$art.edad', '' ] },
+					'raza': { $ifNull: [ '$art.raza', '' ] },
+					'd_fabricante': '$art.d_fabricante',
+					'd_marca': '$art.d_marca',
+					'd_rubro': '$art.d_rubro',
+					'd_linea': '$art.d_linea',
+					'd_especie': '$art.d_especie',
+					'd_raza': '$art.d_raza',
+					'd_edad': '$art.d_edad',
+					'tags': { $ifNull: [ '$art.tags', '' ] },
+					'art_margen': '$art.margen',
+					'private_web': { $ifNull: [ '$art.private_web', false ] },
+					'formula': '$art.formula',
+					'detalles': { $ifNull: [ '$art.detalles', '' ] },
+					'beneficios': '$art.beneficios',
+					'tipo': {
+						$cond: ['$parent', 
+							// Tine parent 
+							1, 
+							0
+						]
+					},
+				}
+			},
+			{
+				$lookup: producto_ins_template()
+			},
+			{
+				$lookup: producto_parte_template()
+			},
+			{
+				$lookup: producto_cerrado_template()
+			},
+			{
+				$unwind: {
+					path: '$parte',
+					includeArrayIndex: 'count_parte',
+					preserveNullAndEmptyArrays: true
+				}				
+			},
+			{
+				$unwind: {
+					path: '$cerrado',
+					includeArrayIndex: 'count_cerrado',
+					preserveNullAndEmptyArrays: true
+				}				
+			},
+			{
+				$unwind: {
+					path: '$ins',
+					includeArrayIndex: 'count_ins',
+					preserveNullAndEmptyArrays: true
+				}				
+			},
+			{
+				$project:
+				{
+					"_id": 1,
+					"parent": 1,
+					"name": 1,
+					"contiene": 1,
+					"unidad": 1,
+					"precio": 1,
+					"compra": 1,
+					"reposicion": 1,
+					"precio_desde": 1,
+					"precio_hasta": 1,
+					"ahora": 1,
+					"ahorad": 1,
+					"ahorah": 1,
+					"ahoracomp": 1,
+					"reposicion_fecha":1,
+					"pesable": 1,
+					"servicio": 1,
+					"pVenta": 1,
+					"pCompra": 1,
+					'codigo': 1,
+					'plu': 1,
+					"stockMin": 1,
+					"iva": 1,
+					"margen": 1,
+					"articuloId": 1,
+					"image": {$cond:[{$eq:[{ $strLenBytes: "$image" },0]},'$art_image','$image']},
+					'art_name': 1,
+					'art_fullName': 1,
+					'url': 1,
+					'art_image': 1,
+					'art_iva': 1,
+					'fabricante': 1,
+					'marca': 1,
+					'rubro': 1,
+					'linea': 1,
+					'especie': 1,
+					'edad': 1,
+					'raza': 1,
+					'd_fabricante': 1,
+					'd_marca': 1,
+					'd_rubro': 1,
+					'd_linea': 1,
+					'd_especie': 1,
+					'd_raza': 1,
+					'd_edad': 1,
+					'tags': 1,
+					'art_margen': 1,
+					'private_web': 1,
+					'formula': 1,
+					'detalles': 1,
+					'beneficios': 1,
+					'tipo': 1,
+					'ins': 1,
+					'count_ins':1,
+					'cerrado':1,
+					'count_cerrado': 1,
+					'parte':1,
+					'count_parte': 1,
+					"strContiene": {$cond: [{$eq:['$count_ins',0]}, {$concat: ['con ','$strContiene']}, '$strContiene']},
+					'lista': precioLista(1.0778521857),
+					//'calc_precio': calculaPrecio(1,22.5,true),
+					//'showPrecio': calculaPrecio(1,22.5,true),
+					//'reventa': calculaPrecio(.85,18.5,true),
+					//'reventa1': calculaPrecio(.43,14.5,true),
+					//'reventa2': calculaPrecio(.1556,11.5,true),
+					'calc_precio': calculaPrecio(1,15,true),
+					//'showPrecio': calculaPrecio(1,15,true),
+					//"showPrecio": { $cond: [ { $and: ['$precio', {$lte: [ahora,'$precio_hasta']}, {$gte: [ahora, '$precio_desde']}]}, '$precio', calculaPrecio(1,15,true)]}, 
+					"showPrecio": { $cond: [ { $and: ['$precio', {$lte: [ahora,'$precio_hasta']}, {$gte: [ahora, '$precio_desde']}]}, '$precio', calculaPrecio(1,15,true)]}, 
+					'reventa': calculaPrecio(.85,14,true),
+					'reventa1': calculaPrecio(.43,12,true),
+					'reventa2': calculaPrecio(.1556,10,true),
+					'sub': {
+						$cond: [ {$eq: ['$count_ins',0]},
+							'$ins',
+							{$cond: [{$eq: ['$count_parte',0]},
+								'$parte',
+								{$cond: [{$eq: ['$count_cerrado',0]},
+									'$cerrado',
+									{'name':'','strContiene':'','unidad':''}
+								]}
+							]}
+						]
+					},
+					"stock":{ $floor: 
+						{ $cond: [ {$eq: ['$count_parte', 0]}, 
+							{ $multiply: ['$parte.stock', '$parte.contiene']}, 
+							{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+								{ $multiply: ['$cerrado.stock', '$cerrado.contiene']},
+								{ $cond: [ {$eq: ['$ins_count',0]},
+									{ $cond: [ {$gte: [ '$stock', 1] }, '$stock', 0]}, 
+									{ $cond: [ {$gte: [ '$stock', 1] }, '$stock', 0]} 
+								]}
 							]}
 						]}
-					]
-				},
-				"pesable": 1,
-				"servicio": 1,
-				"pVenta": 1,
-				"pCompra": 1,
-				'codigo': { $ifNull: [ '$codigo', '' ] },
-				'plu': { $ifNull: [ '$plu', '' ] },
-				"image": {$cond:[{$eq:[{ $strLenBytes: "$image" },0]},'$art_image','$image']},
-				"stock":{ $floor: 
-					{ $cond: [ {$eq: ['$count_parte', 0]}, 
-						{ $multiply: ['$parte.stock', '$parte.contiene']}, 
+					},
+					"divisor": { $cond: [ {$eq: ['$count_parte', 0]}, 
+						'$parte.contiene', 
 						{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-							{ $multiply: ['$cerrado.stock', '$cerrado.contiene']},
+							'$cerrado.contiene', 
 							{ $cond: [ {$eq: ['$ins_count',0]},
-								{ $cond: [ {$gte: [ '$stock', 1] }, '$stock', 0]}, 
-								{ $cond: [ {$gte: [ '$stock', 1] }, '$stock', 0]} 
+								'$ins.contiene',
+								1 ] }
 							]}
-						]}
-					]}
-				},
-				"divisor": { $cond: [ {$eq: ['$count_parte', 0]}, 
-					'$parte.contiene', 
-					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
-						'$cerrado.contiene', 
-						{ $cond: [ {$eq: ['$ins_count',0]},
-							'$ins.contiene',
-							1 ] }
-						]}
-					]
-				},
-				"scontiene": { $cond: [ {$eq: ['$count_parte', 0]}, 
-					'', 
-					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+						]
+					},
+					"scontiene": { $cond: [ {$eq: ['$count_parte', 0]}, 
 						'', 
-						{ $cond: [ {$eq: ['$count_ins',0]},
-							'$ins.contiene',
-							'' ] }
-						]}
-					]
-				},
-				"sStrContiene": { $cond: [ {$eq: ['$count_parte', 0]}, 
-					'', 
-					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+						{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+							'', 
+							{ $cond: [ {$eq: ['$count_ins',0]},
+								'$ins.contiene',
+								'' ] }
+							]}
+						]
+					},
+					"sStrContiene": { $cond: [ {$eq: ['$count_parte', 0]}, 
 						'', 
-						{ $cond: [ {$eq: ['$count_ins',0]},
-							'$ins.strContiene',
-							'' ] }
-						]}
-					]
-				},
-				"sname": { $cond: [ {$eq: ['$count_parte', 0]}, 
-					'', 
-					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+						{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+							'', 
+							{ $cond: [ {$eq: ['$count_ins',0]},
+								'$ins.strContiene',
+								'' ] }
+							]}
+						]
+					},
+					"sname": { $cond: [ {$eq: ['$count_parte', 0]}, 
 						'', 
-						{ $cond: [ {$eq: ['$count_ins',0]},
-							'$ins.name',
-							'' ] }
-						]}
-					]
-				},
-				"sunidad": { $cond: [ {$eq: ['$count_parte', 0]}, 
-					'', 
-					{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+						{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+							'', 
+							{ $cond: [ {$eq: ['$count_ins',0]},
+								'$ins.name',
+								'' ] }
+							]}
+						]
+					},
+					"sunidad": { $cond: [ {$eq: ['$count_parte', 0]}, 
 						'', 
-						{ $cond: [ {$eq: ['$count_ins',0]},
-							'$ins.unidad',
-							'' ] }
-						]}
-					]
-				},
-				"stockMin": 1,
-				"iva": 1,
-				"margen": 1,
-				"articuloId": 1,
-				"art_name": 1,
-				"art_fullName": 1,
-				"url": 1,
-				"art_image": 1,
-				"art_iva": 1,
-				"fabricante": 1,
-				"marca": 1,
-				"rubro": 1,
-				"linea": 1,
-				"especie": 1,
-				"edad": 1,
-				"raza": 1,
-				"d_fabricante": 1,
-				"d_marca": 1,
-				"d_especie": 1,
-				"d_edad": 1,
-				"d_raza": 1,
-				"d_rubro": 1,
-				"d_linea": 1,
-				"tags": 1,
-				"art_margen": 1,
-				"tipo": 1,
-				'ins': 1,
-				'count_ins':1,
-				'cerrado':1,
-				'count_cerrado': 1,
-				'parte':1,
-				'formula': 1,
-				'detalles': 1,
-				'beneficios': 1,
-				'count_parte': 1,
-				'private_web': 1,
-			}
-		},
-		{ 
-			$project: {
-				"_id": 1,
-				"name": 1,
-				"contiene": 1,
-				"strContiene": 1,
-				"compra": 1,
-				"reposicion": 1,
-				"precio_desde":1,
-				"precio_hasta":1,
-				"compra_fecha":1,
-				"ahora":1,
-				"ahorad": { '$lte': ['$precio_desde', ahora]},
-				"ahorah": { '$gte': ['$precio_hasta', ahora]},
-				"ahoracomp": { '$and': [ { '$lte': ['$precio_desde', ahora]}, { '$gte': ['$precio_hasta', ahora]}]},
-				"reposicion_fecha":1,
-				"precio": {
-					$cond: [ { '$and': [ { '$lte': ['$precio_desde', ahora]}, { '$gte': ['$precio_hasta', ahora]} ]},
-						'$precio',	
-						'$calc_precio'
-					]
-				},
-				'calc_precio': {
-					$cond: [ { '$and': [ {'$lte': ['$precio', '$calc_precio']}, { '$lte': ['$precio_desde', ahora]}, { '$gte': ['$precio_hasta', ahora]} ]},
-						'$precio',	
-						'$calc_precio'
-					]
-				},
-				'lista': 1,
-				'showPrecio': {
-					$cond: [ { '$and': [ {'$lte': ['$precio', '$showPrecio']}, { '$lte': ['$precio_desde', ahora]}, { '$gte': ['$precio_hasta', ahora]} ]},
-						'$precio',	
-						'$showPrecio'
-					]
-				},
-				'reventa': 1,
-				'reventa1': 1,
-				'reventa2': 1,
-				"precioref": 1,
-				'sub': 1,
-				"pesable": 1,
-				"servicio": 1,
-				"pVenta": 1,
-				"pCompra": 1,
-				'codigo': 1,
-				'plu': 1,
-				"image": 1,
-				"stock":1,
-				"divisor": 1,
-				"scontiene": 1,
-				"sStrContiene": 1,
-				"sname": 1,
-				"sunidad": 1,
-				"stockMin": 1,
-				"iva": 1,
-				"margen": 1,
-				"articuloId": 1,
-				"art_name": 1,
-				"art_fullName": 1,
-				"url": 1,
-				"art_image": 1,
-				"art_iva": 1,
-				"fabricante": 1,
-				"marca": 1,
-				"rubro": 1,
-				"linea": 1,
-				"especie": 1,
-				"edad": 1,
-				"raza": 1,
-				"d_fabricante": 1,
-				"d_marca": 1,
-				"d_especie": 1,
-				"d_edad": 1,
-				"d_raza": 1,
-				"d_rubro": 1,
-				"d_linea": 1,
-				"tags": 1,
-				"art_margen": 1,
-				"tipo": 1,
-				'ins': 1,
-				'count_ins':1,
-				'cerrado':1,
-				'count_cerrado': 1,
-				'parte':1,
-				'formula': 1,
-				'detalles': 1,
-				'beneficios': 1,
-				'count_parte': 1,
-				'private_web': 1,
-				'fullName': producto_fullName_template()
-				,'unidad': { $cond: [{$eq:['$unidad','']},
-														{$trim:{
-															input: {
-																$concat: [
-																	{ $cond: [{ $eq: ['$sname', '']}, '', ' ']},
-																	'$sname',
-																	{ $cond: [{ $eq: ['$sStrContiene', '']}, '', ' ']},
-																	'$sStrContiene',
-																	{ $cond: [{ $eq: ['$sunidad', '']}, '', ' ']},
-																	'$sunidad'
-																]
-															}
-														}},
-														'$unidad']}
-				,'prodName': {
-					$trim:{ 
-						input: { 
-							$concat: [
-								'$name',
-								{ $cond: [{ $eq: ['$strContiene', '']}, '', ' ']},
-								'$strContiene',
-								{ $cond: [{ $eq: ['$unidad', '']}, '', ' ']},
-								'$unidad',
-								{ $cond: [{ $eq: ['$sname', '']}, '', ' ']},
-								'$sname',
-								{ $cond: [{ $eq: ['$sStrContiene', '']}, '', ' ']},
-								'$sStrContiene',
-								{ $cond: [{ $eq: ['$sunidad', '']}, '', ' ']},
-								'$sunidad'
-							]
+						{ $cond: [ {$eq:[ '$count_cerrado', 0 ]}, 
+							'', 
+							{ $cond: [ {$eq: ['$count_ins',0]},
+								'$ins.unidad',
+								'' ] }
+							]}
+						]
+					},
+				}
+			},
+			{ 
+				$project: {
+					"_id": 1,
+					"parent": 1,
+					"name": 1,
+					"contiene": 1,
+					"precio": 1,
+					"compra": 1,
+					"reposicion": 1,
+					"precio_desde": 1,
+					"precio_hasta": 1,
+					"ahora": 1,
+					"ahorad": 1,
+					"ahorah": 1,
+					"ahoracomp": 1,
+					"reposicion_fecha":1,
+					"pesable": 1,
+					"servicio": 1,
+					"pVenta": 1,
+					"pCompra": 1,
+					'codigo': 1,
+					'plu': 1,
+					"stockMin": 1,
+					"iva": 1,
+					"margen": 1,
+					"articuloId": 1,
+					"image": 1,
+					'art_name': 1,
+					'art_fullName': 1,
+					'url': 1,
+					'art_image': 1,
+					'art_iva': 1,
+					'fabricante': 1,
+					'marca': 1,
+					'rubro': 1,
+					'linea': 1,
+					'especie': 1,
+					'edad': 1,
+					'raza': 1,
+					'd_fabricante': 1,
+					'd_marca': 1,
+					'd_rubro': 1,
+					'd_linea': 1,
+					'd_especie': 1,
+					'd_raza': 1,
+					'd_edad': 1,
+					'tags': 1,
+					'art_margen': 1,
+					'private_web': 1,
+					'formula': 1,
+					'detalles': 1,
+					'beneficios': 1,
+					'tipo': 1,
+					'ins': 1,
+					'count_ins':1,
+					'cerrado':1,
+					'count_cerrado': 1,
+					'parte':1,
+					'count_parte': 1,
+					"strContiene": {$cond: [{$eq:['$count_ins',0]}, {$concat: ['con ','$strContiene']}, '$strContiene']},
+					'lista': 1,
+					'calc_precio': 1,
+					"showPrecio": 1, 
+					'reventa': { $cond: [{$lt:['$reventa','$showPrecio']},'$reventa','$showPrecio']},
+					'reventa1': { $cond: [{$lt:['$reventa1','$showPrecio']},'$reventa1','$showPrecio']},
+					'reventa2': { $cond: [{$lt:['$reventa2','$showPrecio']},'$reventa2','$showPrecio']},
+					"oferta": {$lt:['$showPrecio','$calc_precio']}, 
+					'precioref': {
+						$round: [
+							{ $divide: ['$showPrecio', '$contiene' ] },
+							qry.Decimales
+						]
+					},//referencia(qry.Decimales),
+					'sub': 1,
+					"stock":1,
+					"divisor": 1,
+					"scontiene": 1,
+					"sStrContiene": 1,
+					"sname": 1,
+					"sunidad": 1,
+					'fullName': producto_fullName_template(),
+					'unidad': { 
+						$cond: [
+							{$eq:['$unidad','']},
+							{
+								$trim:{
+									input: {
+										$concat: [
+											{ $cond: [{ $eq: ['$sname', '']}, '', ' ']},
+											'$sname',
+											{ $cond: [{ $eq: ['$sStrContiene', '']}, '', ' ']},
+											'$sStrContiene',
+											{ $cond: [{ $eq: ['$sunidad', '']}, '', ' ']},
+											'$sunidad'
+										]
+									}
+								}
+							},
+							'$unidad'
+						]
+					},
+					'prodName': {
+						$trim:{ 
+							input: { 
+								$concat: [
+									'$name',
+									{ $cond: [{ $eq: ['$strContiene', '']}, '', ' ']},
+									'$strContiene',
+									{ $cond: [{ $eq: ['$unidad', '']}, '', ' ']},
+									'$unidad',
+									{ $cond: [{ $eq: ['$sname', '']}, '', ' ']},
+									'$sname',
+									{ $cond: [{ $eq: ['$sStrContiene', '']}, '', ' ']},
+									'$sStrContiene',
+									{ $cond: [{ $eq: ['$sunidad', '']}, '', ' ']},
+									'$sunidad'
+								]
+							}
 						}
 					}
 				}
-
+			},
+			{ $project: qry.showData },
+			{
+				$match: qry.Extra
+			},
+			{
+				$project: qry.hiddenData
+			},
+			{
+				$sort: qry.Sort
 			}
-		},
-		{ $project: qry.showData },
-		{
-			$match: qry.Extra
-		},
-		{
-			$project: qry.hiddenData
-		},
-		{
-			$sort: qry.Sort
-		}
-
-	];
-	let array:any;
-	if (qry.limit){
-		array = { data: await producto.aggregate(aggr).skip(qry.skip).limit(qry.limit), count: await producto.find(qry.Producto).count()};
-	} else {
-		array = await producto.aggregate(aggr);
-	}
 	
-//	console.log(qry.Sort)
-	return array;
-} 
-
+		];
+		let array:any;
+		if (qry.limit){
+			array = { data: await producto.aggregate(aggr).skip(qry.skip).limit(qry.limit), count: await producto.find(qry.Producto).count()};
+		} else {
+			array = await producto.aggregate(aggr);
+		}
+		
+	//	console.log(qry.Sort)
+		return array;
+	} 
+	
 class ProductoControler {
 
 	public router: Router = Router();
@@ -1975,42 +2406,39 @@ class ProductoControler {
 		const fbShowData = {
 			id: { $cond: [{ $eq:['$codigo', '']},'$_id','$codigo']},
 			'title': '$fullName',
-			//{
-			//	$trim: 
-			//	{ input: 
-			//		{ $concat: [
-			//			'$art_name', 
-			//			{ $cond: [{ $eq: ['$name', '']}, '', ' ']},
-			//			'$name',
-			//			{ $cond: [{ $eq: ['$strContiene', '']}, '', ' ']},
-			//			'$strContiene',
-			//			{ $cond: [{ $eq: ['$unidad', '']}, '', ' ']},
-			//			'$unidad',
-			//			{ $cond: [{ $eq: ['$sname', '']}, '', ' ']},
-			//			'$sname',
-			//			{ $cond: [{ $eq: ['$sStrContiene', '']}, '', ' ']},
-			//			'$sStrContiene',
-			//			{ $cond: [{ $eq: ['$sunidad', '']}, '', ' ']},
-			//			'$sunidad'
-			//			]
-			//		}
-			//	}
-			//},
+			//'rich_text_description': { $cond: [{ $eq: ['$detalles', '']}, '$art_fullName','$detalles'] },
 			'description': { $cond: [{ $eq: ['$detalles', '']}, '$art_fullName','$detalles'] },
-//			'description': 'probando la descripción otra linea',
-//			'availability': 'in stock',
-
 			'availability': {
 				$cond: [ {$gte: [ '$stock', 1] }, 'in stock', 'out of stock'] 
 			},
-
 			'condition': 'new',
 			'price':{
 				$concat: [{ 
 					$cond: [ { $eq:['$pesable', true] },
-									{$toString: { $ceil:  '$showPrecio'  }},
-									{$toString: { $multiply: [ { $ceil:{ $divide:['$showPrecio',10]}},10]}}
+									{$toString: { $ceil:  '$calc_precio'  }},
+									{$toString: { $multiply: [ { $ceil:{ $divide:['$calc_precio',10]}},10]}}
 								]}, ' ARS']
+			},
+			'sale_price': { 
+				$cond: [ { $and: ['$precio', {$lte: [ahora,'$precio_hasta']}, {$gte: [ahora, '$precio_desde']}]}, 
+					{
+						$concat: [{ 
+							$cond: [ { $eq:['$pesable', true] },
+										{$toString: '$precio'},
+										{$toString: { $multiply: [ { $ceil:{ $divide:['$precio',10]}},10]}}
+							]}, ' ARS']
+					}, 
+					{
+						$concat: [{ 
+							$cond: [ { $eq:['$pesable', true] },
+											{$toString: { $ceil:  '$calc_precio'  }},
+											{$toString: { $multiply: [ { $ceil:{ $divide:['$calc_precio',10]}},10]}}
+										]}, ' ARS']
+					}
+				]
+			},
+			'sale_price_effective_date': {
+				$concat: [ { $toString: '$precio_desde' },'/',{ $toString: '$precio_hasta' }]
 			},
 			'link': {
 				$concat: ['https://firulais.net.ar/producto/',{$toString: '$_id'}]
@@ -2051,104 +2479,25 @@ class ProductoControler {
 					]}
 				]
 			},
-			'google_product_category': { 
-				$cond: [ { $in:['$especie', ['Perro','perro', 'Perros', 'perros']] },
-					'Animals & Pet Supplies > Pet Supplies > Dog Supplies',
-					{	$cond: [ { $in:['$especie',['Gato','gato', 'Gatos', 'gatos']]},
-						'Animals & Pet Supplies > Pet Supplies > Cat Supplies',
-						{ $cond: [ { $in:['$especie', ['Ave', 'ave', 'Aves', 'aves']]}, 
-							'Animals & Pet Supplies > Pet Supplies > Bird Supplies',
-							'Animals & Pet Supplies > Pet Supplies'
-						]}
-					]}
-				]
-			},
-/*
-			'google_product_category':
-			{	$concat: [
-				{ $cond: [{ $eq:['$fabricante', '']}, '', 
-					{ $cond: [ { $or: [ 
-												{$ne: ['$marca','']}, 
-												{$ne: ['$rubro','']}, 
-												{$ne: ['$linea','']}, 
-												{$ne: ['$especie','']}, 
-												{$ne: ['$edad','']}, 
-												{$ne: ['$raza','']} 
-											]}, 
-											{ $concat:['$fabricante',' > ']},
-											'$fabricante'
-										]}
-				]},
-				{ $cond: [{ $eq:['$marca', '']}, '', 
-					{ $cond: [ { $or: [ 
-												{$ne: ['$rubro','']}, 
-												{$ne: ['$linea','']}, 
-												{$ne: ['$especie','']}, 
-												{$ne: ['$edad','']}, 
-												{$ne: ['$raza','']} 
-											]}, 
-											{ $concat:['$marca',' > ']},
-											'$marca'
-										]}
-				]},
-				{ $cond: [{ $eq:['$rubro', '']}, '', 
-					{ $cond: [ { $or: [ 
-												{$ne: ['$linea','']}, 
-												{$ne: ['$especie','']}, 
-												{$ne: ['$edad','']}, 
-												{$ne: ['$raza','']} 
-											]}, 
-											{ $concat:['$rubro',' > ']},
-											'$rubro'
-										]}
-				]},
-				{ $cond: [{ $eq:['$linea', '']}, '', 
-					{ $cond: [ { $or: [ 
-												{$ne: ['$especie','']}, 
-												{$ne: ['$edad','']}, 
-												{$ne: ['$raza','']} 
-											]}, 
-											{ $concat:['$linea',' > ']},
-											'$linea'
-										]}
-				]},
-				{ $cond: [{ $eq:['$especie', '']}, '', 
-					{ $cond: [ { $or: [ 
-												{$ne: ['$edad','']}, 
-												{$ne: ['$raza','']} 
-											]}, 
-											{ $concat:['$especie',' > ']},
-											'$especie'
-										]}
-				]},
-				{ $cond: [{ $eq:['$edad', '']}, '', 
-					{ $cond: [ { $or: [ 
-												{$ne: ['$raza','']} 
-											]}, 
-											{ $concat:['$edad',' > ']},
-											'$edad'
-										]}
-				]},
-				{ $cond: [{ $eq:['$raza', '']}, '', '$raza']}
-
-			]},
-*/
+			//'google_product_category': { 
+			//	$cond: [ { $in:['$especie', ['Perro','perro', 'Perros', 'perros']] },
+			//		'Animals & Pet Supplies > Pet Supplies > Dog Supplies',
+			//		{	$cond: [ { $in:['$especie',['Gato','gato', 'Gatos', 'gatos']]},
+			//			'Animals & Pet Supplies > Pet Supplies > Cat Supplies',
+			//			{ $cond: [ { $in:['$especie', ['Ave', 'ave', 'Aves', 'aves']]}, 
+			//				'Animals & Pet Supplies > Pet Supplies > Bird Supplies',
+			//				'Animals & Pet Supplies > Pet Supplies'
+			//			]}
+			//		]}
+			//	]
+			//},
 			'item_group_id': '$articuloId',
 			'custom_label_0': '$marca',
-			'custom_label_1': '$rubro',
-			'custom_label_2': '$linea',
-			'custom_label_3': '$especie',
-			'custom_label_4': '$edad',
+			'custom_label_1': '$especie',
+			'custom_label_2': '$raza',
+			'custom_label_3': '$edad',
+			'custom_label_4': '$rubro',
 			'visibility': 'published',
-/*
-			'fabricante': 1,
-			'marca': 1,
-			'rubro': 1,
-			'linea': 1,
-			'especie': 1,
-			'edad': 1,
-			'raza': 1,
-*/
 			'_id': 0
 		/*
 			'quantity_to_sell_on_facebook': '$stock',
@@ -2168,26 +2517,27 @@ class ProductoControler {
 			'id',
 			'title',
 			'description',
+			'rich_text_description',
 			'availability',
 			'condition',
 			'price',
+			'sale_price',
+			'sale_price_effective_date',
 			'link',
 			'image_link',
 			'brand',
 			'fb_product_category',
-			'google_product_category',
+			//'google_product_category',
 			'item_group_id',
 			'visibility',
-/*
 			'custom_label_0',
 			'custom_label_1',
 			'custom_label_2',
 			'custom_label_3',
 			'custom_label_4'
-		*/
 		]
 		let qry:any = {}; //req.body;
-		qry.Producto = { pesable: {$ne: true }, pVenta: true, compra: { $gt: 0 } }
+		qry.Producto = { pesable: {$ne: true }, pVenta: true, reposicion: { $gt: 0 } }
 
 		const artList:any = await articulos.find({'private_web': { $ne: true }});
 		for (let index = 0; index < artList.length; index++) {
@@ -2239,7 +2589,6 @@ class ProductoControler {
 		res.set({'Content-Disposition': 'attachment; filename=\"fbproduct.csv\"','Content-type': 'text/csv'})
 		res.send(retData);
 //		res.status(200).write(retData)
-
 	}
 }
 
